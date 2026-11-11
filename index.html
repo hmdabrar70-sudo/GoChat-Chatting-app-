@@ -312,6 +312,23 @@
 .profile-username{font-size:14px;font-weight:650;color:var(--muted);margin-top:2px;margin-bottom:2px}
 .profile-username:not([hidden]){display:block}
 
+
+.voice-rec-bar{display:flex;align-items:center;gap:10px;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line);flex:none}
+.voice-rec-bar[hidden]{display:none !important}
+.voice-rec-cancel,.voice-rec-send{border:none;border-radius:20px;padding:8px 14px;font-weight:750;font-size:14px;cursor:pointer}
+.voice-rec-cancel{background:var(--surface2);color:var(--text)}
+.voice-rec-send{background:var(--accent);color:#fff}
+.voice-rec-mid{flex:1;display:flex;align-items:center;justify-content:center;gap:10px}
+.voice-rec-dot{width:10px;height:10px;border-radius:50%;background:#e03131;animation:voicePulse 1s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+.voice-rec-time{font-variant-numeric:tabular-nums;font-weight:800;font-size:16px;letter-spacing:.3px}
+.composer.voice-hidden{display:none !important}
+
+
+.story-reply-unavailable{padding:28px 14px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);background:rgba(0,0,0,.04)}
+.msg.mine .story-reply-unavailable{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.story-reply-unavailable.soft{padding:40px 14px}
+
 /* Skeleton loading */
 .sk-wrap{padding:6px 0 12px}
 .sk-row{display:flex;align-items:center;gap:12px;padding:12px 4px}
@@ -380,7 +397,15 @@
 <button class="nav-item" data-page="storiesPage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M10.0957 2.00445C6.62194 2.03072 4.71683 2.2121 3.46447 3.46447C2.6068 4.32213 2.25143 5.48593 2.10418 7.25002H6.59861L10.0957 2.00445Z"/><path fill="currentColor" d="M2.02644 8.75002C2 9.68875 2 10.7633 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 10.7633 22 9.68875 21.9736 8.75002H2.02644Z"/><path fill="currentColor" d="M21.8958 7.25002C21.7486 5.48593 21.3932 4.32213 20.5355 3.46447C19.9382 2.86714 19.1924 2.51345 18.1987 2.30403L14.9014 7.25002H21.8958Z"/><path fill="currentColor" d="M16.5401 2.08783C15.3293 2 13.8452 2 12 2C11.967 2 11.9342 2 11.9014 2L8.40139 7.25002H13.0986L16.5401 2.08783Z"/></svg><span>Stories</span></button>
 <button class="nav-item nav-item-profile" data-page="settingsPage" type="button"><img class="nav-user-avatar" id="navAvatar" alt="Profile"><span>Profile</span></button>
 </nav></div>
-<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header><div class="messages" id="messages"></div><div id="replyBar" class="reply-bar"><span id="replyText"></span><button id="cancelReply">Cancel</button></div><form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section><div id="toast" class="toast"></div>
+<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header><div class="messages" id="messages"></div><div id="replyBar" class="reply-bar"><span id="replyText"></span><button id="cancelReply">Cancel</button></div><div id="voiceRecBar" class="voice-rec-bar" hidden>
+  <button type="button" class="voice-rec-cancel" id="voiceRecCancel" aria-label="Cancel recording">Cancel</button>
+  <div class="voice-rec-mid">
+    <span class="voice-rec-dot" aria-hidden="true"></span>
+    <span class="voice-rec-time" id="voiceRecTime">0:00</span>
+  </div>
+  <button type="button" class="voice-rec-send" id="voiceRecSend" aria-label="Send voice">Send</button>
+</div>
+<form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section><div id="toast" class="toast"></div>
 
 <div id="mediaViewer" class="media-viewer" aria-hidden="true">
   <div class="zoom-actions-capsule" onclick="event.stopPropagation()">
@@ -814,23 +839,32 @@ function renderStoryReplyAttachment(m, mine){
   var isVid = !!(m.sharedStoryIsVideo || m.sharedStoryVideo);
   var thumb = isVid ? (m.sharedStoryVideo || m.sharedStoryImg || '') : (m.sharedStoryImg || m.sharedStoryVideo || '');
   var owner = m.sharedStoryOwner || 'Story';
+  var ownerUid = m.sharedStoryOwnerUid || m.sharedStoryUid || '';
+  var storyId = m.sharedStoryId || '';
   var text = (m.text || '').trim();
+  var unavailable = !!(m.storyUnavailable);
   var mediaHtml = '';
-  if(thumb){
-    if(isVid){
+  if(unavailable){
+    mediaHtml = '<div class="story-reply-unavailable">Story unavailable</div>';
+  } else if(thumb || storyId){
+    if(isVid && thumb){
       var poster = thumb;
       try{
         if(thumb.indexOf('/video/upload/') !== -1){
           poster = thumb.replace('/video/upload/', '/video/upload/so_0,f_jpg,w_480,c_fill/');
         }
       }catch(e){}
-      mediaHtml = '<div class="story-reply-media" data-full="'+esc(thumb)+'" data-kind="video">'
+      mediaHtml = '<div class="story-reply-media" data-story-id="'+esc(storyId)+'" data-story-uid="'+esc(ownerUid)+'" data-full="'+esc(thumb)+'" data-kind="video">'
         + '<img src="'+esc(poster)+'" alt="" loading="lazy">'
         + '<span class="story-reply-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>'
         + '</div>';
+    } else if(thumb){
+      mediaHtml = '<div class="story-reply-media" data-story-id="'+esc(storyId)+'" data-story-uid="'+esc(ownerUid)+'" data-full="'+esc(thumb)+'" data-kind="image">'
+        + '<img src="'+esc(thumb)+'" alt="" loading="lazy">'
+        + '</div>';
     } else {
-      mediaHtml = '<div class="story-reply-media" data-full="'+esc(thumb)+'" data-kind="image">'
-        + '<img src="'+esc(thumb)+'" alt="" loading="lazy" data-full="'+esc(thumb)+'" data-kind="image">'
+      mediaHtml = '<div class="story-reply-media" data-story-id="'+esc(storyId)+'" data-story-uid="'+esc(ownerUid)+'">'
+        + '<div class="story-reply-unavailable soft">Open story</div>'
         + '</div>';
     }
   }
@@ -930,7 +964,107 @@ $('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=as
   }
   e.target.value='';
 };
-$('voiceButton').onclick=async()=>{if(voiceState==='recording'){mediaRecorder.stop();voiceState='uploading';$('voiceButton').style.background='var(--surface2)';return}try{if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)throw Error('Voice recording requires a supported secure browser context');voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});voiceChunks=[];mediaRecorder=new MediaRecorder(voiceStream);mediaRecorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};mediaRecorder.onstop=async()=>{voiceStream.getTracks().forEach(t=>t.stop());let blob=new Blob(voiceChunks,{type:mediaRecorder.mimeType||'audio/webm'});try{if(blob.size>10*1024*1024)throw Error('Voice message exceeds 10 MB');let fd=new FormData();fd.append('file',blob,'voice.webm');fd.append('upload_preset','gochat');let r=await fetch('https://api.cloudinary.com/v1_1/pfbi9lmx/video/upload',{method:'POST',body:fd}),j=await r.json();if(!r.ok||!j.secure_url)throw Error(j.error?.message||'Upload failed');await sendPayload({audioUrl:j.secure_url});toast('Voice message sent')}catch(err){toast('Voice upload failed: '+err.message)}finally{voiceState='idle'}};mediaRecorder.start();voiceState='recording';toast('Recording… tap mic again to send')}catch(err){toast('Microphone unavailable: '+err.message)}};
+(function(){
+  var voiceRecTimer = null, voiceRecStarted = 0, voiceDiscard = false;
+  function fmtRec(ms){
+    var s = Math.floor(ms/1000);
+    var m = Math.floor(s/60); s = s % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  function showRecBar(on){
+    var bar = $('voiceRecBar'), comp = $('composer');
+    if(bar) bar.hidden = !on;
+    if(comp) comp.classList.toggle('voice-hidden', !!on);
+  }
+  function stopRecTimer(){
+    if(voiceRecTimer){ clearInterval(voiceRecTimer); voiceRecTimer = null; }
+  }
+  function resetVoiceUi(){
+    stopRecTimer();
+    showRecBar(false);
+    voiceState = 'idle';
+    voiceDiscard = false;
+    var tEl = $('voiceRecTime'); if(tEl) tEl.textContent = '0:00';
+  }
+  async function uploadVoiceBlob(blob){
+    if(!blob || blob.size < 200){ toast('Recording too short'); return; }
+    if(blob.size > 10*1024*1024){ toast('Voice message exceeds 10 MB'); return; }
+    voiceState = 'uploading';
+    toast('Sending voice…');
+    try{
+      var fd = new FormData();
+      fd.append('file', blob, 'voice.webm');
+      fd.append('upload_preset', 'gochat');
+      var r = await fetch('https://api.cloudinary.com/v1_1/pfbi9lmx/video/upload', { method:'POST', body: fd });
+      var j = await r.json();
+      if(!r.ok || !j.secure_url) throw Error(j.error && j.error.message || 'Upload failed');
+      await sendPayload({ audioUrl: j.secure_url });
+      toast('Voice message sent');
+    }catch(err){
+      toast('Voice upload failed: ' + (err.message || err));
+    }finally{
+      voiceState = 'idle';
+    }
+  }
+  function startVoiceRecording(){
+    if(voiceState !== 'idle' || !currentChat) return;
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
+      toast('Voice recording is not supported here');
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+      voiceStream = stream;
+      voiceChunks = [];
+      voiceDiscard = false;
+      try{
+        mediaRecorder = new MediaRecorder(stream);
+      }catch(e){
+        stream.getTracks().forEach(function(tr){ tr.stop(); });
+        toast('Recorder unavailable');
+        return;
+      }
+      mediaRecorder.ondataavailable = function(e){ if(e.data && e.data.size) voiceChunks.push(e.data); };
+      mediaRecorder.onstop = function(){
+        try{ if(voiceStream) voiceStream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
+        voiceStream = null;
+        var blob = new Blob(voiceChunks, { type: (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm' });
+        mediaRecorder = null;
+        if(voiceDiscard){ voiceChunks = []; resetVoiceUi(); return; }
+        resetVoiceUi();
+        uploadVoiceBlob(blob);
+      };
+      mediaRecorder.start(200);
+      voiceState = 'recording';
+      voiceRecStarted = Date.now();
+      showRecBar(true);
+      var tEl = $('voiceRecTime'); if(tEl) tEl.textContent = '0:00';
+      stopRecTimer();
+      voiceRecTimer = setInterval(function(){
+        if(tEl) tEl.textContent = fmtRec(Date.now() - voiceRecStarted);
+      }, 250);
+    }).catch(function(err){
+      toast('Microphone unavailable: ' + (err.message || err));
+      resetVoiceUi();
+    });
+  }
+  function cancelVoiceRecording(){
+    if(voiceState !== 'recording' || !mediaRecorder){ resetVoiceUi(); return; }
+    voiceDiscard = true;
+    try{ mediaRecorder.stop(); }catch(e){ resetVoiceUi(); }
+  }
+  function sendVoiceRecording(){
+    if(voiceState !== 'recording' || !mediaRecorder) return;
+    voiceDiscard = false;
+    try{ mediaRecorder.stop(); }catch(e){ resetVoiceUi(); toast('Could not finish recording'); }
+  }
+  var vb = $('voiceButton');
+  if(vb) vb.onclick = function(){ startVoiceRecording(); };
+  var vc = $('voiceRecCancel');
+  if(vc) vc.onclick = function(){ cancelVoiceRecording(); };
+  var vs = $('voiceRecSend');
+  if(vs) vs.onclick = function(){ sendVoiceRecording(); };
+})();
+
 async function loadChatLists(){
   listUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
   listUnsubs = [];
@@ -1724,6 +1858,7 @@ function renderActiveList(){
         sharedStoryVideo: isVideo ? thumb : '',
         sharedStoryIsVideo: isVideo,
         sharedStoryOwner: otherName,
+        sharedStoryOwnerUid: otherUid || s.uid || '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       await db.collection('chats').doc(chatId).set({
@@ -1843,6 +1978,68 @@ function renderActiveList(){
 
   window.msCloseStoryViewer = closeViewer;
   window.msIsStoryOpen = function(){ var v=$('msStoryViewer'); return !!(v && v.classList.contains('open')); };
+
+  // Open a specific story from a chat story-reply card
+  window.openStoryFromReply = async function(storyId, ownerUid, mediaEl){
+    try{
+      if(!storyId){
+        toast('Story unavailable');
+        if(mediaEl) mediaEl.outerHTML = '<div class="story-reply-unavailable">Story unavailable</div>';
+        return;
+      }
+      var snap = await db.collection('stories').doc(storyId).get();
+      if(!snap.exists){
+        toast('Story unavailable');
+        if(mediaEl) mediaEl.outerHTML = '<div class="story-reply-unavailable">Story unavailable</div>';
+        return;
+      }
+      var s = snap.data() || {};
+      s.id = snap.id;
+      // Expiry check (24h or explicit expiresAt)
+      var created = s.createdAt && s.createdAt.toDate ? s.createdAt.toDate().getTime() : (s.createdAt ? new Date(s.createdAt).getTime() : 0);
+      var exp = s.expiresAt && s.expiresAt.toDate ? s.expiresAt.toDate().getTime() : (created ? created + STORY_MS : 0);
+      if(exp && Date.now() > exp){
+        toast('Story unavailable');
+        if(mediaEl) mediaEl.outerHTML = '<div class="story-reply-unavailable">Story unavailable</div>';
+        return;
+      }
+      var uid = ownerUid || s.uid || '';
+      // Prefer existing loaded group
+      var gi = -1, idx = 0;
+      for(var i=0;i<storyGroups.length;i++){
+        if(storyGroups[i].uid === uid){
+          gi = i;
+          for(var j=0;j<storyGroups[i].items.length;j++){
+            if(storyGroups[i].items[j].id === storyId){ idx = j; break; }
+          }
+          break;
+        }
+      }
+      if(gi < 0){
+        // Build a temporary one-item group
+        storyGroups.push({
+          uid: uid,
+          name: s.name || 'User',
+          avatar: s.avatar || '',
+          items: [s]
+        });
+        gi = storyGroups.length - 1;
+        idx = 0;
+      } else {
+        // Ensure this story is in items
+        var found = storyGroups[gi].items.some(function(it){ return it.id === storyId; });
+        if(!found) storyGroups[gi].items.push(s);
+        for(var k=0;k<storyGroups[gi].items.length;k++){
+          if(storyGroups[gi].items[k].id === storyId){ idx = k; break; }
+        }
+      }
+      openViewer(gi, idx);
+    }catch(err){
+      console.warn('openStoryFromReply', err);
+      toast('Story unavailable');
+      if(mediaEl) try{ mediaEl.outerHTML = '<div class="story-reply-unavailable">Story unavailable</div>'; }catch(e){}
+    }
+  };
 })();
 
 
@@ -2062,7 +2259,11 @@ function closeMsgCtx(fromPop){
   ctxMsgId = null; ctxMsgData = null;
   if(!fromPop && msgCtxNavPushed){
     msgCtxNavPushed = false;
-    try{ history.back(); }catch(e){}
+    // Replace state instead of history.back() so chat is not closed by the following popstate
+    try{
+      if(currentChat) history.replaceState({ page: 'chat', chat: currentChat }, '', '#chat/' + currentChat);
+      else history.replaceState({ page: 'chatsPage' }, '', '#chats');
+    }catch(e){}
   } else {
     msgCtxNavPushed = false;
   }
@@ -2071,14 +2272,17 @@ function openMsgCtx(id, data){
   if(!id) return;
   ctxMsgId = id; ctxMsgData = data || {};
   var mine = !!(data && user && data.uid === user.uid);
-  var isText = !!(data && data.text && !data.imageUrl && !data.videoUrl && !data.audioUrl && !data.voiceUrl && !data.sharedPostId);
+  var rawText = (data && data.text) ? String(data.text).trim() : '';
+  var hasCopyableText = rawText.length > 0;
+  // Edit only pure text bubbles (no media / voice / story-share attachments)
+  var isPureText = hasCopyableText && !(data.imageUrl || data.videoUrl || data.audioUrl || data.voiceUrl || data.sharedPostId || data.sharedPostImg || data.sharedStoryId || data.sharedStoryImg || data.sharedStoryVideo);
   var sheet = $('msgCtxSheet');
   if(!sheet) return;
   var items = [];
   items.push({label:'Reply', action:'reply', ico:CTX_ICO.reply, danger:false});
   items.push({label:'Forward', action:'forward', ico:CTX_ICO.forward, danger:false});
-  if(isText) items.push({label:'Copy message', action:'copy', ico:CTX_ICO.copy, danger:false});
-  if(mine && isText) items.push({label:'Edit', action:'edit', ico:CTX_ICO.edit, danger:false});
+  if(hasCopyableText) items.push({label:'Copy message', action:'copy', ico:CTX_ICO.copy, danger:false});
+  if(mine && isPureText) items.push({label:'Edit', action:'edit', ico:CTX_ICO.edit, danger:false});
   items.push({label:'Delete for you', action:'delete', ico:CTX_ICO.del, danger:false});
   if(mine) items.push({label:'Unsend', action:'unsend', ico:CTX_ICO.unsend, danger:true});
   sheet.innerHTML = items.map(function(it){
@@ -2101,13 +2305,18 @@ async function runCtxAction(act){
   var id = ctxMsgId;
   var m = ctxMsgData || {};
   var ref = db.collection('chats').doc(currentChat).collection('messages').doc(id);
-  // close UI first without history.back — we'll manage history once
+  // Close UI; keep chat history entry (do not history.back — that was closing the chat)
   var el = $('msgCtx');
   if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
   var hadNav = msgCtxNavPushed;
   msgCtxNavPushed = false;
   ctxMsgId = null; ctxMsgData = null;
-  if(hadNav){ try{ history.back(); }catch(e){} }
+  if(hadNav){
+    try{
+      if(currentChat) history.replaceState({ page: 'chat', chat: currentChat }, '', '#chat/' + currentChat);
+      else history.replaceState({ page: 'chatsPage' }, '', '#chats');
+    }catch(e){}
+  }
 
   if(act === 'reply'){
     replyTarget = Object.assign({ id: id }, m);
@@ -2429,9 +2638,15 @@ function toggleVoicePlayer(wrap){
 document.addEventListener('click', function(e){
   var srm = e.target.closest('.story-reply-media');
   if(srm){
-    var url = srm.getAttribute('data-full');
-    var kind = srm.getAttribute('data-kind') || 'image';
-    if(url && typeof openMediaViewer === 'function'){ openMediaViewer(url, kind); }
+    e.preventDefault();
+    e.stopPropagation();
+    var sid = srm.getAttribute('data-story-id') || '';
+    var suid = srm.getAttribute('data-story-uid') || '';
+    if(typeof window.openStoryFromReply === 'function'){
+      window.openStoryFromReply(sid, suid, srm);
+    } else {
+      toast('Story viewer unavailable');
+    }
     return;
   }
   // Media close X
