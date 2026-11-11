@@ -308,6 +308,10 @@
 .login-btn.is-loading{opacity:.85}
 #loginError{color:#e03131;font-size:13px;margin:8px 0 0;min-height:1.2em}
 
+
+.profile-username{font-size:14px;font-weight:650;color:var(--muted);margin-top:2px;margin-bottom:2px}
+.profile-username:not([hidden]){display:block}
+
 /* Skeleton loading */
 .sk-wrap{padding:6px 0 12px}
 .sk-row{display:flex;align-items:center;gap:12px;padding:12px 4px}
@@ -321,7 +325,7 @@
 @keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style></head><body>
 <div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><div class="brand">gochat</div><div class="auth-sub">Your conversations, together.</div><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
-<div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button></header>
+<div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
 <section id="chatsPage" class="main-page active"><div class="searchbar"><input id="chatSearch" placeholder="Search friends by name or username" autocomplete="off"></div><div id="searchResults" class="search-results"></div><div id="chatList"><div class="empty">Loading your chats…</div></div></section>
 <section id="activePage" class="main-page"><div class="active-wrap"><div id="activeList" class="active-grid"><div class="active-empty">Loading active people…</div></div></div></section>
 <section id="storiesPage" class="main-page">
@@ -346,7 +350,7 @@
 
 <div id="msAppSettings" class="ms-app-settings" aria-hidden="true">
   <header class="ms-as-top">
-    <button type="button" class="ms-as-back" id="msAsBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button type="button" class="ms-as-back" id="msAsBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.5119C14.7001 4.19741 15.1736 4.16099 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
     <div class="ms-as-title">Settings</div>
     <span class="ms-as-spacer"></span>
   </header>
@@ -369,7 +373,7 @@
   <div class="ms-sp-top"><button type="button" id="msSpClose">✕</button><span>New story</span><button type="button" id="msSpPost" class="ms-sp-post">Share</button></div>
   <div class="ms-sp-media" id="msSpMedia"></div>
 </div>
-<section id="settingsPage" class="main-page"><div class="profile-head"><img id="settingsAvatar" class="avatar large" alt=""><div class="profile-name" id="settingsName">Your account</div><div class="about" id="settingsEmail"></div></div></section>
+<section id="settingsPage" class="main-page"><div class="profile-head"><img id="settingsAvatar" class="avatar large" alt=""><div class="profile-name" id="settingsName">Your account</div><div class="profile-username" id="settingsUsername" hidden></div><div class="about" id="settingsEmail"></div></div></section>
 <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
 <button class="nav-item selected" data-page="chatsPage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22ZM8 13.25C7.58579 13.25 7.25 13.5858 7.25 14C7.25 14.4142 7.58579 14.75 8 14.75H13.5C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25H8ZM7.25 10.5C7.25 10.0858 7.58579 9.75 8 9.75H16C16.4142 9.75 16.75 10.0858 16.75 10.5C16.75 10.9142 16.4142 11.25 16 11.25H8C7.58579 11.25 7.25 10.9142 7.25 10.5Z" clip-rule="evenodd"/></svg><span>Chats</span></button>
 <button class="nav-item" data-page="activePage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M9 13.001C12.866 13.001 16 14.7918 16 17.001C16 19.2101 12.866 21.001 9 21.001C5.13401 21.001 2 19.2101 2 17.001C2 14.7918 5.13401 13.001 9 13.001Z"/><path fill="currentColor" d="M16.4756 14.001C18.9605 14.0011 20.9987 15.3434 20.999 17C20.999 18.6569 18.9628 20 16.4775 20C17.2097 19.1997 17.7138 18.1955 17.7139 17.002C17.7139 15.8071 17.209 14.8017 16.4756 14.001Z"/><path fill="currentColor" d="M9 2C11.2091 2 13 3.79086 13 6C13 8.20914 11.2091 10 9 10C6.79086 10 5 8.20914 5 6C5 3.79086 6.79086 2 9 2Z"/><path fill="currentColor" d="M14.999 3.00098C16.6557 3.00118 17.999 4.34425 17.999 6.00098C17.9989 7.6576 16.6556 9.00078 14.999 9.00098C14.6378 9.00098 14.2914 8.93633 13.9707 8.81934C14.4435 7.98748 14.7138 7.02523 14.7139 6C14.7139 4.97534 14.444 4.0132 13.9717 3.18164C14.2921 3.06489 14.6382 3.00098 14.999 3.00098Z"/></svg><span>Active</span></button>
@@ -406,7 +410,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
       Save media
     </button>
-    <button type="button" class="media-menu-cancel" id="mediaMenuCancel">Cancel</button>
   </div>
 </div>
 <div id="gcFwdSheet" class="gc-fwd-sheet" aria-hidden="true">
@@ -686,17 +689,35 @@ async function shareMediaCurrent(){
   var url = mediaCurrentUrl;
   if(!url) return;
   try{
-    if(navigator.share){
-      await navigator.share({ url: url, title: 'GoChat media' });
-    } else if(navigator.clipboard && navigator.clipboard.writeText){
-      await navigator.clipboard.writeText(url);
-      toast('Link copied');
-    } else {
-      window.open(url, '_blank');
+    var res = await fetch(url, { mode: 'cors' });
+    var blob = await res.blob();
+    var isVid = (mediaCurrentKind === 'video') || (blob.type && blob.type.indexOf('video') === 0);
+    var ext = isVid ? 'mp4' : (blob.type && blob.type.indexOf('png')>=0 ? 'png' : 'jpg');
+    var mime = blob.type || (isVid ? 'video/mp4' : 'image/jpeg');
+    var fileName = 'GoChat_' + (isVid ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
+    var file = new File([blob], fileName, { type: mime });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      await navigator.share({ files: [file], title: 'GoChat media' });
+      return;
     }
+    if(navigator.share){
+      // Some Android WebViews accept files without canShare
+      try{
+        await navigator.share({ files: [file], title: 'GoChat media' });
+        return;
+      }catch(shareErr){
+        if(shareErr && shareErr.name === 'AbortError') return;
+      }
+    }
+    // Last resort: open system share via Android bridge if present
+    if(window.AndroidBridge && typeof window.AndroidBridge.shareFile === 'function'){
+      try{ window.AndroidBridge.shareFile(url, mime); return; }catch(e){}
+    }
+    toast('Sharing is not supported on this device');
   }catch(e){
     if(e && e.name === 'AbortError') return;
-    try{ await navigator.clipboard.writeText(url); toast('Link copied'); }catch(err){ toast('Could not share'); }
+    console.warn('shareMediaCurrent', e);
+    toast('Could not share media');
   }
 }
 
@@ -752,8 +773,23 @@ function listenMessages(cid){
     if(currentChat !== cid) return;
     var docs = snap.docs.slice().reverse();
     if(box){
+      // Only auto-scroll if user is already near the bottom (or first paint)
+      var nearBottom = true;
+      try{
+        if(painted){
+          var dist = box.scrollHeight - box.scrollTop - box.clientHeight;
+          nearBottom = dist < 120;
+        }
+      }catch(e){ nearBottom = true; }
+      var prevHeight = box.scrollHeight;
+      var prevTop = box.scrollTop;
       box.innerHTML = docs.map(function(d){ return renderMessage(d.id, d.data()); }).join('') || '<div class="empty">No messages yet. Say hello.</div>';
-      box.scrollTop = box.scrollHeight;
+      if(!painted || nearBottom){
+        box.scrollTop = box.scrollHeight;
+      } else {
+        // Keep relative position when reading older messages
+        try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
+      }
     }
     painted = true;
     docs.forEach(function(d){
@@ -1574,6 +1610,7 @@ function renderActiveList(){
         stage.innerHTML = '<video class="ms-fit-contain" src="'+esc(s.mediaUrl)+'" playsinline webkit-playsinline autoplay></video>';
         var vidEl = stage.querySelector('video');
         if(vidEl){
+          try{ vidEl.muted = false; vidEl.defaultMuted = false; vidEl.volume = 1; }catch(e){}
           vidEl.addEventListener('loadedmetadata', function(){
             try{
               if(vidEl.videoWidth && vidEl.videoHeight && (vidEl.videoWidth/vidEl.videoHeight) > 0.85){
@@ -1587,8 +1624,10 @@ function renderActiveList(){
         }
         var vid = stage.querySelector('video');
         if(vid){
+          try{ vid.muted = false; vid.defaultMuted = false; vid.volume = 1; }catch(e){}
           vid.onloadedmetadata = function(){ startProgress(Math.min(15000, Math.max(4000, (vid.duration||5)*1000))); };
           vid.onended = function(){ nextSegment(); };
+          try{ var p = vid.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
         } else startProgress(5000);
       } else if(s.mediaUrl){
         stage.innerHTML = '<img src="'+esc(s.mediaUrl)+'" alt="">';
@@ -1721,11 +1760,13 @@ function renderActiveList(){
     var media = $('msSpMedia');
     if(media){
       if(pendingIsVideo){
-        media.innerHTML = '<video src="'+pendingUrl+'" playsinline webkit-playsinline muted autoplay loop disablePictureInPicture controlslist="nodownload nofullscreen noremoteplayback"></video>';
+        media.innerHTML = '<video src="'+pendingUrl+'" playsinline webkit-playsinline autoplay loop disablePictureInPicture controlslist="nodownload nofullscreen noremoteplayback"></video>';
         var v = media.querySelector('video');
         if(v){
           try{ v.controls = false; }catch(e){}
           try{ v.disablePictureInPicture = true; }catch(e){}
+          try{ v.muted = false; v.defaultMuted = false; v.volume = 1; }catch(e){}
+          try{ var p = v.play(); if(p && p.catch) p.catch(function(){}); }catch(e){}
         }
       } else {
         media.innerHTML = '<img src="'+pendingUrl+'" alt="">';
@@ -1941,7 +1982,16 @@ $('loginForm').onsubmit=async e=>{
   }
 };
 
-auth.onAuthStateChanged(async u=>{authReady=true;if(!u){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}listUnsubs.forEach(x=>x());listUnsubs=[];user=null;userData={};closeMediaViewer(true);closeChat();showAuthOnly();return}user=u;try{let d=await db.collection('users').doc(u.uid).get();userData=d.exists?d.data():{name:u.email?.split('@')[0]||'User'};showAppOnly();$('settingsName').textContent=userData.name||userData.displayName||u.email?.split('@')[0]||'Your account';$('settingsEmail').textContent=u.email||'';$('settingsAvatar').src=avatar(userData);$('navAvatar').src=avatar(userData);await loadChatLists();await db.collection('users').doc(u.uid).set({online:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});if(presenceTimer)clearInterval(presenceTimer);presenceTimer=setInterval(()=>{if(document.visibilityState==='visible')db.collection('users').doc(u.uid).set({online:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(()=>{})},60000)}catch(err){$('loginError').textContent='Could not load GoChat data: '+err.message;showAuthOnly()}});
+auth.onAuthStateChanged(async u=>{authReady=true;if(!u){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}listUnsubs.forEach(x=>x());listUnsubs=[];user=null;userData={};closeMediaViewer(true);closeChat();showAuthOnly();return}user=u;try{let d=await db.collection('users').doc(u.uid).get();userData=d.exists?d.data():{name:u.email?.split('@')[0]||'User'};showAppOnly();$('settingsName').textContent=userData.name||userData.displayName||u.email?.split('@')[0]||'Your account';
+(function(){
+  var un = (userData.username || userData.userName || '').toString().trim();
+  var unEl = $('settingsUsername');
+  if(unEl){
+    if(un){ unEl.textContent = un.charAt(0)==='@' ? un : ('@'+un); unEl.hidden = false; }
+    else { unEl.textContent = ''; unEl.hidden = true; }
+  }
+})();
+$('settingsEmail').textContent=u.email||'';$('settingsAvatar').src=avatar(userData);$('navAvatar').src=avatar(userData);await loadChatLists();await db.collection('users').doc(u.uid).set({online:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});if(presenceTimer)clearInterval(presenceTimer);presenceTimer=setInterval(()=>{if(document.visibilityState==='visible')db.collection('users').doc(u.uid).set({online:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(()=>{})},60000)}catch(err){$('loginError').textContent='Could not load GoChat data: '+err.message;showAuthOnly()}});
 window.addEventListener('pagehide',()=>{if(user)db.collection('users').doc(user.uid).set({online:false,lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(()=>{});if(presenceTimer)clearInterval(presenceTimer);if(voiceStream)voiceStream.getTracks().forEach(t=>t.stop())});
 // History-based Back stack: chat view is always dismissed before leaving the chat list.
 // Android / browser Back: close chat first, then return through tab history, stay in app on list
@@ -2395,7 +2445,7 @@ document.addEventListener('click', function(e){
     openMediaMenu();
     return;
   }
-  if(e.target.closest('#mediaMenuCancel') || e.target === $('mediaMenu')){
+  if(e.target === $('mediaMenu')){
     closeMediaMenu();
     return;
   }
