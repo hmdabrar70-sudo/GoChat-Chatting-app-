@@ -35,6 +35,87 @@
 .friend-meta .uname{font-size:12px;color:var(--muted);margin-top:3px}
 .friend-badge{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:5px 10px;border-radius:99px}
 
+
+/* Forced theme overrides (ignore system preference when set) */
+html.theme-light, html.theme-light body{
+  color-scheme: light;
+  --bg:#f4f6f8;--surface:#fff;--surface2:#edf1f4;--text:#17212b;--muted:#71808e;--line:#e7ebef;--accent:#087f5b;--accent-soft:#e3f5ee;--shadow:0 8px 28px rgba(20,40,55,.07);--nav:rgba(255,255,255,.92);
+}
+html.theme-dark, html.theme-dark body{
+  color-scheme: dark;
+  --bg:#10171d;--surface:#182229;--surface2:#22313a;--text:#edf4f5;--muted:#9aabb4;--line:#2a3942;--accent:#46d6a2;--accent-soft:#1c3c34;--shadow:0 8px 28px rgba(0,0,0,.22);--nav:rgba(24,34,41,.94);
+}
+html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
+
+/* Active empty centered in content area */
+#activePage{position:relative;min-height:calc(100dvh - 70px - 90px)}
+#activePage .active-wrap{min-height:calc(100dvh - 70px - 90px);display:flex;flex-direction:column}
+#activePage .active-grid{flex:1;display:flex;flex-wrap:wrap;align-content:flex-start}
+#activePage .active-grid.is-empty{
+  align-items:center;justify-content:center;align-content:center;
+}
+#activePage .active-empty{
+  margin:0 auto;padding:24px 28px;text-align:center;color:var(--muted);
+  font-size:14px;line-height:1.55;max-width:280px;width:100%;
+}
+
+/* WhatsApp-like reply composer bar */
+.reply-bar{display:none;padding:10px 12px;background:var(--surface);border-top:1px solid var(--line);align-items:stretch;gap:10px}
+.reply-bar.show{display:flex}
+.reply-bar-accent{width:3px;border-radius:3px;background:var(--accent);flex:none}
+.reply-bar-body{flex:1;min-width:0}
+.reply-bar-name{font-size:12px;font-weight:800;color:var(--accent);margin-bottom:2px}
+.reply-bar-text{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reply-bar-close{width:32px;height:32px;border-radius:50%;border:0;background:var(--surface2);color:var(--muted);display:grid;place-items:center;flex:none;align-self:center;cursor:pointer}
+.reply-bar-close svg{width:16px;height:16px}
+
+/* Reply preview inside bubble */
+.msg-reply-ref{border-left:3px solid currentColor;padding:6px 8px;margin-bottom:6px;border-radius:4px;background:rgba(0,0,0,.06);cursor:pointer}
+.msg.mine .msg-reply-ref{background:rgba(255,255,255,.14)}
+.msg-reply-ref .rr-name{font-size:11px;font-weight:800;opacity:.9}
+.msg-reply-ref .rr-text{font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Edit message modal */
+.gc-edit-backdrop{display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px}
+.gc-edit-backdrop.open{display:flex}
+.gc-edit-sheet{width:min(400px,100%);background:var(--surface);color:var(--text);border-radius:18px;padding:18px 16px 14px;box-shadow:var(--shadow)}
+.gc-edit-sheet h3{margin:0 0 12px;font-size:17px;font-weight:800;text-align:center}
+.gc-edit-sheet textarea{width:100%;min-height:110px;max-height:40vh;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface2);color:var(--text);font:inherit;line-height:1.45;outline:0}
+.gc-edit-actions{display:flex;gap:10px;margin-top:14px}
+.gc-edit-actions button{flex:1;height:44px;border-radius:12px;border:0;font-weight:750;cursor:pointer}
+.gc-edit-cancel{background:var(--surface2);color:var(--text)}
+.gc-edit-save{background:var(--accent);color:#fff}
+
+/* Logout confirm */
+.gc-confirm-backdrop{display:none;position:fixed;inset:0;z-index:75;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:24px}
+.gc-confirm-backdrop.open{display:flex}
+.gc-confirm-sheet{width:min(340px,100%);background:var(--surface);color:var(--text);border-radius:18px;padding:22px 18px 16px;box-shadow:var(--shadow);text-align:center}
+.gc-confirm-sheet p{margin:0 0 18px;font-size:15px;font-weight:650;line-height:1.45;color:var(--text)}
+.gc-confirm-actions{display:flex;gap:10px}
+.gc-confirm-actions button{flex:1;height:44px;border-radius:12px;border:0;font-weight:750;cursor:pointer}
+.gc-confirm-cancel{background:var(--surface2);color:var(--text)}
+.gc-confirm-ok{background:#e03131;color:#fff}
+
+/* Theme settings page */
+.ms-theme-page{position:fixed;inset:0;z-index:56;background:var(--bg);display:flex;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.22,.61,.36,1);pointer-events:none}
+.ms-theme-page.open{transform:translateX(0);pointer-events:auto}
+.ms-theme-top{height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;padding-top:max(0px,env(safe-area-inset-top));border-bottom:1px solid var(--line);flex:none}
+.ms-theme-back{width:40px;height:40px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0}
+.ms-theme-back svg{width:22px;height:22px}
+.ms-theme-title{flex:1;text-align:center;font-weight:800;font-size:17px}
+.ms-theme-spacer{width:40px}
+.ms-theme-body{flex:1;overflow:auto;padding:16px}
+.theme-opt{display:flex;align-items:center;gap:14px;width:100%;padding:16px;margin-bottom:10px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--text);text-align:left;cursor:pointer}
+.theme-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.theme-opt-ico{width:42px;height:42px;border-radius:12px;background:var(--surface2);display:grid;place-items:center;color:var(--accent);flex:none}
+.theme-opt-ico svg{width:22px;height:22px}
+.theme-opt-copy{flex:1}
+.theme-opt-copy strong{display:block;font-size:15px;font-weight:750}
+.theme-opt-copy small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.theme-opt-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none}
+.theme-opt.selected .theme-opt-check{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
+
 /* Boot loader — prevent login flash while Firebase restores session */
 #bootLoader{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:14px;font-weight:650}
 #bootLoader.hidden{display:none!important}
@@ -280,14 +361,14 @@
 .ms-sp-media video::-webkit-media-controls-overlay-play-button{display:none !important}
 
 
-.story-reply-card{border-radius:14px;overflow:hidden;background:rgba(0,0,0,.04);max-width:240px}
+.story-reply-card{border-radius:12px;overflow:hidden;background:rgba(0,0,0,.04);max-width:148px}
 .msg.mine .story-reply-card{background:rgba(255,255,255,.14)}
-.story-reply-label{font-size:11px;font-weight:700;opacity:.7;padding:8px 10px 4px}
-.story-reply-media{position:relative;width:100%;aspect-ratio:9/16;max-height:280px;background:#111;overflow:hidden}
+.story-reply-label{font-size:10px;font-weight:700;opacity:.7;padding:6px 8px 2px}
+.story-reply-media{position:relative;width:100%;aspect-ratio:9/16;max-height:132px;background:#111;overflow:hidden}
 .story-reply-media img{width:100%;height:100%;object-fit:cover;display:block}
 .story-reply-play{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-.story-reply-play svg{width:36px;height:36px;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
-.story-reply-text{padding:8px 10px 10px;font-size:14px;line-height:1.35;word-break:break-word}
+.story-reply-play svg{width:28px;height:28px;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.story-reply-text{padding:6px 8px 8px;font-size:13px;line-height:1.35;word-break:break-word}
 
 
 .ms-profile-settings-btn{width:40px;height:40px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);display:grid;place-items:center;padding:0;cursor:pointer}
@@ -365,6 +446,45 @@
   </div>
 </div>
 
+
+<div id="gcEditModal" class="gc-edit-backdrop" aria-hidden="true">
+  <div class="gc-edit-sheet" onclick="event.stopPropagation()">
+    <h3>Edit message</h3>
+    <textarea id="gcEditInput" maxlength="4000" placeholder="Message"></textarea>
+    <div class="gc-edit-actions">
+      <button type="button" class="gc-edit-cancel" id="gcEditCancel">Cancel</button>
+      <button type="button" class="gc-edit-save" id="gcEditSave">Save</button>
+    </div>
+  </div>
+</div>
+<div id="gcLogoutModal" class="gc-confirm-backdrop" aria-hidden="true">
+  <div class="gc-confirm-sheet" onclick="event.stopPropagation()">
+    <p>Are you sure you want to log out?</p>
+    <div class="gc-confirm-actions">
+      <button type="button" class="gc-confirm-cancel" id="gcLogoutCancel">Cancel</button>
+      <button type="button" class="gc-confirm-ok" id="gcLogoutConfirm">Log Out</button>
+    </div>
+  </div>
+</div>
+<div id="msThemePage" class="ms-theme-page" aria-hidden="true">
+  <header class="ms-theme-top">
+    <button type="button" class="ms-theme-back" id="msThemeBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.5119C14.7001 4.19741 15.1736 4.16099 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
+    <div class="ms-theme-title">Theme</div>
+    <span class="ms-theme-spacer"></span>
+  </header>
+  <div class="ms-theme-body">
+    <button type="button" class="theme-opt" data-theme="light" id="themeOptLight">
+      <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12Z"/><path fill="currentColor" fill-rule="evenodd" d="M12 1.25C12.4142 1.25 12.75 1.58579 12.75 2V3C12.75 3.41421 12.4142 3.75 12 3.75C11.5858 3.75 11.25 3.41421 11.25 3V2C11.25 1.58579 11.5858 1.25 12 1.25ZM4.39861 4.39861C4.6915 4.10572 5.16638 4.10572 5.45927 4.39861L5.85211 4.79145C6.145 5.08434 6.145 5.55921 5.85211 5.85211C5.55921 6.145 5.08434 6.145 4.79145 5.85211L4.39861 5.45927C4.10572 5.16638 4.10572 4.6915 4.39861 4.39861ZM19.6011 4.39887C19.894 4.69176 19.894 5.16664 19.6011 5.45953L19.2083 5.85237C18.9154 6.14526 18.4405 6.14526 18.1476 5.85237C17.8547 5.55947 17.8547 5.0846 18.1476 4.79171L18.5405 4.39887C18.8334 4.10598 19.3082 4.10598 19.6011 4.39887ZM1.25 12C1.25 11.5858 1.58579 11.25 2 11.25H3C3.41421 11.25 3.75 11.5858 3.75 12C3.75 12.4142 3.41421 12.75 3 12.75H2C1.58579 12.75 1.25 12.4142 1.25 12ZM20.25 12C20.25 11.5858 20.5858 11.25 21 11.25H22C22.4142 11.25 22.75 11.5858 22.75 12C22.75 12.4142 22.4142 12.75 22 12.75H21C20.5858 12.75 20.25 12.4142 20.25 12ZM18.1476 18.1476C18.4405 17.8547 18.9154 17.8547 19.2083 18.1476L19.6011 18.5405C19.894 18.8334 19.894 19.3082 19.6011 19.6011C19.3082 19.894 18.8334 19.894 18.5405 19.6011L18.1476 19.2083C17.8547 18.9154 17.8547 18.4405 18.1476 18.1476ZM5.85211 18.1479C6.145 18.4408 6.145 18.9157 5.85211 19.2086L5.45927 19.6014C5.16638 19.8943 4.6915 19.8943 4.39861 19.6014C4.10572 19.3085 4.10572 18.8336 4.39861 18.5407L4.79145 18.1479C5.08434 17.855 5.55921 17.855 5.85211 18.1479ZM12 20.25C12.4142 20.25 12.75 20.5858 12.75 21V22C12.75 22.4142 12.4142 22.75 12 22.75C11.5858 22.75 11.25 22.4142 11.25 22V21C11.25 20.5858 11.5858 20.25 12 20.25Z" clip-rule="evenodd"/></svg></span>
+      <span class="theme-opt-copy"><strong>Light</strong><small>Bright interface</small></span>
+      <span class="theme-opt-check" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="theme-opt" data-theme="dark" id="themeOptDark">
+      <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/></svg></span>
+      <span class="theme-opt-copy"><strong>Dark</strong><small>Dim interface</small></span>
+      <span class="theme-opt-check" aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
 <div id="msAppSettings" class="ms-app-settings" aria-hidden="true">
   <header class="ms-as-top">
     <button type="button" class="ms-as-back" id="msAsBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.5119C14.7001 4.19741 15.1736 4.16099 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
@@ -374,8 +494,8 @@
   <div class="ms-as-body">
     <div class="settings-list">
       <button class="setting" id="themeButton" type="button">
-        <span class="setting-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9c0-.6-.5-1-1-1h-2a2 2 0 0 1-2-2c0-.5.2-1 .5-1.4A2 2 0 0 0 15 4h-3Z"/></svg></span>
-        <span class="setting-copy"><strong>Appearance</strong><small>Switch light and dark theme</small></span>
+        <span class="setting-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12Z"/><path fill="currentColor" fill-rule="evenodd" d="M12 1.25C12.4142 1.25 12.75 1.58579 12.75 2V3C12.75 3.41421 12.4142 3.75 12 3.75C11.5858 3.75 11.25 3.41421 11.25 3V2C11.25 1.58579 11.5858 1.25 12 1.25ZM4.39861 4.39861C4.6915 4.10572 5.16638 4.10572 5.45927 4.39861L5.85211 4.79145C6.145 5.08434 6.145 5.55921 5.85211 5.85211C5.55921 6.145 5.08434 6.145 4.79145 5.85211L4.39861 5.45927C4.10572 5.16638 4.10572 4.6915 4.39861 4.39861ZM19.6011 4.39887C19.894 4.69176 19.894 5.16664 19.6011 5.45953L19.2083 5.85237C18.9154 6.14526 18.4405 6.14526 18.1476 5.85237C17.8547 5.55947 17.8547 5.0846 18.1476 4.79171L18.5405 4.39887C18.8334 4.10598 19.3082 4.10598 19.6011 4.39887ZM1.25 12C1.25 11.5858 1.58579 11.25 2 11.25H3C3.41421 11.25 3.75 11.5858 3.75 12C3.75 12.4142 3.41421 12.75 3 12.75H2C1.58579 12.75 1.25 12.4142 1.25 12ZM20.25 12C20.25 11.5858 20.5858 11.25 21 11.25H22C22.4142 11.25 22.75 11.5858 22.75 12C22.75 12.4142 22.4142 12.75 22 12.75H21C20.5858 12.75 20.25 12.4142 20.25 12ZM18.1476 18.1476C18.4405 17.8547 18.9154 17.8547 19.2083 18.1476L19.6011 18.5405C19.894 18.8334 19.894 19.3082 19.6011 19.6011C19.3082 19.894 18.8334 19.894 18.5405 19.6011L18.1476 19.2083C17.8547 18.9154 17.8547 18.4405 18.1476 18.1476ZM5.85211 18.1479C6.145 18.4408 6.145 18.9157 5.85211 19.2086L5.45927 19.6014C5.16638 19.8943 4.6915 19.8943 4.39861 19.6014C4.10572 19.3085 4.10572 18.8336 4.39861 18.5407L4.79145 18.1479C5.08434 17.855 5.55921 17.855 5.85211 18.1479ZM12 20.25C12.4142 20.25 12.75 20.5858 12.75 21V22C12.75 22.4142 12.4142 22.75 12 22.75C11.5858 22.75 11.25 22.4142 11.25 22V21C11.25 20.5858 11.5858 20.25 12 20.25Z" clip-rule="evenodd"/></svg></span>
+        <span class="setting-copy"><strong>Theme</strong><small>Light or dark appearance</small></span>
         <span class="chevron">›</span>
       </button>
       <button class="setting" id="logoutButton" type="button">
@@ -397,7 +517,7 @@
 <button class="nav-item" data-page="storiesPage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M10.0957 2.00445C6.62194 2.03072 4.71683 2.2121 3.46447 3.46447C2.6068 4.32213 2.25143 5.48593 2.10418 7.25002H6.59861L10.0957 2.00445Z"/><path fill="currentColor" d="M2.02644 8.75002C2 9.68875 2 10.7633 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 10.7633 22 9.68875 21.9736 8.75002H2.02644Z"/><path fill="currentColor" d="M21.8958 7.25002C21.7486 5.48593 21.3932 4.32213 20.5355 3.46447C19.9382 2.86714 19.1924 2.51345 18.1987 2.30403L14.9014 7.25002H21.8958Z"/><path fill="currentColor" d="M16.5401 2.08783C15.3293 2 13.8452 2 12 2C11.967 2 11.9342 2 11.9014 2L8.40139 7.25002H13.0986L16.5401 2.08783Z"/></svg><span>Stories</span></button>
 <button class="nav-item nav-item-profile" data-page="settingsPage" type="button"><img class="nav-user-avatar" id="navAvatar" alt="Profile"><span>Profile</span></button>
 </nav></div>
-<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header><div class="messages" id="messages"></div><div id="replyBar" class="reply-bar"><span id="replyText"></span><button id="cancelReply">Cancel</button></div><div id="voiceRecBar" class="voice-rec-bar" hidden>
+<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header><div class="messages" id="messages"></div><div id="replyBar" class="reply-bar"><div class="reply-bar-accent" aria-hidden="true"></div><div class="reply-bar-body"><div class="reply-bar-name" id="replyName"></div><div class="reply-bar-text" id="replyText"></div></div><button type="button" class="reply-bar-close" id="cancelReply" aria-label="Cancel reply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div id="voiceRecBar" class="voice-rec-bar" hidden>
   <button type="button" class="voice-rec-cancel" id="voiceRecCancel" aria-label="Cancel recording">Cancel</button>
   <div class="voice-rec-mid">
     <span class="voice-rec-dot" aria-hidden="true"></span>
@@ -462,7 +582,16 @@ let user=null,userData={},authReady=false,mediaOpen=false,mediaCurrentUrl="",med
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function avatar(u){return u?.avatar||u?.photoURL||('https://ui-avatars.com/api/?name='+encodeURIComponent(u?.name||'User')+'&background=e7edf0&color=43515a')}
-function fmt(t){try{let d=t?.toDate?t.toDate():new Date(t||Date.now());return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+function fmt(t){
+  try{
+    var d = t && t.toDate ? t.toDate() : new Date(t || Date.now());
+    if(isNaN(d.getTime())) return '';
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if(h === 0) h = 12;
+    return h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }catch(e){ return ''; }
+}
 function setHistory(state){history.pushState(state,'','#'+state.page+(state.chat?'/'+state.chat:''));historyDepth++}
 
 function hideBoot(){ var el=$('bootLoader'); if(el) el.classList.add('hidden'); }
@@ -752,6 +881,14 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   chatReturnPage = returnPage || 'chatsPage';
   currentChat = chatId;
   currentOther = otherUid;
+  // Normalize otherUid from deterministic chat id when missing
+  if((!currentOther || currentOther === 'group') && chatId && String(chatId).indexOf('group_') !== 0 && user){
+    var _p = String(chatId).split('_');
+    if(_p.length >= 2){
+      currentOther = _p[0] === user.uid ? _p.slice(1).join('_') : _p[0];
+      if(currentOther === user.uid) currentOther = _p[1] || otherUid;
+    }
+  }
   replyTarget = null;
   if($('replyBar')) $('replyBar').classList.remove('show');
   if($('chatName')) $('chatName').textContent = otherName || 'Chat';
@@ -892,13 +1029,20 @@ function renderMessage(id,m){
   } else {
     body = linkifyText(m.text||'');
   }
-  let reply=m.replyText?'<div style="border-left:2px solid currentColor;padding-left:8px;opacity:.72;margin-bottom:6px;font-size:12px">'+esc(m.replySender||'')+': '+esc(m.replyText)+'</div>':'';
-  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+fmt(m.createdAt)+(mine?(m.read?' · Seen':' · Sent'):'')+'</time></article>';
+  let reply='';
+  if(m.replyText || m.replyTo || m.replyToId){
+    var rid = m.replyTo || m.replyToId || '';
+    reply = '<div class="msg-reply-ref" data-reply-to="'+esc(rid)+'">'
+      + '<div class="rr-name">'+esc(m.replySender||'User')+'</div>'
+      + '<div class="rr-text">'+esc(m.replyText||'Message')+'</div>'
+      + '</div>';
+  }
+  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+fmt(m.createdAt)+((m.edited||m.isEdited)?' · Edited':'')+(mine?(m.read?' · Seen':' · Sent'):'')+'</time></article>';
 }
 
 async function sendPayload(payload){
-  if(!currentChat||!user)return;
-  var myName = userData.name || userData.displayName || (user.email && user.email.split('@')[0]) || 'User';
+  if(!currentChat||!user) throw new Error('No active chat');
+  var myName = (userData && (userData.name || userData.displayName)) || (user.email && user.email.split('@')[0]) || 'User';
   var msg = {
     uid: user.uid,
     senderName: myName,
@@ -906,41 +1050,73 @@ async function sendPayload(payload){
   };
   Object.keys(payload||{}).forEach(function(k){ msg[k] = payload[k]; });
   if(replyTarget){
+    msg.replyTo = replyTarget.id || null;
     msg.replyToId = replyTarget.id || null;
-    msg.replyText = replyTarget.text || (replyTarget.imageUrl?'Photo':replyTarget.videoUrl?'Video':(replyTarget.audioUrl||replyTarget.voiceUrl)?'Voice message':'Message');
+    msg.replyText = replyTarget.text || (replyTarget.imageUrl?'Photo':replyTarget.videoUrl?'Video':(replyTarget.audioUrl||replyTarget.voiceUrl)?'Voice message':replyTarget.sharedPostId?'Attachment':'Message');
     msg.replySender = replyTarget.senderName || 'User';
-  }
-
-  if(replyTarget){
-    msg.replyTo = replyTarget.id;
-    msg.replySender = replyTarget.senderName || 'User';
-    msg.replyText = replyTarget.text || (replyTarget.imageUrl ? 'Photo' : replyTarget.videoUrl ? 'Video' : 'Voice message');
     replyTarget = null;
     if($('replyBar')) $('replyBar').classList.remove('show');
   }
-  await db.collection('chats').doc(currentChat).collection('messages').add(msg);
-  var preview = msg.text || (msg.sharedPostId || msg.sharedPostImg ? 'Attachment' : msg.imageUrl ? 'Photo' : msg.videoUrl ? 'Video' : msg.audioUrl ? 'Voice message' : 'Message');
+  // Resolve other participant even if currentOther is stale
+  var otherUid = currentOther;
+  if((!otherUid || otherUid === 'group') && currentChat && String(currentChat).indexOf('group_') !== 0){
+    var parts = String(currentChat).split('_');
+    if(parts.length >= 2){
+      otherUid = parts[0] === user.uid ? parts.slice(1).join('_') : parts[0];
+      if(otherUid === user.uid) otherUid = parts[1] || parts[0];
+      currentOther = otherUid;
+    }
+  }
+  var preview = msg.text || (msg.sharedPostId || msg.sharedPostImg ? 'Attachment' : msg.imageUrl ? 'Photo' : msg.videoUrl ? 'Video' : (msg.audioUrl||msg.voiceUrl) ? 'Voice message' : 'Message');
+  if(preview.length > 120) preview = preview.slice(0,117) + '…';
   var patch = {
     lastMsg: preview,
+    lastMessage: preview,
     lastAt: firebase.firestore.FieldValue.serverTimestamp(),
+    lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     lastSender: user.uid,
     isRead: false
   };
-  // Keep 1:1 chats queryable from both apps via users[]
-  if(currentOther && currentOther !== 'group' && String(currentChat).indexOf('group_') !== 0){
-    patch.users = [user.uid, currentOther].filter(Boolean).sort();
+  // Ensure chat doc exists FIRST so security rules allow message create
+  if(otherUid && otherUid !== 'group' && String(currentChat).indexOf('group_') !== 0){
+    var sorted = [user.uid, otherUid].filter(Boolean).sort();
+    patch.users = sorted;
     patch.names = {};
     patch.names[user.uid] = myName;
-    patch.names[currentOther] = ($('chatName') && $('chatName').textContent) || 'User';
+    patch.names[otherUid] = ($('chatName') && $('chatName').textContent) || 'User';
     patch.avatars = {};
-    patch.avatars[user.uid] = userData.avatar || '';
-    patch.avatars[currentOther] = ($('chatAvatar') && $('chatAvatar').src) || '';
+    patch.avatars[user.uid] = (userData && userData.avatar) || '';
+    patch.avatars[otherUid] = ($('chatAvatar') && $('chatAvatar').src) || '';
   }
-  await db.collection('chats').doc(currentChat).set(patch, { merge: true });
+  try{
+    await db.collection('chats').doc(currentChat).set(patch, { merge: true });
+  }catch(err){
+    console.error('chat ensure failed', err);
+    throw new Error('Could not open conversation: ' + (err.message || err));
+  }
+  try{
+    await db.collection('chats').doc(currentChat).collection('messages').add(msg);
+  }catch(err){
+    console.error('send message failed', err);
+    throw err;
+  }
 }
-$('composer').addEventListener('submit',async e=>{e.preventDefault();let t=$('messageInput').value.trim();if(!t)return;$('messageInput').value='';try{await sendPayload({text:t})}catch(err){toast('Message failed: '+err.message)}});
+$('composer').addEventListener('submit',async e=>{
+  e.preventDefault();
+  var t=$('messageInput').value.trim();
+  if(!t)return;
+  if(!currentChat||!user){ toast('Open a chat first'); return; }
+  $('messageInput').value='';
+  try{
+    await sendPayload({text:t});
+  }catch(err){
+    $('messageInput').value=t;
+    toast('Message failed: '+(err.message||err));
+  }
+});
 $('messages').addEventListener('click',async e=>{let b=e.target.closest('[data-action]');if(!b)return;let id=b.dataset.id,act=b.dataset.action,ref=db.collection('chats').doc(currentChat).collection('messages').doc(id),snap=await ref.get();if(!snap.exists)return;let m=snap.data();if(act==='reply'){replyTarget={id,...m};$('replyText').textContent='Replying to '+(m.senderName||'User')+': '+(m.text||'Media message');$('replyBar').classList.add('show');$('messageInput').focus()}else if(act==='forward'){let target=prompt('Enter the recipient chat ID to forward this message:');if(!target)return;let f={uid:user.uid,senderName:userData.name||'User',createdAt:firebase.firestore.FieldValue.serverTimestamp(),forwarded:true};['text','imageUrl','videoUrl','audioUrl','voiceUrl'].forEach(k=>{if(m[k])f[k]=m[k]});await db.collection('chats').doc(target).collection('messages').add(f);await db.collection('chats').doc(target).set({lastMsg:'Forwarded message',lastAt:firebase.firestore.FieldValue.serverTimestamp(),lastSender:user.uid,isRead:false},{merge:true});toast('Forwarded')}else if(act==='unsend'){if(m.uid!==user.uid){toast('You can only unsend your own message');return}if(confirm('Unsend this message for everyone?')){await ref.delete();toast('Message unsent')}}else if(act==='delete'){await ref.set({deletedFor:firebase.firestore.FieldValue.arrayUnion(user.uid)},{merge:true});toast('Deleted for you')}});
-$('cancelReply').onclick=()=>{replyTarget=null;$('replyBar').classList.remove('show')};
+if($('cancelReply')) $('cancelReply').onclick=function(){ cancelReplyComposer(); };
 $('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=async e=>{
   for(let f of [...e.target.files]){
     if(f.size>25*1024*1024){toast('File exceeds 25 MB');continue}
@@ -998,7 +1174,7 @@ $('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=as
       var r = await fetch('https://api.cloudinary.com/v1_1/pfbi9lmx/video/upload', { method:'POST', body: fd });
       var j = await r.json();
       if(!r.ok || !j.secure_url) throw Error(j.error && j.error.message || 'Upload failed');
-      await sendPayload({ audioUrl: j.secure_url });
+      await sendPayload({ audioUrl: j.secure_url, voiceUrl: j.secure_url });
       toast('Voice message sent');
     }catch(err){
       toast('Voice upload failed: ' + (err.message || err));
@@ -1006,46 +1182,110 @@ $('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=as
       voiceState = 'idle';
     }
   }
+  function pickRecorderMime(){
+    if(!window.MediaRecorder || typeof MediaRecorder.isTypeSupported !== 'function') return '';
+    var cands = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
+      'audio/aac'
+    ];
+    for(var i=0;i<cands.length;i++){
+      try{ if(MediaRecorder.isTypeSupported(cands[i])) return cands[i]; }catch(e){}
+    }
+    return '';
+  }
   function startVoiceRecording(){
     if(voiceState !== 'idle' || !currentChat) return;
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
-      toast('Voice recording is not supported here');
+    if(!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost'){
+      toast('Microphone needs HTTPS. Open the app over a secure connection.');
       return;
     }
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
-      voiceStream = stream;
-      voiceChunks = [];
-      voiceDiscard = false;
-      try{
-        mediaRecorder = new MediaRecorder(stream);
-      }catch(e){
-        stream.getTracks().forEach(function(tr){ tr.stop(); });
-        toast('Recorder unavailable');
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      toast('Microphone API not available in this WebView');
+      return;
+    }
+    if(!window.MediaRecorder){
+      toast('Voice recording is not supported on this device');
+      return;
+    }
+    voiceState = 'requesting';
+    var constraintsList = [
+      { audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 } },
+      { audio: true }
+    ];
+    function tryGet(i){
+      if(i >= constraintsList.length){
+        toast('Microphone unavailable. Allow mic permission in app settings and try again.');
+        resetVoiceUi();
         return;
       }
-      mediaRecorder.ondataavailable = function(e){ if(e.data && e.data.size) voiceChunks.push(e.data); };
-      mediaRecorder.onstop = function(){
-        try{ if(voiceStream) voiceStream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
-        voiceStream = null;
-        var blob = new Blob(voiceChunks, { type: (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm' });
-        mediaRecorder = null;
-        if(voiceDiscard){ voiceChunks = []; resetVoiceUi(); return; }
-        resetVoiceUi();
-        uploadVoiceBlob(blob);
-      };
-      mediaRecorder.start(200);
-      voiceState = 'recording';
-      voiceRecStarted = Date.now();
-      showRecBar(true);
-      var tEl = $('voiceRecTime'); if(tEl) tEl.textContent = '0:00';
-      stopRecTimer();
-      voiceRecTimer = setInterval(function(){
-        if(tEl) tEl.textContent = fmtRec(Date.now() - voiceRecStarted);
-      }, 250);
-    }).catch(function(err){
-      toast('Microphone unavailable: ' + (err.message || err));
-      resetVoiceUi();
-    });
+      navigator.mediaDevices.getUserMedia(constraintsList[i]).then(function(stream){
+        voiceStream = stream;
+        voiceChunks = [];
+        voiceDiscard = false;
+        var mime = pickRecorderMime();
+        try{
+          mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+        }catch(e1){
+          try{ mediaRecorder = new MediaRecorder(stream); }
+          catch(e2){
+            stream.getTracks().forEach(function(tr){ tr.stop(); });
+            toast('Recorder unavailable on this device');
+            resetVoiceUi();
+            return;
+          }
+        }
+        mediaRecorder.ondataavailable = function(e){ if(e.data && e.data.size) voiceChunks.push(e.data); };
+        mediaRecorder.onerror = function(){
+          toast('Recording error');
+          try{ mediaRecorder.stop(); }catch(e){}
+        };
+        mediaRecorder.onstop = function(){
+          try{ if(voiceStream) voiceStream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
+          voiceStream = null;
+          var type = (mediaRecorder && mediaRecorder.mimeType) || mime || 'audio/webm';
+          var blob = new Blob(voiceChunks, { type: type });
+          mediaRecorder = null;
+          if(voiceDiscard){ voiceChunks = []; resetVoiceUi(); return; }
+          resetVoiceUi();
+          uploadVoiceBlob(blob);
+        };
+        try{
+          mediaRecorder.start(250);
+        }catch(e){
+          stream.getTracks().forEach(function(tr){ tr.stop(); });
+          toast('Could not start recorder');
+          resetVoiceUi();
+          return;
+        }
+        voiceState = 'recording';
+        voiceRecStarted = Date.now();
+        showRecBar(true);
+        var tEl = $('voiceRecTime'); if(tEl) tEl.textContent = '0:00';
+        stopRecTimer();
+        voiceRecTimer = setInterval(function(){
+          if(tEl) tEl.textContent = fmtRec(Date.now() - voiceRecStarted);
+        }, 250);
+      }).catch(function(err){
+        var name = (err && err.name) || '';
+        if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
+          toast('Microphone permission denied. Enable it in system settings.');
+          resetVoiceUi();
+          return;
+        }
+        if(name === 'NotFoundError' || name === 'DevicesNotFoundError'){
+          toast('No microphone found on this device.');
+          resetVoiceUi();
+          return;
+        }
+        // Retry with looser constraints
+        tryGet(i+1);
+      });
+    }
+    tryGet(0);
   }
   function cancelVoiceRecording(){
     if(voiceState !== 'recording' || !mediaRecorder){ resetVoiceUi(); return; }
@@ -1529,10 +1769,12 @@ function renderActiveList(){
   people.sort(function(a,b){ return a.name.localeCompare(b.name); });
 
   if(!people.length){
+    box.classList.add('is-empty');
     box.innerHTML = '<div class="active-empty">No one is active right now.<br>When friends are online, they will show up here.</div>';
     return;
   }
 
+  box.classList.remove('is-empty');
   box.innerHTML = people.map(function(p){
     var cid = chatIdFor(p.uid);
     return '<button type="button" class="active-person" data-chat="'+esc(cid)+'" data-uid="'+esc(p.uid)+'" data-name="'+esc(p.name)+'" data-avatar="'+esc(p.avatar)+'">'
@@ -2043,6 +2285,75 @@ function renderActiveList(){
 })();
 
 
+
+/* —— Theme preference (light / dark) —— */
+function getSavedTheme(){
+  try{ return localStorage.getItem('gochat_theme') || ''; }catch(e){ return ''; }
+}
+function applyTheme(mode){
+  var root = document.documentElement;
+  root.classList.remove('theme-light','theme-dark','force-dark','force-light');
+  if(mode === 'dark'){
+    root.classList.add('theme-dark');
+    try{ localStorage.setItem('gochat_theme','dark'); }catch(e){}
+  } else if(mode === 'light'){
+    root.classList.add('theme-light');
+    try{ localStorage.setItem('gochat_theme','light'); }catch(e){}
+  } else {
+    try{ localStorage.removeItem('gochat_theme'); }catch(e){}
+  }
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if(meta){
+    meta.setAttribute('content', mode === 'dark' ? '#10171d' : '#f4f6f8');
+  }
+  // Update selected state on theme page if open
+  document.querySelectorAll('.theme-opt').forEach(function(btn){
+    btn.classList.toggle('selected', btn.getAttribute('data-theme') === mode);
+  });
+}
+function initTheme(){
+  var saved = getSavedTheme();
+  if(saved === 'dark' || saved === 'light') applyTheme(saved);
+  else {
+    // follow system once, but still store nothing until user picks
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.querySelectorAll('.theme-opt').forEach(function(btn){
+      btn.classList.toggle('selected', btn.getAttribute('data-theme') === (prefersDark ? 'dark' : 'light'));
+    });
+  }
+}
+initTheme();
+
+function openThemePage(){
+  var el = $('msThemePage');
+  if(!el) return;
+  var cur = getSavedTheme();
+  if(!cur){
+    cur = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  document.querySelectorAll('.theme-opt').forEach(function(btn){
+    btn.classList.toggle('selected', btn.getAttribute('data-theme') === cur);
+  });
+  el.classList.add('open');
+  el.setAttribute('aria-hidden','false');
+  try{ history.pushState({ page: 'themePage' }, '', (location.hash || '#profile') + '/theme'); }catch(e){}
+}
+function closeThemePage(fromPop){
+  var el = $('msThemePage');
+  if(!el) return;
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden','true');
+  if(!fromPop){
+    try{
+      if(history.state && history.state.page === 'themePage') history.back();
+      else history.replaceState({ page: 'appSettings' }, '', '#profile/settings');
+    }catch(e){}
+  }
+}
+window.openThemePage = openThemePage;
+window.closeThemePage = closeThemePage;
+window.applyTheme = applyTheme;
+
 function openAppSettings(){
   var el = document.getElementById('msAppSettings');
   if(!el) return;
@@ -2118,12 +2429,9 @@ if($('searchResults')) $('searchResults').addEventListener('click', function(e){
 document.querySelectorAll('.nav-item[data-page]').forEach(b=>b.onclick=()=>switchMainPage(b.dataset.page));(function(){
   function wireThemeLogout(){
     var lo = $('logoutButton');
-    if(lo) lo.onclick = function(){ auth.signOut(); };
+    if(lo) lo.onclick = function(){ openLogoutConfirm(); };
     var th = $('themeButton');
-    if(th) th.onclick = function(){
-      document.documentElement.classList.toggle('force-dark');
-      document.documentElement.classList.toggle('force-light');
-    };
+    if(th) th.onclick = function(){ openThemePage(); };
   }
   wireThemeLogout();
   var psb = $('profileSettingsBtn');
@@ -2131,6 +2439,39 @@ document.querySelectorAll('.nav-item[data-page]').forEach(b=>b.onclick=()=>switc
   var asb = $('msAsBack');
   if(asb) asb.onclick = function(){ closeAppSettings(false); };
 })();
+
+(function(){
+  function openLogoutConfirm(){
+    var m = document.getElementById('gcLogoutModal');
+    if(!m) return;
+    m.classList.add('open');
+    m.setAttribute('aria-hidden','false');
+  }
+  function closeLogoutConfirm(){
+    var m = document.getElementById('gcLogoutModal');
+    if(!m) return;
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden','true');
+  }
+  window.openLogoutConfirm = openLogoutConfirm;
+  window.closeLogoutConfirm = closeLogoutConfirm;
+  var lc = document.getElementById('gcLogoutCancel');
+  if(lc) lc.onclick = function(){ closeLogoutConfirm(); };
+  var loK = document.getElementById('gcLogoutConfirm');
+  if(loK) loK.onclick = function(){ closeLogoutConfirm(); if(typeof auth!=='undefined') auth.signOut(); };
+  var loBackdrop = document.getElementById('gcLogoutModal');
+  if(loBackdrop) loBackdrop.addEventListener('click', function(e){ if(e.target === loBackdrop) closeLogoutConfirm(); });
+
+  var tb = document.getElementById('msThemeBack');
+  if(tb) tb.onclick = function(){ if(typeof closeThemePage==='function') closeThemePage(false); };
+  document.querySelectorAll('.theme-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.getAttribute('data-theme');
+      if(mode && typeof applyTheme==='function') applyTheme(mode);
+    });
+  });
+})();
+
 /* searchButton removed */$('chatBack').onclick=()=>history.back();
 $('togglePassword').onclick=()=>{let p=$('password'),show=p.type==='password';p.type=show?'text':'password';$('eyeOpen').classList.toggle('hidden',show);$('eyeClosed').classList.toggle('hidden',!show)};
 
@@ -2196,6 +2537,18 @@ try{ history.replaceState({page:'chatsPage'},'','#chats'); }catch(e){}
 window.addEventListener('popstate', function(e){
   if(typeof msIsStoryOpen==='function' && msIsStoryOpen()){
     try{ msCloseStoryViewer(); }catch(err){}
+    return;
+  }
+  if($('msThemePage') && $('msThemePage').classList.contains('open')){
+    try{ closeThemePage(true); }catch(err){}
+    return;
+  }
+  if($('gcEditModal') && $('gcEditModal').classList.contains('open')){
+    try{ closeEditModal(); }catch(err){}
+    return;
+  }
+  if($('gcLogoutModal') && $('gcLogoutModal').classList.contains('open')){
+    try{ $('gcLogoutModal').classList.remove('open'); $('gcLogoutModal').setAttribute('aria-hidden','true'); }catch(err){}
     return;
   }
   if($('msAppSettings') && $('msAppSettings').classList.contains('open')){
@@ -2296,6 +2649,83 @@ function openMsgCtx(id, data){
   }
 }
 
+
+var editMsgId = null;
+function openEditModal(id, text){
+  editMsgId = id;
+  var modal = $('gcEditModal');
+  var input = $('gcEditInput');
+  if(!modal || !input) return;
+  input.value = text || '';
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  setTimeout(function(){ try{ input.focus(); input.setSelectionRange(input.value.length, input.value.length); }catch(e){} }, 50);
+}
+function closeEditModal(){
+  var modal = $('gcEditModal');
+  if(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+  editMsgId = null;
+}
+async function saveEditedMessage(){
+  if(!editMsgId || !currentChat || !user){ closeEditModal(); return; }
+  var input = $('gcEditInput');
+  var next = (input && input.value || '').trim();
+  if(!next){ toast('Message cannot be empty'); return; }
+  var ref = db.collection('chats').doc(currentChat).collection('messages').doc(editMsgId);
+  try{
+    await ref.set({
+      text: next,
+      edited: true,
+      isEdited: true,
+      editedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    toast('Edited');
+    closeEditModal();
+  }catch(e){
+    toast('Could not edit: ' + (e.message || e));
+  }
+}
+(function(){
+  var c = $('gcEditCancel');
+  if(c) c.onclick = function(){ closeEditModal(); };
+  var s = $('gcEditSave');
+  if(s) s.onclick = function(){ saveEditedMessage(); };
+  var b = $('gcEditModal');
+  if(b) b.addEventListener('click', function(e){ if(e.target === b) closeEditModal(); });
+})();
+
+
+function previewTextForMsg(m){
+  if(!m) return 'Message';
+  if(m.text) return String(m.text);
+  if(m.imageUrl) return 'Photo';
+  if(m.videoUrl) return 'Video';
+  if(m.audioUrl || m.voiceUrl) return 'Voice message';
+  if(m.sharedStoryId || m.sharedStoryImg) return 'Story';
+  if(m.sharedPostId) return 'Attachment';
+  return 'Message';
+}
+function startReplyToMessage(id, m){
+  m = m || {};
+  replyTarget = Object.assign({ id: id }, m);
+  var name = m.senderName || 'User';
+  var preview = previewTextForMsg(m);
+  if($('replyName')) $('replyName').textContent = name;
+  if($('replyText')) $('replyText').textContent = preview;
+  if($('replyBar')) $('replyBar').classList.add('show');
+  if($('messageInput')){
+    try{ $('messageInput').focus(); }catch(e){}
+  }
+}
+function cancelReplyComposer(){
+  replyTarget = null;
+  if($('replyBar')) $('replyBar').classList.remove('show');
+  if($('replyName')) $('replyName').textContent = '';
+  if($('replyText')) $('replyText').textContent = '';
+}
+window.startReplyToMessage = startReplyToMessage;
+window.cancelReplyComposer = cancelReplyComposer;
+
 async function runCtxAction(act){
   if(act === 'cancel'){
     closeMsgCtx(false);
@@ -2319,11 +2749,7 @@ async function runCtxAction(act){
   }
 
   if(act === 'reply'){
-    replyTarget = Object.assign({ id: id }, m);
-    var preview = m.text || (m.imageUrl ? 'Photo' : m.videoUrl ? 'Video' : (m.audioUrl||m.voiceUrl) ? 'Voice message' : m.sharedPostId ? 'Attachment' : 'Message');
-    if($('replyText')) $('replyText').textContent = (m.senderName||'User')+': '+preview;
-    if($('replyBar')) $('replyBar').classList.add('show');
-    if($('messageInput')) $('messageInput').focus();
+    startReplyToMessage(id, m);
   } else if(act === 'forward'){
     openForwardSheet(id, m);
   } else if(act === 'copy'){
@@ -2337,15 +2763,11 @@ async function runCtxAction(act){
       toast('Copied');
     }catch(e){ toast('Could not copy'); }
   } else if(act === 'edit'){
-    if(!m.text) return;
-    var next = prompt('Edit message', m.text);
-    if(next == null) return;
-    next = String(next).trim();
-    if(!next) return;
-    await ref.set({ text: next, edited: true }, { merge: true });
-    toast('Edited');
+    if(!m.text){ toast('Only text messages can be edited'); return; }
+    if(!user || m.uid !== user.uid){ toast('You can only edit your own messages'); return; }
+    openEditModal(id, m.text || '');
   } else if(act === 'unsend'){
-    // Match main GoChat: hard delete for everyone
+    if(!user || m.uid !== user.uid){ toast('You can only unsend your own messages'); return; }
     try{
       await ref.delete();
       toast('Message unsent');
@@ -2353,17 +2775,19 @@ async function runCtxAction(act){
       try{
         await ref.set({ deletedForEveryone:true, unsent:true, text:'', imageUrl:null, videoUrl:null, audioUrl:null, voiceUrl:null }, { merge:true });
         toast('Message unsent');
-      }catch(e2){ toast('Could not unsend'); }
+      }catch(e2){ toast('Could not unsend: ' + (e2.message || e2)); }
     }
   } else if(act === 'delete'){
     try{
       await ref.set({ deletedFor: firebase.firestore.FieldValue.arrayUnion(user.uid) }, { merge: true });
       toast('Deleted for you');
     }catch(e){
-      var deletedFor = Array.isArray(m.deletedFor) ? m.deletedFor.slice() : [];
-      if(deletedFor.indexOf(user.uid) === -1) deletedFor.push(user.uid);
-      await ref.set({ deletedFor: deletedFor }, { merge:true });
-      toast('Deleted for you');
+      try{
+        var deletedFor = Array.isArray(m.deletedFor) ? m.deletedFor.slice() : [];
+        if(deletedFor.indexOf(user.uid) === -1) deletedFor.push(user.uid);
+        await ref.set({ deletedFor: deletedFor }, { merge:true });
+        toast('Deleted for you');
+      }catch(e2){ toast('Could not delete: ' + (e2.message || e2)); }
     }
   }
 }
@@ -2579,6 +3003,85 @@ function bindMsgHold(listEl){
 }
 if($('messages')) bindMsgHold($('messages'));
 
+document.addEventListener('click', function(e){
+  var ref = e.target.closest('.msg-reply-ref');
+  if(!ref) return;
+  var rid = ref.getAttribute('data-reply-to');
+  if(!rid) return;
+  var target = document.querySelector('article.msg[data-id="'+CSS.escape(rid)+'"]');
+  if(target){
+    target.scrollIntoView({ behavior:'smooth', block:'center' });
+    target.style.outline = '2px solid var(--accent)';
+    target.style.outlineOffset = '2px';
+    setTimeout(function(){ target.style.outline = ''; target.style.outlineOffset = ''; }, 1400);
+  }
+}, true);
+
+
+/* Swipe-right to reply (WhatsApp-like) */
+(function(){
+  var list = document.getElementById('messages');
+  if(!list || list._swipeBound) return;
+  list._swipeBound = true;
+  var startX=0, startY=0, activeArt=null, tracking=false, locked=false;
+  var THRESH = 72;
+  list.addEventListener('touchstart', function(e){
+    if(!e.touches || e.touches.length !== 1) return;
+    var art = e.target.closest('article.msg');
+    if(!art) return;
+    if(e.target.closest('a,button,.gc-vp-play,.story-reply-media,img,video')) return;
+    activeArt = art;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = true;
+    locked = false;
+    art.style.transition = 'none';
+  }, {passive:true});
+  list.addEventListener('touchmove', function(e){
+    if(!tracking || !activeArt || !e.touches || !e.touches.length) return;
+    var dx = e.touches[0].clientX - startX;
+    var dy = e.touches[0].clientY - startY;
+    if(!locked){
+      if(Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)){
+        tracking = false;
+        activeArt.style.transform = '';
+        activeArt = null;
+        return;
+      }
+      if(Math.abs(dx) > 10) locked = true;
+    }
+    if(locked && dx > 0){
+      var shift = Math.min(dx, 96);
+      activeArt.style.transform = 'translateX(' + shift + 'px)';
+      if(e.cancelable) e.preventDefault();
+    }
+  }, {passive:false});
+  function endSwipe(e){
+    if(!tracking || !activeArt) return;
+    var art = activeArt;
+    var dx = 0;
+    try{
+      var t = (e.changedTouches && e.changedTouches[0]) || null;
+      if(t) dx = t.clientX - startX;
+    }catch(err){}
+    art.style.transition = 'transform .18s ease';
+    art.style.transform = '';
+    tracking = false;
+    activeArt = null;
+    locked = false;
+    if(dx >= THRESH){
+      var id = art.getAttribute('data-id');
+      if(!id || !currentChat) return;
+      db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
+        if(snap.exists) startReplyToMessage(id, snap.data());
+      }).catch(function(){});
+    }
+  }
+  list.addEventListener('touchend', endSwipe, {passive:true});
+  list.addEventListener('touchcancel', endSwipe, {passive:true});
+})();
+
+
 // Message list click: voice / shared / image / video
 if($('messages') && !$('messages')._mediaClickBound){
   $('messages')._mediaClickBound = true;
@@ -2676,7 +3179,7 @@ document.addEventListener('click', function(e){
   // Context sheet
   if(e.target === $('msgCtx')){ closeMsgCtx(false); return; }
   var ctxBtn = e.target.closest('#msgCtx [data-ctx]');
-  if(ctxBtn){ runCtxAction(ctxBtn.getAttribute('data-ctx')); return; }
+  if(ctxBtn){ Promise.resolve(runCtxAction(ctxBtn.getAttribute('data-ctx'))).catch(function(err){ toast((err && err.message) || 'Action failed'); }); return; }
   // Forward sheet
   if(e.target === $('gcFwdSheet') || e.target.closest('#gcFwdClose')){ closeForwardSheet(false); return; }
   var fwdRow = e.target.closest('[data-fwd]');
