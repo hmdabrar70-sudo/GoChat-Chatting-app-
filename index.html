@@ -31,8 +31,9 @@
 .friend-row:active{opacity:.8}
 .friend-row .avatar{width:48px;height:48px}
 .friend-meta{min-width:0;flex:1}
-.friend-meta .name{font-size:15px;font-weight:750}
-.friend-meta .uname{font-size:12px;color:var(--muted);margin-top:3px}
+.friend-meta{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.friend-meta .name{font-size:15px;font-weight:750;display:block;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friend-meta .uname{font-size:12px;color:var(--muted);display:block;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .friend-badge{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:5px 10px;border-radius:99px}
 
 
@@ -879,18 +880,36 @@ async function shareMediaCurrent(){
 function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   if(isGroup == null) isGroup = false;
   chatReturnPage = returnPage || 'chatsPage';
-  currentChat = chatId;
   currentOther = otherUid;
-  // Normalize otherUid from deterministic chat id when missing
-  if((!currentOther || currentOther === 'group') && chatId && String(chatId).indexOf('group_') !== 0 && user){
+  // Always normalize 1:1 chat id to sorted pair so Main GoChat & Messenger share the same path
+  if(chatId && String(chatId).indexOf('group_') !== 0 && user){
     var _p = String(chatId).split('_');
     if(_p.length >= 2){
-      currentOther = _p[0] === user.uid ? _p.slice(1).join('_') : _p[0];
-      if(currentOther === user.uid) currentOther = _p[1] || otherUid;
+      var _a = _p[0], _b = _p.slice(1).join('_');
+      if(_a === user.uid) currentOther = _b;
+      else if(_b === user.uid) currentOther = _a;
+      else if(!currentOther) currentOther = otherUid || _b;
     }
+  }
+  if(currentOther && currentOther !== 'group' && user && !isGroup){
+    currentChat = [user.uid, currentOther].filter(Boolean).sort().join('_');
+  } else {
+    currentChat = chatId;
   }
   replyTarget = null;
   if($('replyBar')) $('replyBar').classList.remove('show');
+  // Remember this conversation so it always appears in the chat list
+  try{
+    if(currentChat){
+      var known = JSON.parse(localStorage.getItem('gc_msg_known_chats') || '[]');
+      if(!Array.isArray(known)) known = [];
+      if(known.indexOf(currentChat) === -1){
+        known.push(currentChat);
+        if(known.length > 200) known = known.slice(-200);
+        localStorage.setItem('gc_msg_known_chats', JSON.stringify(known));
+      }
+    }
+  }catch(e){}
   if($('chatName')) $('chatName').textContent = otherName || 'Chat';
   if($('chatAvatar')) $('chatAvatar').src = otherAvatar || avatar({ name: otherName });
   if($('chatStatus')) $('chatStatus').textContent = '';
@@ -1041,34 +1060,60 @@ function renderMessage(id,m){
 }
 
 async function sendPayload(payload){
-  if(!currentChat||!user) throw new Error('No active chat');
+  if(!user) throw new Error('Not signed in');
+  if(!currentChat) throw new Error('No active chat');
+
+  // Resolve other participant WITHOUT changing the active listener's chat id
+  var otherUid = currentOther;
+  var activeCid = currentChat;
+  if(activeCid && String(activeCid).indexOf('group_') !== 0){
+    var parts = String(activeCid).split('_');
+    // Firebase UIDs never contain '_'; chat ids are exactly uidA_uidB
+    if(parts.length === 2){
+      if(parts[0] === user.uid) otherUid = parts[1];
+      else if(parts[1] === user.uid) otherUid = parts[0];
+    }
+  }
+  if(otherUid && otherUid !== 'group') currentOther = otherUid;
+
+  // Canonical sorted id (must match Main GoChat). Only switch if different AND no listener conflict.
+  var canonical = (otherUid && otherUid !== 'group')
+    ? [user.uid, otherUid].filter(Boolean).sort().join('_')
+    : activeCid;
+  if(canonical && canonical !== activeCid){
+    // Re-point listener before write so snapshots land in the open thread
+    currentChat = canonical;
+    try{ listenMessages(canonical); }catch(e){}
+    activeCid = canonical;
+  }
+
   var myName = (userData && (userData.name || userData.displayName)) || (user.email && user.email.split('@')[0]) || 'User';
+  var myAvatar = (userData && (userData.avatar || userData.photoURL)) || '';
+  var otherName = ($('chatName') && $('chatName').textContent) || 'User';
+  var otherAvatar = '';
+  try{
+    var avEl = $('chatAvatar');
+    if(avEl && avEl.src && avEl.src.indexOf('data:') !== 0) otherAvatar = avEl.src;
+  }catch(e){}
+
   var msg = {
     uid: user.uid,
     senderName: myName,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-  Object.keys(payload||{}).forEach(function(k){ msg[k] = payload[k]; });
-  if(replyTarget){
-    msg.replyTo = replyTarget.id || null;
-    msg.replyToId = replyTarget.id || null;
-    msg.replyText = replyTarget.text || (replyTarget.imageUrl?'Photo':replyTarget.videoUrl?'Video':(replyTarget.audioUrl||replyTarget.voiceUrl)?'Voice message':replyTarget.sharedPostId?'Attachment':'Message');
-    msg.replySender = replyTarget.senderName || 'User';
-    replyTarget = null;
-    if($('replyBar')) $('replyBar').classList.remove('show');
+  Object.keys(payload || {}).forEach(function(k){ msg[k] = payload[k]; });
+
+  var pendingReply = replyTarget;
+  if(pendingReply){
+    msg.replyTo = pendingReply.id || null;
+    msg.replyToId = pendingReply.id || null;
+    msg.replyText = pendingReply.text || (pendingReply.imageUrl ? 'Photo' : pendingReply.videoUrl ? 'Video' : (pendingReply.audioUrl || pendingReply.voiceUrl) ? 'Voice message' : pendingReply.sharedPostId ? 'Attachment' : 'Message');
+    msg.replySender = pendingReply.senderName || 'User';
   }
-  // Resolve other participant even if currentOther is stale
-  var otherUid = currentOther;
-  if((!otherUid || otherUid === 'group') && currentChat && String(currentChat).indexOf('group_') !== 0){
-    var parts = String(currentChat).split('_');
-    if(parts.length >= 2){
-      otherUid = parts[0] === user.uid ? parts.slice(1).join('_') : parts[0];
-      if(otherUid === user.uid) otherUid = parts[1] || parts[0];
-      currentOther = otherUid;
-    }
-  }
-  var preview = msg.text || (msg.sharedPostId || msg.sharedPostImg ? 'Attachment' : msg.imageUrl ? 'Photo' : msg.videoUrl ? 'Video' : (msg.audioUrl||msg.voiceUrl) ? 'Voice message' : 'Message');
-  if(preview.length > 120) preview = preview.slice(0,117) + '…';
+
+  var preview = msg.text || (msg.sharedPostId || msg.sharedPostImg ? 'Attachment' : msg.imageUrl ? 'Photo' : msg.videoUrl ? 'Video' : (msg.audioUrl || msg.voiceUrl) ? 'Voice message' : 'Message');
+  if(preview.length > 120) preview = preview.slice(0, 117) + '…';
+
   var patch = {
     lastMsg: preview,
     lastMessage: preview,
@@ -1078,43 +1123,97 @@ async function sendPayload(payload){
     lastSender: user.uid,
     isRead: false
   };
-  // Ensure chat doc exists FIRST so security rules allow message create
-  if(otherUid && otherUid !== 'group' && String(currentChat).indexOf('group_') !== 0){
+  if(otherUid && otherUid !== 'group' && String(activeCid).indexOf('group_') !== 0){
     var sorted = [user.uid, otherUid].filter(Boolean).sort();
     patch.users = sorted;
     patch.names = {};
     patch.names[user.uid] = myName;
-    patch.names[otherUid] = ($('chatName') && $('chatName').textContent) || 'User';
+    patch.names[otherUid] = otherName;
     patch.avatars = {};
-    patch.avatars[user.uid] = (userData && userData.avatar) || '';
-    patch.avatars[otherUid] = ($('chatAvatar') && $('chatAvatar').src) || '';
+    patch.avatars[user.uid] = myAvatar;
+    patch.avatars[otherUid] = otherAvatar || '';
   }
+
+  // Optimistic local bubble so the user always sees the send immediately
+  var tempId = 'local_' + Date.now();
   try{
-    await db.collection('chats').doc(currentChat).set(patch, { merge: true });
+    var box = $('messages');
+    if(box && msg.text){
+      var optimistic = Object.assign({}, msg, { createdAt: new Date() });
+      var html = renderMessage(tempId, optimistic);
+      if(html){
+        var empty = box.querySelector('.empty');
+        if(empty) empty.remove();
+        box.insertAdjacentHTML('beforeend', html);
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+  }catch(e){}
+
+  try{
+    await db.collection('chats').doc(activeCid).set(patch, { merge: true });
   }catch(err){
     console.error('chat ensure failed', err);
+    try{ var t = document.querySelector('article.msg[data-id="'+tempId+'"]'); if(t) t.remove(); }catch(e){}
     throw new Error('Could not open conversation: ' + (err.message || err));
   }
+
   try{
-    await db.collection('chats').doc(currentChat).collection('messages').add(msg);
+    await db.collection('chats').doc(activeCid).collection('messages').add(msg);
   }catch(err){
     console.error('send message failed', err);
+    try{ var t2 = document.querySelector('article.msg[data-id="'+tempId+'"]'); if(t2) t2.remove(); }catch(e){}
     throw err;
   }
-}
-$('composer').addEventListener('submit',async e=>{
-  e.preventDefault();
-  var t=$('messageInput').value.trim();
-  if(!t)return;
-  if(!currentChat||!user){ toast('Open a chat first'); return; }
-  $('messageInput').value='';
-  try{
-    await sendPayload({text:t});
-  }catch(err){
-    $('messageInput').value=t;
-    toast('Message failed: '+(err.message||err));
+
+  if(pendingReply){
+    replyTarget = null;
+    if($('replyBar')) $('replyBar').classList.remove('show');
   }
+
+  // Remember this chat for future list loads
+  try{
+    var known = JSON.parse(localStorage.getItem('gc_msg_known_chats') || '[]');
+    if(!Array.isArray(known)) known = [];
+    if(known.indexOf(activeCid) === -1){ known.push(activeCid); if(known.length > 200) known = known.slice(-200); localStorage.setItem('gc_msg_known_chats', JSON.stringify(known)); }
+  }catch(e){}
+}
+async function gcSubmitComposer(){
+  if(window.__gcSendBusy) return;
+  var input = $('messageInput');
+  if(!input) return;
+  var t = input.value.trim();
+  if(!t) return;
+  if(!currentChat || !user){ toast('Open a chat first'); return; }
+  window.__gcSendBusy = true;
+  var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
+  if(sendBtn) sendBtn.disabled = true;
+  try{
+    await sendPayload({ text: t });
+    input.value = '';
+  }catch(err){
+    toast('Message failed: ' + (err.message || err));
+  }finally{
+    window.__gcSendBusy = false;
+    if(sendBtn) sendBtn.disabled = false;
+    try{ input.focus(); }catch(e){}
+  }
+}
+$('composer').addEventListener('submit', function(e){
+  e.preventDefault();
+  gcSubmitComposer();
 });
+(function(){
+  var sb = document.querySelector('#composer .send, #composer button[type=submit]');
+  if(sb && !sb._gcSendWired){
+    sb._gcSendWired = true;
+    sb.addEventListener('click', function(e){
+      e.preventDefault();
+      gcSubmitComposer();
+    });
+  }
+})();
+
 $('messages').addEventListener('click',async e=>{let b=e.target.closest('[data-action]');if(!b)return;let id=b.dataset.id,act=b.dataset.action,ref=db.collection('chats').doc(currentChat).collection('messages').doc(id),snap=await ref.get();if(!snap.exists)return;let m=snap.data();if(act==='reply'){replyTarget={id,...m};$('replyText').textContent='Replying to '+(m.senderName||'User')+': '+(m.text||'Media message');$('replyBar').classList.add('show');$('messageInput').focus()}else if(act==='forward'){let target=prompt('Enter the recipient chat ID to forward this message:');if(!target)return;let f={uid:user.uid,senderName:userData.name||'User',createdAt:firebase.firestore.FieldValue.serverTimestamp(),forwarded:true};['text','imageUrl','videoUrl','audioUrl','voiceUrl'].forEach(k=>{if(m[k])f[k]=m[k]});await db.collection('chats').doc(target).collection('messages').add(f);await db.collection('chats').doc(target).set({lastMsg:'Forwarded message',lastAt:firebase.firestore.FieldValue.serverTimestamp(),lastSender:user.uid,isRead:false},{merge:true});toast('Forwarded')}else if(act==='unsend'){if(m.uid!==user.uid){toast('You can only unsend your own message');return}if(confirm('Unsend this message for everyone?')){await ref.delete();toast('Message unsent')}}else if(act==='delete'){await ref.set({deletedFor:firebase.firestore.FieldValue.arrayUnion(user.uid)},{merge:true});toast('Deleted for you')}});
 if($('cancelReply')) $('cancelReply').onclick=function(){ cancelReplyComposer(); };
 $('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=async e=>{
@@ -1430,6 +1529,18 @@ async function loadChatLists(){
 
   // Probe deterministic 1:1 chat docs for network people (covers chats missing users[])
   loadPeopleAndProbeChats().then(function(){ scheduleRender(); }).catch(function(){});
+  // Also load chats remembered locally (opened/sent before)
+  try{
+    var known = JSON.parse(localStorage.getItem('gc_msg_known_chats') || '[]');
+    if(Array.isArray(known)){
+      known.slice(0, 150).forEach(function(cid){
+        if(!cid || chatMap.has(cid)) return;
+        db.collection('chats').doc(cid).get().then(function(doc){
+          if(doc.exists){ ingestChatDoc(doc.id, doc.data()||{}); scheduleRender(); }
+        }).catch(function(){});
+      });
+    }
+  }catch(e){}
 }
 
 function toMs(v){
@@ -2627,7 +2738,6 @@ function openMsgCtx(id, data){
   var mine = !!(data && user && data.uid === user.uid);
   var rawText = (data && data.text) ? String(data.text).trim() : '';
   var hasCopyableText = rawText.length > 0;
-  // Edit only pure text bubbles (no media / voice / story-share attachments)
   var isPureText = hasCopyableText && !(data.imageUrl || data.videoUrl || data.audioUrl || data.voiceUrl || data.sharedPostId || data.sharedPostImg || data.sharedStoryId || data.sharedStoryImg || data.sharedStoryVideo);
   var sheet = $('msgCtxSheet');
   if(!sheet) return;
@@ -2641,14 +2751,34 @@ function openMsgCtx(id, data){
   sheet.innerHTML = items.map(function(it){
     return '<button type="button" class="'+(it.danger?'danger':'')+'" data-ctx="'+it.action+'"><span>'+it.label+'</span>'+(it.ico||'')+'</button>';
   }).join('') + '<button type="button" class="msg-ctx-cancel" data-ctx="cancel">Cancel</button>';
+
+  // Bind handlers DIRECTLY on each button — delegated document clicks failed repeatedly on Android WebView
+  Array.prototype.forEach.call(sheet.querySelectorAll('[data-ctx]'), function(btn){
+    var act = btn.getAttribute('data-ctx');
+    function fire(ev){
+      if(ev){ try{ ev.preventDefault(); ev.stopPropagation(); }catch(e){} }
+      if(btn._ctxFired) return;
+      btn._ctxFired = true;
+      setTimeout(function(){ btn._ctxFired = false; }, 500);
+      Promise.resolve(runCtxAction(act)).catch(function(err){
+        toast((err && err.message) || 'Action failed');
+      });
+    }
+    btn.onclick = fire;
+    btn.ontouchend = function(ev){
+      if(Date.now() - (window.__gcMsgCtxOpenedAt || 0) < 300) return;
+      fire(ev);
+    };
+  });
+
   var el = $('msgCtx');
   if(el){ el.classList.add('open'); el.setAttribute('aria-hidden','false'); }
+  window.__gcMsgCtxOpenedAt = Date.now();
   if(!msgCtxNavPushed){
     msgCtxNavPushed = true;
     try{ history.pushState({ page: 'msgctx' }, '', location.hash || '#chat'); }catch(e){}
   }
 }
-
 
 var editMsgId = null;
 function openEditModal(id, text){
@@ -2755,13 +2885,26 @@ async function runCtxAction(act){
   } else if(act === 'copy'){
     var t = (m.text || '').trim();
     if(!t){ toast('Nothing to copy'); return; }
+    var copied = false;
     try{
-      if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(t);
-      else {
-        var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(t);
+        copied = true;
       }
-      toast('Copied');
-    }catch(e){ toast('Could not copy'); }
+    }catch(e){}
+    if(!copied){
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = t;
+        ta.setAttribute('readonly','');
+        ta.style.position='fixed'; ta.style.left='-9999px'; ta.style.top='0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select(); ta.setSelectionRange(0, t.length);
+        copied = document.execCommand('copy');
+        ta.remove();
+      }catch(e2){}
+    }
+    toast(copied ? 'Copied' : 'Could not copy');
   } else if(act === 'edit'){
     if(!m.text){ toast('Only text messages can be edited'); return; }
     if(!user || m.uid !== user.uid){ toast('You can only edit your own messages'); return; }
@@ -2868,24 +3011,37 @@ async function confirmForward(){
       var snap = await db.collection('chats').doc(currentChat).collection('messages').doc(gcFwdMsgId).get();
       if(snap.exists) m = snap.data();
     }
+    var preview = m.text || (m.imageUrl ? 'Photo' : m.videoUrl ? 'Video' : (m.audioUrl || m.voiceUrl) ? 'Voice message' : m.sharedPostId ? 'Attachment' : 'Forwarded message');
     var payload = {
       uid: user.uid,
-      senderName: userData.name || userData.displayName || 'User',
+      senderName: (userData && (userData.name || userData.displayName)) || 'User',
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       forwarded: true
     };
     ['text','imageUrl','videoUrl','videoThumb','poster','thumbnail','audioUrl','voiceUrl',
-     'sharedPostId','sharedPostImg','sharedPostAuthorName','sharedPostAuthorUser','sharedPostAuthorAvatar','sharedPostCaption'
+     'sharedPostId','sharedPostImg','sharedPostAuthorName','sharedPostAuthorUser','sharedPostAuthorAvatar','sharedPostCaption',
+     'sharedStoryId','sharedStoryImg','sharedStoryVideo','sharedStoryIsVideo','sharedStoryOwner','sharedStoryOwnerUid'
     ].forEach(function(k){ if(m[k] != null && m[k] !== '') payload[k] = m[k]; });
     for(var i=0;i<ids.length;i++){
-      await db.collection('chats').doc(ids[i]).collection('messages').add(payload);
+      var fid = ids[i];
+      // Ensure destination chat doc is writable under rules
       try{
-        await db.collection('chats').doc(ids[i]).set({
-          lastMessage: payload.text || (payload.imageUrl?'Photo':payload.videoUrl?'Video':payload.audioUrl?'Voice':'Forwarded message'),
+        var fparts = String(fid).split('_');
+        var fpatch = {
+          lastMsg: preview,
+          lastMessage: preview,
+          lastAt: firebase.firestore.FieldValue.serverTimestamp(),
           lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, {merge:true});
-      }catch(e){}
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastSender: user.uid,
+          isRead: false
+        };
+        if(fparts.length >= 2 && fid.indexOf('group_') !== 0){
+          fpatch.users = [fparts[0], fparts.slice(1).join('_')].sort();
+        }
+        await db.collection('chats').doc(fid).set(fpatch, { merge: true });
+      }catch(e){ console.warn('fwd chat ensure', e); }
+      await db.collection('chats').doc(fid).collection('messages').add(payload);
     }
     toast('Forwarded');
     closeForwardSheet(false);
