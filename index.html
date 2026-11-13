@@ -422,6 +422,22 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .sk-bubble{height:42px;border-radius:16px;margin:8px 0;max-width:70%;background:linear-gradient(90deg,var(--surface2,#eee) 25%,var(--line,#ddd) 50%,var(--surface2,#eee) 75%);background-size:200% 100%;animation:sk-shimmer 1.1s ease-in-out infinite}
 .sk-bubble.me{margin-left:auto;background:linear-gradient(90deg,rgba(26,26,46,.12) 25%,rgba(26,26,46,.22) 50%,rgba(26,26,46,.12) 75%);background-size:200% 100%}
 @keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Typing indicator · 3-dot bounce */
+.gc-typing-dots{display:inline-flex;align-items:center;gap:4px;height:14px;vertical-align:middle}
+.gc-typing-dots i{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.45;display:block;
+  animation:gcTypingBounce 1.2s infinite ease-in-out}
+.gc-typing-dots i:nth-child(2){animation-delay:.15s}
+.gc-typing-dots i:nth-child(3){animation-delay:.3s}
+@keyframes gcTypingBounce{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-4px);opacity:1}}
+.gc-typing-inline{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:650}
+.gc-typing-preview{color:var(--accent)!important;font-weight:650}
+#chatStatus.gc-is-typing{color:var(--accent);font-weight:650}
+/* New incoming message subtle highlight */
+article.msg.gc-msg-new{animation:gcMsgFlash 1.6s ease}
+@keyframes gcMsgFlash{0%{background:var(--accent-soft)}100%{background:transparent}}
+article.msg.mine.gc-msg-new{animation:none}
+
 </style></head><body>
 <div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><div class="brand">gochat</div><div class="auth-sub">Your conversations, together.</div><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
 <div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
@@ -579,7 +595,7 @@ const firebaseConfig={apiKey:"AIzaSyAnKueAHG8cw6O-Hy8U9fgGzH4fDMYQBy8",authDomai
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
 try{auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
 db.settings({experimentalForceLongPolling:true});
-let user=null,userData={},authReady=false,mediaOpen=false,mediaCurrentUrl="",mediaCurrentKind="image",chatMap=new Map(),chatReturnPage='chatsPage',usersCache=new Map(),listUnsubs=[],msgUnsub=null,otherStatusUnsub=null,currentChat=null,currentOther=null,replyTarget=null,mediaRecorder=null,voiceChunks=[],voiceStream=null,voiceState='idle',presenceTimer=null;
+let user=null,userData={},authReady=false,typingUnsub=null,typingMap={},myTypingTimer=null,seenMsgIds=new Set(),mediaOpen=false,mediaCurrentUrl="",mediaCurrentKind="image",chatMap=new Map(),chatReturnPage='chatsPage',usersCache=new Map(),listUnsubs=[],msgUnsub=null,otherStatusUnsub=null,currentChat=null,currentOther=null,replyTarget=null,mediaRecorder=null,voiceChunks=[],voiceStream=null,voiceState='idle',presenceTimer=null;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 function avatar(u){return u?.avatar||u?.photoURL||('https://ui-avatars.com/api/?name='+encodeURIComponent(u?.name||'User')+'&background=e7edf0&color=43515a')}
@@ -915,7 +931,8 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   if($('chatStatus')) $('chatStatus').textContent = '';
   if($('chatView')) $('chatView').classList.add('open');
   try{ history.pushState({ page: 'chat', chat: chatId, returnPage: chatReturnPage }, '', '#chat/' + chatId); }catch(e){}
-  listenMessages(chatId);
+  listenMessages(currentChat || chatId);
+  try{ listenTyping(currentChat || chatId); }catch(e){}
   if(!isGroup && otherUid && otherUid !== 'group') listenOtherStatus(otherUid);
   // Backfill users[] so list queries work across both apps
   if(!isGroup && otherUid && otherUid !== 'group' && chatId && user){
@@ -944,8 +961,68 @@ function closeChat(){
   chatReturnPage = 'chatsPage';
 }
 function listenOtherStatus(uid){if(otherStatusUnsub)otherStatusUnsub();otherStatusUnsub=db.collection('users').doc(uid).onSnapshot(d=>{if(!d.exists)return;let x=d.data()||{};$('chatStatus').textContent=x.showActiveStatus===false?'':x.online===true?'Online':x.lastSeen?'Last seen '+fmt(x.lastSeen):''})}
+
+/* ═══ Typing indicator (same chat-doc fields as Main GoChat: typing, typingAt) ═══ */
+function gcTypingDotsHtml(){
+  return '<span class="gc-typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>';
+}
+function setMyTyping(isTyping){
+  if(!currentChat || !user) return;
+  if(myTypingTimer){ clearTimeout(myTypingTimer); myTypingTimer = null; }
+  try{
+    if(isTyping){
+      db.collection('chats').doc(currentChat).set({
+        typing: user.uid,
+        typingAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      myTypingTimer = setTimeout(function(){
+        try{ db.collection('chats').doc(currentChat).set({ typing: null, typingAt: null }, { merge: true }); }catch(e){}
+      }, 2500);
+    } else {
+      db.collection('chats').doc(currentChat).set({ typing: null, typingAt: null }, { merge: true });
+    }
+  }catch(e){}
+}
+function showChatTyping(on){
+  var st = $('chatStatus');
+  if(!st) return;
+  if(on){
+    st.classList.add('gc-is-typing');
+    st.innerHTML = gcTypingDotsHtml() + ' <span>typing…</span>';
+  } else {
+    st.classList.remove('gc-is-typing');
+    // leave presence text; openChat / presence listener will refresh
+    if(st.getAttribute('data-typing') === '1'){
+      st.removeAttribute('data-typing');
+      st.textContent = st.getAttribute('data-prev-status') || '';
+    }
+  }
+  if(on){
+    st.setAttribute('data-typing', '1');
+    if(!st.getAttribute('data-prev-status')) st.setAttribute('data-prev-status', st.textContent || '');
+  }
+}
+function listenTyping(cid){
+  if(typingUnsub){ try{ typingUnsub(); }catch(e){} typingUnsub = null; }
+  if(!cid || !user) return;
+  typingUnsub = db.collection('chats').doc(cid).onSnapshot(function(snap){
+    if(!snap.exists) return;
+    var d = snap.data() || {};
+    var who = d.typing || null;
+    var at = d.typingAt;
+    var fresh = false;
+    if(at && at.toMillis) fresh = (Date.now() - at.toMillis()) < 6000;
+    else if(at && at.seconds) fresh = (Date.now() - at.seconds * 1000) < 6000;
+    var active = !!(who && who !== user.uid && fresh);
+    typingMap[cid] = active;
+    if(currentChat === cid) showChatTyping(active);
+    try{ renderChats(); }catch(e){}
+  }, function(){});
+}
+
 function listenMessages(cid){
   if(msgUnsub){ try{ msgUnsub(); }catch(e){} msgUnsub=null; }
+  seenMsgIds = new Set(); // reset so reopen doesn't re-flash old messages
   var box = $('messages');
   if(box) box.innerHTML = '<div class="sk-msg" aria-hidden="true"><div class="sk-bubble w80"></div><div class="sk-bubble me w60"></div><div class="sk-bubble w50"></div><div class="sk-bubble me w80"></div><div class="sk-bubble w40"></div></div>';
   var q = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','desc').limit(50);
@@ -964,12 +1041,32 @@ function listenMessages(cid){
       }catch(e){ nearBottom = true; }
       var prevHeight = box.scrollHeight;
       var prevTop = box.scrollTop;
-      box.innerHTML = docs.map(function(d){ return renderMessage(d.id, d.data()); }).join('') || '<div class="empty">No messages yet. Say hello.</div>';
+      var isFirstPaint = !painted;
+      var newIds = [];
+      box.innerHTML = docs.map(function(d){
+        var html = renderMessage(d.id, d.data());
+        var data = d.data() || {};
+        // Subtle highlight for newly arrived messages from the other user (not on first paint)
+        if(!isFirstPaint && user && data.uid && data.uid !== user.uid && !seenMsgIds.has(d.id)){
+          newIds.push(d.id);
+        }
+        seenMsgIds.add(d.id);
+        return html;
+      }).join('') || '<div class="empty">No messages yet. Say hello.</div>';
       if(!painted || nearBottom){
         box.scrollTop = box.scrollHeight;
       } else {
-        // Keep relative position when reading older messages
         try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
+      }
+      // Apply highlight after DOM insert
+      if(newIds.length){
+        newIds.forEach(function(nid){
+          var el = box.querySelector('article.msg[data-id="'+CSS.escape(nid)+'"]');
+          if(el){
+            el.classList.add('gc-msg-new');
+            setTimeout(function(){ try{ el.classList.remove('gc-msg-new'); }catch(e){} }, 1800);
+          }
+        });
       }
     }
     painted = true;
@@ -1063,12 +1160,10 @@ async function sendPayload(payload){
   if(!user) throw new Error('Not signed in');
   if(!currentChat) throw new Error('No active chat');
 
-  // Resolve other participant WITHOUT changing the active listener's chat id
   var otherUid = currentOther;
-  var activeCid = currentChat;
-  if(activeCid && String(activeCid).indexOf('group_') !== 0){
-    var parts = String(activeCid).split('_');
-    // Firebase UIDs never contain '_'; chat ids are exactly uidA_uidB
+  var activeCid = String(currentChat);
+  if(activeCid.indexOf('group_') !== 0){
+    var parts = activeCid.split('_');
     if(parts.length === 2){
       if(parts[0] === user.uid) otherUid = parts[1];
       else if(parts[1] === user.uid) otherUid = parts[0];
@@ -1076,15 +1171,14 @@ async function sendPayload(payload){
   }
   if(otherUid && otherUid !== 'group') currentOther = otherUid;
 
-  // Canonical sorted id (must match Main GoChat). Only switch if different AND no listener conflict.
+  // Keep the same document the open listener is already watching
   var canonical = (otherUid && otherUid !== 'group')
     ? [user.uid, otherUid].filter(Boolean).sort().join('_')
     : activeCid;
   if(canonical && canonical !== activeCid){
-    // Re-point listener before write so snapshots land in the open thread
     currentChat = canonical;
-    try{ listenMessages(canonical); }catch(e){}
     activeCid = canonical;
+    try{ listenMessages(canonical); }catch(e){}
   }
 
   var myName = (userData && (userData.name || userData.displayName)) || (user.email && user.email.split('@')[0]) || 'User';
@@ -1096,22 +1190,22 @@ async function sendPayload(payload){
     if(avEl && avEl.src && avEl.src.indexOf('data:') !== 0) otherAvatar = avEl.src;
   }catch(e){}
 
-  var msg = {
+  var out = {
     uid: user.uid,
     senderName: myName,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-  Object.keys(payload || {}).forEach(function(k){ msg[k] = payload[k]; });
+  Object.keys(payload || {}).forEach(function(k){ out[k] = payload[k]; });
 
   var pendingReply = replyTarget;
   if(pendingReply){
-    msg.replyTo = pendingReply.id || null;
-    msg.replyToId = pendingReply.id || null;
-    msg.replyText = pendingReply.text || (pendingReply.imageUrl ? 'Photo' : pendingReply.videoUrl ? 'Video' : (pendingReply.audioUrl || pendingReply.voiceUrl) ? 'Voice message' : pendingReply.sharedPostId ? 'Attachment' : 'Message');
-    msg.replySender = pendingReply.senderName || 'User';
+    out.replyTo = pendingReply.id || null;
+    out.replyToId = pendingReply.id || null;
+    out.replyText = pendingReply.text || (pendingReply.imageUrl ? 'Photo' : pendingReply.videoUrl ? 'Video' : (pendingReply.audioUrl || pendingReply.voiceUrl) ? 'Voice message' : pendingReply.sharedPostId ? 'Attachment' : 'Message');
+    out.replySender = pendingReply.senderName || 'User';
   }
 
-  var preview = msg.text || (msg.sharedPostId || msg.sharedPostImg ? 'Attachment' : msg.imageUrl ? 'Photo' : msg.videoUrl ? 'Video' : (msg.audioUrl || msg.voiceUrl) ? 'Voice message' : 'Message');
+  var preview = out.text || (out.sharedPostId || out.sharedPostImg ? 'Attachment' : out.imageUrl ? 'Photo' : out.videoUrl ? 'Video' : (out.audioUrl || out.voiceUrl) ? 'Voice message' : 'Message');
   if(preview.length > 120) preview = preview.slice(0, 117) + '…';
 
   var patch = {
@@ -1123,7 +1217,7 @@ async function sendPayload(payload){
     lastSender: user.uid,
     isRead: false
   };
-  if(otherUid && otherUid !== 'group' && String(activeCid).indexOf('group_') !== 0){
+  if(otherUid && otherUid !== 'group' && activeCid.indexOf('group_') !== 0){
     var sorted = [user.uid, otherUid].filter(Boolean).sort();
     patch.users = sorted;
     patch.names = {};
@@ -1134,69 +1228,68 @@ async function sendPayload(payload){
     patch.avatars[otherUid] = otherAvatar || '';
   }
 
-  // Optimistic local bubble so the user always sees the send immediately
-  var tempId = 'local_' + Date.now();
-  try{
-    var box = $('messages');
-    if(box && msg.text){
-      var optimistic = Object.assign({}, msg, { createdAt: new Date() });
-      var html = renderMessage(tempId, optimistic);
-      if(html){
-        var empty = box.querySelector('.empty');
-        if(empty) empty.remove();
-        box.insertAdjacentHTML('beforeend', html);
-        box.scrollTop = box.scrollHeight;
-      }
-    }
-  }catch(e){}
-
+  // NO optimistic local bubble — only show server-confirmed messages (prevents fake/disappearing msgs)
   try{
     await db.collection('chats').doc(activeCid).set(patch, { merge: true });
   }catch(err){
     console.error('chat ensure failed', err);
-    try{ var t = document.querySelector('article.msg[data-id="'+tempId+'"]'); if(t) t.remove(); }catch(e){}
     throw new Error('Could not open conversation: ' + (err.message || err));
   }
 
   try{
-    await db.collection('chats').doc(activeCid).collection('messages').add(msg);
+    await db.collection('chats').doc(activeCid).collection('messages').add(out);
   }catch(err){
     console.error('send message failed', err);
-    try{ var t2 = document.querySelector('article.msg[data-id="'+tempId+'"]'); if(t2) t2.remove(); }catch(e){}
     throw err;
   }
+
+  // Clear typing state after send
+  try{
+    db.collection('chats').doc(activeCid).set({ typing: null, typingAt: null }, { merge: true });
+  }catch(e){}
 
   if(pendingReply){
     replyTarget = null;
     if($('replyBar')) $('replyBar').classList.remove('show');
   }
 
-  // Remember this chat for future list loads
   try{
     var known = JSON.parse(localStorage.getItem('gc_msg_known_chats') || '[]');
     if(!Array.isArray(known)) known = [];
-    if(known.indexOf(activeCid) === -1){ known.push(activeCid); if(known.length > 200) known = known.slice(-200); localStorage.setItem('gc_msg_known_chats', JSON.stringify(known)); }
+    if(known.indexOf(activeCid) === -1){
+      known.push(activeCid);
+      if(known.length > 200) known = known.slice(-200);
+      localStorage.setItem('gc_msg_known_chats', JSON.stringify(known));
+    }
   }catch(e){}
 }
+
 async function gcSubmitComposer(){
-  if(window.__gcSendBusy) return;
+  if(window.__gcSendBusy) return false;
   var input = $('messageInput');
-  if(!input) return;
+  if(!input) return false;
   var t = input.value.trim();
-  if(!t) return;
-  if(!currentChat || !user){ toast('Open a chat first'); return; }
+  if(!t) return false;
+  if(!currentChat || !user){ toast('Open a chat first'); return false; }
   window.__gcSendBusy = true;
   var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
   if(sendBtn) sendBtn.disabled = true;
+  // Clear immediately for snappy UX; restore only if write fails
+  input.value = '';
+  try{ input.blur(); }catch(e){}
   try{
     await sendPayload({ text: t });
-    input.value = '';
+    try{ input.focus(); }catch(e){}
+    return true;
   }catch(err){
+    // Restore text so the user can retry
+    input.value = t;
     toast('Message failed: ' + (err.message || err));
+    try{ input.focus(); }catch(e){}
+    return false;
   }finally{
     window.__gcSendBusy = false;
     if(sendBtn) sendBtn.disabled = false;
-    try{ input.focus(); }catch(e){}
   }
 }
 $('composer').addEventListener('submit', function(e){
@@ -1213,6 +1306,25 @@ $('composer').addEventListener('submit', function(e){
     });
   }
 })();
+
+/* Composer → typing signal */
+(function(){
+  var input = $('messageInput');
+  if(!input || input._typingWired) return;
+  input._typingWired = true;
+  var debounce = null;
+  input.addEventListener('input', function(){
+    if(!currentChat || !user) return;
+    setMyTyping(true);
+    if(debounce) clearTimeout(debounce);
+    debounce = setTimeout(function(){ setMyTyping(false); }, 2200);
+  });
+  input.addEventListener('blur', function(){
+    if(debounce) clearTimeout(debounce);
+    setMyTyping(false);
+  });
+})();
+
 
 $('messages').addEventListener('click',async e=>{let b=e.target.closest('[data-action]');if(!b)return;let id=b.dataset.id,act=b.dataset.action,ref=db.collection('chats').doc(currentChat).collection('messages').doc(id),snap=await ref.get();if(!snap.exists)return;let m=snap.data();if(act==='reply'){replyTarget={id,...m};$('replyText').textContent='Replying to '+(m.senderName||'User')+': '+(m.text||'Media message');$('replyBar').classList.add('show');$('messageInput').focus()}else if(act==='forward'){let target=prompt('Enter the recipient chat ID to forward this message:');if(!target)return;let f={uid:user.uid,senderName:userData.name||'User',createdAt:firebase.firestore.FieldValue.serverTimestamp(),forwarded:true};['text','imageUrl','videoUrl','audioUrl','voiceUrl'].forEach(k=>{if(m[k])f[k]=m[k]});await db.collection('chats').doc(target).collection('messages').add(f);await db.collection('chats').doc(target).set({lastMsg:'Forwarded message',lastAt:firebase.firestore.FieldValue.serverTimestamp(),lastSender:user.uid,isRead:false},{merge:true});toast('Forwarded')}else if(act==='unsend'){if(m.uid!==user.uid){toast('You can only unsend your own message');return}if(confirm('Unsend this message for everyone?')){await ref.delete();toast('Message unsent')}}else if(act==='delete'){await ref.set({deletedFor:firebase.firestore.FieldValue.arrayUnion(user.uid)},{merge:true});toast('Deleted for you')}});
 if($('cancelReply')) $('cancelReply').onclick=function(){ cancelReplyComposer(); };
@@ -1789,7 +1901,7 @@ function renderChats(){
         kind: 'chat', id: id, data: data, uid: 'group', group: true,
         name: gName,
         avatar: data.groupAvatar || data.avatar || avatar({ name: gName }),
-        preview: formatChatPreview(data.lastMsg || data.lastMessage) || 'Group chat',
+        preview: (typingMap[id] ? '__TYPING__' : (formatChatPreview(data.lastMsg || data.lastMessage) || 'Group chat')),
         sort: toMs(data.lastAt) || 1,
         unread: false
       });
@@ -1820,7 +1932,7 @@ function renderChats(){
     rows.push({
       kind: 'chat', id: id, data: data, uid: other, group: false,
       name: displayName, avatar: displayAv,
-      preview: formatChatPreview(data.lastMsg || data.lastMessage) || 'Start chatting',
+      preview: (typingMap[id] ? '__TYPING__' : (formatChatPreview(data.lastMsg || data.lastMessage) || 'Start chatting')),
       sort: toMs(data.lastAt) || 1,
       unread: !!(data.lastSender && data.lastSender !== user.uid && data.isRead === false)
     });
@@ -1846,7 +1958,7 @@ function renderChats(){
     return '<button class="chat-row" type="button" data-chat="'+esc(x.id)+'" data-uid="'+esc(x.uid)+'" data-name="'+esc(x.name)+'" data-avatar="'+esc(x.avatar)+'" data-group="'+(x.group?'true':'false')+'">'
       + '<img class="avatar" src="'+esc(x.avatar)+'" alt="">'
       + '<span class="chat-main"><span class="name-line"><span class="name">'+esc(x.name)+'</span><span class="time">'+esc(fmt(x.data.lastAt))+'</span></span>'
-      + '<span class="preview">'+esc(x.preview || '')+'</span></span>'
+      + '<span class="preview'+(x.preview==='__TYPING__'?' gc-typing-preview':'')+'">'+(x.preview==='__TYPING__'?gcTypingDotsHtml()+' typing…':esc(x.preview || ''))+'</span></span>'
       + (x.unread ? '<span class="unread">•</span>' : '')
       + '</button>';
   }).join('');
@@ -3135,7 +3247,7 @@ function bindMsgHold(listEl){
       db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
         if(snap.exists) openMsgCtx(id, snap.data());
       }).catch(function(){});
-    }, 280);
+    }, 180);
   }
   function cancelHold(){ clearTimeout(msgHoldTimer); msgHoldTimer = null; }
   listEl.addEventListener('touchstart', startHold, {passive:true});
@@ -3180,7 +3292,7 @@ document.addEventListener('click', function(e){
   if(!list || list._swipeBound) return;
   list._swipeBound = true;
   var startX=0, startY=0, activeArt=null, tracking=false, locked=false;
-  var THRESH = 72;
+  var THRESH = 36;
   list.addEventListener('touchstart', function(e){
     if(!e.touches || e.touches.length !== 1) return;
     var art = e.target.closest('article.msg');
@@ -3198,13 +3310,13 @@ document.addEventListener('click', function(e){
     var dx = e.touches[0].clientX - startX;
     var dy = e.touches[0].clientY - startY;
     if(!locked){
-      if(Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)){
+      if(Math.abs(dy) > 18 && Math.abs(dy) > Math.abs(dx) * 1.2){
         tracking = false;
         activeArt.style.transform = '';
         activeArt = null;
         return;
       }
-      if(Math.abs(dx) > 10) locked = true;
+      if(Math.abs(dx) > 6) locked = true;
     }
     if(locked && dx > 0){
       var shift = Math.min(dx, 96);
