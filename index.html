@@ -310,6 +310,9 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .ms-story-card .ms-sc-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
 .ms-story-card .ms-sc-time{font-size:11px;opacity:.85;margin-top:2px}
 .ms-story-card.own{outline:2px solid var(--accent);outline-offset:1px}
+.ms-story-card .ms-sc-skel{width:100%;height:100%;background:linear-gradient(110deg,var(--surface2) 25%,var(--surface) 40%,var(--surface2) 55%);background-size:200% 100%;animation:msSkel 1.2s ease infinite}
+@keyframes msSkel{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.ms-story-card .ms-sc-play{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;pointer-events:none;z-index:1;backdrop-filter:blur(2px)}
 .ms-story-empty{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--muted)}
 
 .ms-story-viewer{position:fixed;inset:0;z-index:12000;background:#000;display:none;flex-direction:column;width:100%;height:100%;height:100dvh}
@@ -342,9 +345,10 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 
 .ms-story-preview{position:fixed;inset:0;z-index:12100;background:#0a0a0f;display:none;flex-direction:column}
 .ms-story-preview.open{display:flex}
-.ms-sp-top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));color:#fff;font-weight:700}
-.ms-sp-top button{border:none;background:rgba(255,255,255,.12);color:#fff;border-radius:20px;height:36px;padding:0 12px;font-weight:700;cursor:pointer}
-.ms-sp-post{background:var(--accent)!important}
+.ms-sp-top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));color:#fff;font-weight:700;position:relative}
+.ms-sp-top button{border:none;background:rgba(255,255,255,.12);color:#fff;border-radius:20px;height:36px;padding:0 12px;font-weight:700;cursor:pointer;flex:none;z-index:1}
+.ms-sp-top > span{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none;white-space:nowrap}
+.ms-sp-post{background:var(--accent)!important;min-width:88px;text-align:center}
 .ms-sp-media{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 0;min-height:0;overflow:hidden;background:#000}
 .ms-sp-media img,.ms-sp-media video{
   width:100%;height:100%;max-width:100%;max-height:100%;
@@ -439,7 +443,7 @@ article.msg.gc-msg-new{animation:gcMsgFlash 1.6s ease}
 article.msg.mine.gc-msg-new{animation:none}
 
 </style></head><body>
-<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
+<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><div class="brand">gochat</div><div class="auth-sub">Your conversations, together.</div><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
 <div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
 <section id="chatsPage" class="main-page active"><div class="searchbar"><input id="chatSearch" placeholder="Search friends by name or username" autocomplete="off"></div><div id="searchResults" class="search-results"></div><div id="chatList"><div class="empty">Loading your chats…</div></div></section>
 <section id="activePage" class="main-page"><div class="active-wrap"><div id="activeList" class="active-grid"><div class="active-empty">Loading active people…</div></div></div></section>
@@ -492,12 +496,12 @@ article.msg.mine.gc-msg-new{animation:none}
   <div class="ms-theme-body">
     <button type="button" class="theme-opt" data-theme="light" id="themeOptLight">
       <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12Z"/><path fill="currentColor" fill-rule="evenodd" d="M12 1.25C12.4142 1.25 12.75 1.58579 12.75 2V3C12.75 3.41421 12.4142 3.75 12 3.75C11.5858 3.75 11.25 3.41421 11.25 3V2C11.25 1.58579 11.5858 1.25 12 1.25ZM4.39861 4.39861C4.6915 4.10572 5.16638 4.10572 5.45927 4.39861L5.85211 4.79145C6.145 5.08434 6.145 5.55921 5.85211 5.85211C5.55921 6.145 5.08434 6.145 4.79145 5.85211L4.39861 5.45927C4.10572 5.16638 4.10572 4.6915 4.39861 4.39861ZM19.6011 4.39887C19.894 4.69176 19.894 5.16664 19.6011 5.45953L19.2083 5.85237C18.9154 6.14526 18.4405 6.14526 18.1476 5.85237C17.8547 5.55947 17.8547 5.0846 18.1476 4.79171L18.5405 4.39887C18.8334 4.10598 19.3082 4.10598 19.6011 4.39887ZM1.25 12C1.25 11.5858 1.58579 11.25 2 11.25H3C3.41421 11.25 3.75 11.5858 3.75 12C3.75 12.4142 3.41421 12.75 3 12.75H2C1.58579 12.75 1.25 12.4142 1.25 12ZM20.25 12C20.25 11.5858 20.5858 11.25 21 11.25H22C22.4142 11.25 22.75 11.5858 22.75 12C22.75 12.4142 22.4142 12.75 22 12.75H21C20.5858 12.75 20.25 12.4142 20.25 12ZM18.1476 18.1476C18.4405 17.8547 18.9154 17.8547 19.2083 18.1476L19.6011 18.5405C19.894 18.8334 19.894 19.3082 19.6011 19.6011C19.3082 19.894 18.8334 19.894 18.5405 19.6011L18.1476 19.2083C17.8547 18.9154 17.8547 18.4405 18.1476 18.1476ZM5.85211 18.1479C6.145 18.4408 6.145 18.9157 5.85211 19.2086L5.45927 19.6014C5.16638 19.8943 4.6915 19.8943 4.39861 19.6014C4.10572 19.3085 4.10572 18.8336 4.39861 18.5407L4.79145 18.1479C5.08434 17.855 5.55921 17.855 5.85211 18.1479ZM12 20.25C12.4142 20.25 12.75 20.5858 12.75 21V22C12.75 22.4142 12.4142 22.75 12 22.75C11.5858 22.75 11.25 22.4142 11.25 22V21C11.25 20.5858 11.5858 20.25 12 20.25Z" clip-rule="evenodd"/></svg></span>
-      <span class="theme-opt-copy"><strong>Light mode</strong></span>
+      <span class="theme-opt-copy"><strong>Light</strong><small>Bright interface</small></span>
       <span class="theme-opt-check" aria-hidden="true"></span>
     </button>
     <button type="button" class="theme-opt" data-theme="dark" id="themeOptDark">
       <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/></svg></span>
-      <span class="theme-opt-copy"><strong>Dark mode</strong></span>
+      <span class="theme-opt-copy"><strong>Dark</strong><small>Dim interface</small></span>
       <span class="theme-opt-check" aria-hidden="true"></span>
     </button>
   </div>
@@ -949,6 +953,7 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
         patch.names[user.uid] = (userData && (userData.name || userData.displayName)) || 'User';
         if(currentOther) patch.names[currentOther] = otherName || patch.names[currentOther] || 'User';
       }
+      try{ if(window.__gcUnreadCache) window.__gcUnreadCache[cid] = 0; }catch(e){}
       db.collection('chats').doc(cid).set(patch, { merge: true }).catch(function(){});
     }).catch(function(){});
   }
@@ -1180,14 +1185,13 @@ async function sendPayload(payload){
   }
   if(otherUid && otherUid !== 'group') currentOther = otherUid;
 
-  // Keep the same document the open listener is already watching
+  // Canonical sorted id — same path Main GoChat uses for 1:1
   var canonical = (otherUid && otherUid !== 'group')
     ? [user.uid, otherUid].filter(Boolean).sort().join('_')
     : activeCid;
   if(canonical && canonical !== activeCid){
     currentChat = canonical;
     activeCid = canonical;
-    try{ listenMessages(canonical); }catch(e){}
   }
 
   var myName = (userData && (userData.name || userData.displayName)) || (user.email && user.email.split('@')[0]) || 'User';
@@ -1199,8 +1203,13 @@ async function sendPayload(payload){
     if(avEl && avEl.src && avEl.src.indexOf('data:') !== 0) otherAvatar = avEl.src;
   }catch(e){}
 
+  // Auth must be live — rules compare request.auth.uid
+  var authUid = (firebase.auth().currentUser && firebase.auth().currentUser.uid) || user.uid;
+  if(!authUid) throw new Error('Not signed in');
+
+  // Message body — same shape as Main GoChat sendMsg
   var out = {
-    uid: user.uid,
+    uid: authUid,
     senderName: myName,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
@@ -1209,7 +1218,6 @@ async function sendPayload(payload){
   var pendingReply = replyTarget;
   if(pendingReply){
     out.replyTo = pendingReply.id || null;
-    out.replyToId = pendingReply.id || null;
     out.replyText = pendingReply.text || (pendingReply.imageUrl ? 'Photo' : pendingReply.videoUrl ? 'Video' : (pendingReply.audioUrl || pendingReply.voiceUrl) ? 'Voice message' : pendingReply.sharedPostId ? 'Attachment' : 'Message');
     out.replySender = pendingReply.senderName || 'User';
   }
@@ -1217,63 +1225,57 @@ async function sendPayload(payload){
   var preview = out.text || (out.sharedPostId || out.sharedPostImg ? 'Attachment' : out.imageUrl ? 'Photo' : out.videoUrl ? 'Video' : (out.audioUrl || out.voiceUrl) ? 'Voice message' : 'Message');
   if(preview.length > 120) preview = preview.slice(0, 117) + '…';
 
+  // Chat meta — same fields Main GoChat writes
   var patch = {
     lastMsg: preview,
-    lastMessage: preview,
     lastAt: firebase.firestore.FieldValue.serverTimestamp(),
-    lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    lastSender: user.uid,
-    isRead: false,
-    unreadCount: firebase.firestore.FieldValue.increment(1)
+    lastSender: authUid,
+    isRead: false
   };
   if(otherUid && otherUid !== 'group' && activeCid.indexOf('group_') !== 0){
-    var sorted = [user.uid, otherUid].filter(Boolean).sort();
+    var sorted = [authUid, otherUid].filter(Boolean).sort();
+    // Recompute canonical with auth uid
+    var can2 = sorted.join('_');
+    if(can2){ activeCid = can2; currentChat = can2; }
     patch.users = sorted;
     patch.names = {};
-    patch.names[user.uid] = myName;
+    patch.names[authUid] = myName;
     patch.names[otherUid] = otherName;
     patch.avatars = {};
-    patch.avatars[user.uid] = myAvatar;
+    patch.avatars[authUid] = myAvatar;
     patch.avatars[otherUid] = otherAvatar || '';
   }
 
-  // NO optimistic local bubble — only show server-confirmed messages (prevents fake/disappearing msgs)
+  // Ensure chat doc exists first (rules require get(chat) for messages.create).
+  // Then add the message. Throws on any failure so caller keeps the input text.
   try{
     await db.collection('chats').doc(activeCid).set(patch, { merge: true });
   }catch(err){
-    console.error('chat ensure failed', err);
-    throw new Error('Could not open conversation: ' + (err.message || err));
+    console.error('chat ensure failed', activeCid, err);
+    throw new Error('Could not open conversation: ' + (err.message || err.code || err));
   }
-
   try{
     await db.collection('chats').doc(activeCid).collection('messages').add(out);
   }catch(err){
-    console.error('send message failed', err);
+    console.error('message add failed', activeCid, err);
     throw err;
   }
 
-  // Clear typing state after send
-  try{
-    db.collection('chats').doc(activeCid).set({ typing: null, typingAt: null }, { merge: true });
-  }catch(e){}
+  // Best-effort typing clear (non-blocking)
+  try{ db.collection('chats').doc(activeCid).set({ typing: null, typingAt: null }, { merge: true }); }catch(e){}
 
   if(pendingReply){
     replyTarget = null;
     if($('replyBar')) $('replyBar').classList.remove('show');
   }
 
-  // Immediately reflect in local chat list (snapshot will reconcile)
+  // Local list update
   try{
     var prev = (chatMap.get(activeCid) || {}).data || {};
     var merged = Object.assign({}, prev, patch);
     merged.lastAt = new Date();
-    merged.lastMessageAt = merged.lastAt;
     merged.lastSender = user.uid;
     merged.isRead = false;
-    // Local estimate: FieldValue.increment is not a number yet — keep previous + 1 for UI
-    var prevUC = (typeof prev.unreadCount === 'number') ? prev.unreadCount : 0;
-    merged.unreadCount = prevUC + 1;
     chatMap.set(activeCid, { id: activeCid, data: merged });
     if(typeof renderChats === 'function') renderChats();
   }catch(e){}
@@ -1297,31 +1299,49 @@ async function gcSubmitComposer(){
   if(!t) return false;
   if(!user){ toast('Not signed in'); return false; }
   if(!currentChat){ toast('Open a chat first'); return false; }
-  // Force canonical sorted id one more time right before write
+  // Force canonical sorted id (same as Main GoChat currentChatId)
   if(currentOther && currentOther !== 'group' && String(currentChat).indexOf('group_') !== 0){
     var can = [user.uid, currentOther].filter(Boolean).sort().join('_');
-    if(can && can !== currentChat){
-      currentChat = can;
-      try{ listenMessages(can); }catch(e){}
-    }
+    if(can) currentChat = can;
   }
+  var sendCid = currentChat;
   window.__gcSendBusy = true;
   var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
   if(sendBtn) sendBtn.disabled = true;
-  // Clear immediately for snappy UX; restore only if write fails
-  input.value = '';
-  try{ updateSendBtnState(); }catch(e){}
-  try{ input.blur(); }catch(e){}
   try{
+    // Main GoChat pattern: do NOT clear input until Firestore write succeeds
     await sendPayload({ text: t });
+    input.value = '';
+    try{ updateSendBtnState(); }catch(e){}
+    // Guarantee the bubble appears even if the ordered snapshot is briefly lagging
+    // (serverTimestamp can be null locally for a moment and drop out of orderBy queries)
+    try{
+      var box = $('messages');
+      if(box && currentChat === sendCid){
+        var tempId = 'local_' + Date.now();
+        var localMsg = {
+          uid: user.uid,
+          senderName: (userData && (userData.name || userData.displayName)) || 'User',
+          text: t,
+          createdAt: { toDate: function(){ return new Date(); } }
+        };
+        if(window.__gcMsgDataCache) window.__gcMsgDataCache[tempId] = localMsg;
+        var html = renderMessage(tempId, localMsg);
+        if(html){
+          var empty = box.querySelector('.empty, .sk-msg');
+          if(empty) empty.remove();
+          box.insertAdjacentHTML('beforeend', html);
+          box.scrollTop = box.scrollHeight;
+        }
+      }
+    }catch(e){}
     try{ input.focus(); }catch(e){}
     return true;
   }catch(err){
     console.error('gcSubmitComposer failed', err);
-    // Restore text so the user can retry — never leave a silent failure
-    input.value = t;
     try{ updateSendBtnState(); }catch(e){}
-    toast('Message failed: ' + (err.message || err));
+    var msg = (err && err.code) ? (err.code + ': ' + (err.message || '')) : (err && err.message ? err.message : String(err));
+    toast('Message failed: ' + msg);
     try{ input.focus(); }catch(e){}
     return false;
   }finally{
@@ -1329,19 +1349,29 @@ async function gcSubmitComposer(){
     if(sendBtn) sendBtn.disabled = false;
   }
 }
-$('composer').addEventListener('submit', function(e){
-  e.preventDefault();
-  gcSubmitComposer();
-});
+// Wire form submit + send button (click + touchend, capture) for reliable WebView delivery
 (function(){
-  var sb = document.querySelector('#composer .send, #composer button[type=submit]');
-  if(sb && !sb._gcSendWired){
-    sb._gcSendWired = true;
-    sb.addEventListener('click', function(e){
-      e.preventDefault();
-      gcSubmitComposer();
-    });
+  function onSubmit(e){
+    if(e){ try{ e.preventDefault(); e.stopPropagation(); }catch(err){} }
+    gcSubmitComposer();
   }
+  var form = $('composer');
+  if(form && !form._gcSubmitWired){
+    form._gcSubmitWired = true;
+    form.addEventListener('submit', onSubmit, true);
+  }
+  function wireSendBtn(){
+    var sb = document.querySelector('#composer .send, #composer button[type=submit]');
+    if(!sb || sb._gcSendWired) return;
+    sb._gcSendWired = true;
+    sb.addEventListener('click', onSubmit, true);
+    sb.addEventListener('touchend', function(e){
+      try{ e.preventDefault(); e.stopPropagation(); }catch(err){}
+      onSubmit(e);
+    }, {passive:false, capture:true});
+  }
+  wireSendBtn();
+  setTimeout(wireSendBtn, 0);
 })();
 
 function updateSendBtnState(){
@@ -1978,11 +2008,14 @@ function renderChats(){
     var displayName = u.name || u.displayName || names[other] || 'GoChat user';
     var displayAv = u.avatar || u.photoURL || avatars[other] || avatar({ name: displayName });
     var isUnread = !!(data.lastSender && data.lastSender !== user.uid && data.isRead === false);
-    // Prefer explicit unreadCount when present; otherwise 1 for the latest unread message
+    // Prefer explicit unreadCount; otherwise use locally cached count, fall back to 1
     var uCount = 0;
     if(isUnread){
       var raw = data.unreadCount;
-      uCount = (typeof raw === 'number' && raw > 0) ? Math.min(99, Math.floor(raw)) : 1;
+      var cached = (window.__gcUnreadCache && window.__gcUnreadCache[id]) || 0;
+      if(typeof raw === 'number' && raw > 0) uCount = Math.min(99, Math.floor(raw));
+      else if(cached > 0) uCount = Math.min(99, cached);
+      else uCount = 1;
     }
     rows.push({
       kind: 'chat', id: id, data: data, uid: other, group: false,
@@ -2013,7 +2046,7 @@ function renderChats(){
   listEl.innerHTML = rows.map(function(x){
     var un = x.unread ? ' is-unread' : '';
     var count = x.unreadCount || 0;
-    var badge = (x.unread && count > 0) ? '<span class="unread">'+(count > 99 ? '99+' : String(count))+'</span>' : '';
+    var badge = (x.unread && count > 0) ? '<span class="unread" data-chat-badge="'+esc(x.id)+'">'+(count > 99 ? '99+' : String(count))+'</span>' : '';
     return '<button class="chat-row" type="button" data-chat="'+esc(x.id)+'" data-uid="'+esc(x.uid)+'" data-name="'+esc(x.name)+'" data-avatar="'+esc(x.avatar)+'" data-group="'+(x.group?'true':'false')+'">'
       + '<img class="avatar" src="'+esc(x.avatar)+'" alt="">'
       + '<span class="chat-main"><span class="name-line"><span class="name'+un+'">'+esc(x.name)+'</span><span class="time">'+esc(fmt(x.data.lastAt))+'</span></span>'
@@ -2031,6 +2064,49 @@ function renderChats(){
       }));
     }
   }catch(e){}
+  // Accurate unread counts: count messages from the other person that are not yet read
+  try{ enrichUnreadCounts(rows); }catch(e){}
+}
+
+function enrichUnreadCounts(rows){
+  if(!user || !rows || !rows.length) return;
+  if(!window.__gcUnreadCache) window.__gcUnreadCache = {};
+  var unreadRows = rows.filter(function(x){ return x.unread && x.id && !x.group; });
+  if(!unreadRows.length) return;
+  // Cap concurrent fetches
+  unreadRows.slice(0, 8).forEach(function(x){
+    var cid = x.id;
+    if(window.__gcUnreadPending && window.__gcUnreadPending[cid]) return;
+    if(!window.__gcUnreadPending) window.__gcUnreadPending = {};
+    window.__gcUnreadPending[cid] = true;
+    db.collection('chats').doc(cid).collection('messages')
+      .orderBy('createdAt', 'desc')
+      .limit(40)
+      .get()
+      .then(function(snap){
+        var n = 0;
+        snap.forEach(function(d){
+          var m = d.data() || {};
+          if(m.uid && m.uid !== user.uid && !m.read && !m.isSystem && !m.deletedForEveryone) n++;
+        });
+        window.__gcUnreadCache[cid] = n;
+        var badge = document.querySelector('[data-chat-badge="'+CSS.escape(cid)+'"]');
+        if(badge){
+          if(n > 0) badge.textContent = n > 99 ? '99+' : String(n);
+          else badge.remove();
+        }
+        // Keep chatMap in sync so next full render uses the real count
+        try{
+          var entry = chatMap.get(cid);
+          if(entry && entry.data){
+            entry.data.unreadCount = n;
+            if(n === 0) entry.data.isRead = true;
+          }
+        }catch(e){}
+      })
+      .catch(function(){})
+      .then(function(){ try{ delete window.__gcUnreadPending[cid]; }catch(e){} });
+  });
 }
 
 function renderActiveList(){
@@ -2190,12 +2266,33 @@ function renderActiveList(){
     var html = addCard;
     storyGroups.forEach(function(g, gi){
       var last = g.items[g.items.length-1] || {};
-      var thumb = last.mediaUrl || '';
+      var thumb = last.mediaUrl || last.thumbUrl || last.poster || last.thumbnail || '';
       var isVid = !!last.isVideo;
       var own = user && g.uid===user.uid;
-      var media = isVid
-        ? '<video src="'+esc(thumb)+'" muted playsinline preload="metadata"></video>'
-        : (thumb ? '<img src="'+esc(thumb)+'" alt="" loading="lazy">' : '<div style="width:100%;height:100%;background:#333"></div>');
+      // Prefer a real poster/thumbnail image for video stories (Cloudinary so_0 frame).
+      // Never rely on <video preload=metadata> as the card face — WebView often shows
+      // a blank/default play glyph instead of the first frame.
+      var media;
+      if(isVid && thumb){
+        var poster = '';
+        try{
+          if(typeof cloudinaryVideoPoster === 'function') poster = cloudinaryVideoPoster(thumb);
+          if(!poster && thumb.indexOf('/video/upload/') !== -1){
+            poster = thumb.replace('/video/upload/', '/video/upload/so_0,f_jpg,w_480,h_640,c_fill/');
+          }
+        }catch(e){}
+        if(poster){
+          // Real first-frame thumbnail only — no play icon overlay
+          media = '<img src="'+esc(poster)+'" alt="" loading="lazy" decoding="async" data-story-thumb="1">';
+        } else {
+          // Soft skeleton only (no default media/play glyph)
+          media = '<div class="ms-sc-skel" aria-hidden="true"></div>';
+        }
+      } else if(thumb){
+        media = '<img src="'+esc(thumb)+'" alt="" loading="lazy" decoding="async">';
+      } else {
+        media = '<div class="ms-sc-skel" aria-hidden="true"></div>';
+      }
       html += '<button type="button" class="ms-story-card'+(own?' own':'')+'" data-gi="'+gi+'">'
         + media
         + '<div class="ms-sc-grad"></div>'
@@ -2218,14 +2315,24 @@ function renderActiveList(){
     try{ history.pushState({page:'msStory'}, '', (location.hash||'#stories')+'/story'); }catch(e){}
     showSegment();
   }
-  function closeViewer(){
+  function closeViewer(fromPop){
     stopProgress();
     var stage = $('msSvStage');
     if(stage) stage.innerHTML = '';
     var v = $('msStoryViewer');
     if(v){ v.classList.remove('open'); v.setAttribute('aria-hidden','true'); }
     activeGroup = null;
-    try{ if(history.state && history.state.page==='msStory') history.back(); }catch(e){}
+    // X button: replaceState so we land cleanly on Stories without an extra back.
+    // Android Back (popstate) already removed the history entry — skip history change.
+    if(!fromPop){
+      try{
+        if(history.state && history.state.page==='msStory'){
+          history.replaceState({ page: 'storiesPage' }, '', '#stories');
+        } else {
+          history.replaceState({ page: 'storiesPage' }, '', '#stories');
+        }
+      }catch(e){}
+    }
   }
   function stopProgress(){
     paused = false;
@@ -2334,15 +2441,17 @@ function renderActiveList(){
     if(!activeGroup) return;
     if(activeIndex < activeGroup.items.length-1){ activeIndex++; showSegment(); }
     else {
+      // End of this person's stories → advance to next person if any.
+      // Do NOT close the viewer on a plain tap; only X / Android Back close it.
       var gi = storyGroups.indexOf(activeGroup);
       if(gi >= 0 && gi < storyGroups.length-1) openViewer(gi+1, 0);
-      else closeViewer();
+      // else: stay on last segment (user must use ✕ or system back)
     }
   }
   function prevSegment(){
     if(!activeGroup) return;
     if(activeIndex > 0){ activeIndex--; showSegment(); }
-    else closeViewer();
+    // else: stay on first segment — never close via left-tap
   }
 
   async function toggleLike(){
@@ -2493,7 +2602,7 @@ function renderActiveList(){
       if(!isNaN(gi)) openViewer(gi, 0);
     });
     if($('msStoryFileInput')) $('msStoryFileInput').onchange = onFilePicked;
-    if($('msSvClose')) $('msSvClose').onclick = closeViewer;
+    if($('msSvClose')) $('msSvClose').onclick = function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } closeViewer(false); };
     if($('msSvPrev')) $('msSvPrev').onclick = function(e){ e.stopPropagation(); prevSegment(); };
     if($('msSvNext')) $('msSvNext').onclick = function(e){ e.stopPropagation(); nextSegment(); };
     if($('msSvLike')) $('msSvLike').onclick = function(e){ e.stopPropagation(); toggleLike(); };
@@ -2827,7 +2936,7 @@ window.addEventListener('pagehide',()=>{if(user)db.collection('users').doc(user.
 try{ history.replaceState({page:'chatsPage'},'','#chats'); }catch(e){}
 window.addEventListener('popstate', function(e){
   if(typeof msIsStoryOpen==='function' && msIsStoryOpen()){
-    try{ msCloseStoryViewer(); }catch(err){}
+    try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
   if($('msThemePage') && $('msThemePage').classList.contains('open')){
