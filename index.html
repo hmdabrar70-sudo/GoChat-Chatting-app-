@@ -939,22 +939,36 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   try{ listenTyping(currentChat || chatId); }catch(e){}
   if(!isGroup && otherUid && otherUid !== 'group') listenOtherStatus(otherUid);
   try{ if(typeof updateSendBtnState === 'function') updateSendBtnState(); }catch(e){}
-  // Backfill users[] on the CANONICAL chat id so list queries work across both apps
+  // Backfill users[] + mark read ONLY when the other person sent the latest message.
+  // Never clear isRead/unreadCount when WE are the lastSender — that would hide the
+  // recipient's unread badge on their device (shared chat document).
   if(!isGroup && currentOther && currentOther !== 'group' && currentChat && user){
     var cid = currentChat;
     db.collection('chats').doc(cid).get().then(function(doc){
-      var data = doc.exists ? (doc.data() || {}) : {};
+      if(!doc.exists) return;
+      var data = doc.data() || {};
       var sorted = [user.uid, currentOther].filter(Boolean).sort();
       var needsUsers = !Array.isArray(data.users) || data.users.indexOf(user.uid) === -1 || data.users.indexOf(currentOther) === -1;
-      var patch = { isRead: true, unreadCount: 0 };
+      var otherSentLatest = !!(data.lastSender && data.lastSender !== user.uid);
+      var patch = {};
       if(needsUsers){
         patch.users = sorted;
-        patch.names = data.names || {};
+        patch.names = Object.assign({}, data.names || {});
         patch.names[user.uid] = (userData && (userData.name || userData.displayName)) || 'User';
         if(currentOther) patch.names[currentOther] = otherName || patch.names[currentOther] || 'User';
       }
-      try{ if(window.__gcUnreadCache) window.__gcUnreadCache[cid] = 0; }catch(e){}
-      db.collection('chats').doc(cid).set(patch, { merge: true }).catch(function(){});
+      if(otherSentLatest){
+        patch.isRead = true;
+        patch.unreadCount = 0;
+        try{ if(window.__gcUnreadCache) window.__gcUnreadCache[cid] = 0; }catch(e){}
+        try{
+          var entry = chatMap.get(cid);
+          if(entry && entry.data){ entry.data.isRead = true; entry.data.unreadCount = 0; }
+        }catch(e){}
+      }
+      if(Object.keys(patch).length){
+        db.collection('chats').doc(cid).set(patch, { merge: true }).catch(function(){});
+      }
     }).catch(function(){});
   }
 }
@@ -1083,13 +1097,25 @@ function listenMessages(cid){
       }
     }
     painted = true;
+    var hadOtherUnread = false;
     docs.forEach(function(d){
       var m = d.data() || {};
-      if(user && m.uid !== user.uid && !m.read && !m.isSystem){
+      if(user && m.uid && m.uid !== user.uid && !m.read && !m.isSystem){
+        hadOtherUnread = true;
         try{ d.ref.update({ read:true, readAt: firebase.firestore.FieldValue.serverTimestamp() }); }catch(e){}
       }
     });
-    try{ db.collection('chats').doc(cid).set({ isRead: true, unreadCount: 0 }, { merge: true }); }catch(e){}
+    // Only clear shared unread state when we actually consumed the other person's messages.
+    // If we only opened a chat where WE last messaged, leave isRead/unreadCount alone
+    // so the recipient still sees the correct badge.
+    if(hadOtherUnread){
+      try{
+        db.collection('chats').doc(cid).set({ isRead: true, unreadCount: 0 }, { merge: true });
+        if(window.__gcUnreadCache) window.__gcUnreadCache[cid] = 0;
+        var entry = chatMap.get(cid);
+        if(entry && entry.data){ entry.data.isRead = true; entry.data.unreadCount = 0; }
+      }catch(e){}
+    }
   }
   // Fast first paint via get(), then live updates
   q.get().then(function(snap){ if(!painted) paint(snap); }).catch(function(){});
@@ -1225,12 +1251,13 @@ async function sendPayload(payload){
   var preview = out.text || (out.sharedPostId || out.sharedPostImg ? 'Attachment' : out.imageUrl ? 'Photo' : out.videoUrl ? 'Video' : (out.audioUrl || out.voiceUrl) ? 'Voice message' : 'Message');
   if(preview.length > 120) preview = preview.slice(0, 117) + '…';
 
-  // Chat meta — same fields Main GoChat writes
+  // Chat meta — same fields Main GoChat writes + proper unread counter for recipient
   var patch = {
     lastMsg: preview,
     lastAt: firebase.firestore.FieldValue.serverTimestamp(),
     lastSender: authUid,
-    isRead: false
+    isRead: false,
+    unreadCount: firebase.firestore.FieldValue.increment(1)
   };
   if(otherUid && otherUid !== 'group' && activeCid.indexOf('group_') !== 0){
     var sorted = [authUid, otherUid].filter(Boolean).sort();
@@ -1269,13 +1296,15 @@ async function sendPayload(payload){
     if($('replyBar')) $('replyBar').classList.remove('show');
   }
 
-  // Local list update
+  // Local list update (resolve FieldValue.increment for local cache)
   try{
     var prev = (chatMap.get(activeCid) || {}).data || {};
     var merged = Object.assign({}, prev, patch);
     merged.lastAt = new Date();
     merged.lastSender = user.uid;
     merged.isRead = false;
+    var prevUnread = (typeof prev.unreadCount === 'number' && prev.unreadCount > 0) ? prev.unreadCount : 0;
+    merged.unreadCount = prevUnread + 1;
     chatMap.set(activeCid, { id: activeCid, data: merged });
     if(typeof renderChats === 'function') renderChats();
   }catch(e){}
@@ -1634,20 +1663,38 @@ async function loadChatLists(){
 
   function ingestChatDoc(id, data){
     if(!id) return;
-    chatMap.set(id, { id: id, data: data || {} });
-    var people = (data && (data.users || data.members)) || [];
+    data = data || {};
+    chatMap.set(id, { id: id, data: data });
+    var people = (data.users || data.members) || [];
     people.forEach(function(uid){ prefetchUser(uid); });
-    if(data && !data.isGroup && String(id).indexOf('group_') !== 0){
+    if(!data.isGroup && String(id).indexOf('group_') !== 0){
       var parts = String(id).split('_');
       if(parts.length >= 2){
         // UIDs don't contain '_'; chatId is uidA_uidB
         var a = parts[0], b = parts.slice(1).join('_');
-        if(a === user.uid) prefetchUser(b);
-        else if(b === user.uid) prefetchUser(a);
-        else {
-          if(String(id).indexOf(user.uid) !== -1){
-            var other = a === user.uid ? b : a;
-            prefetchUser(other);
+        var other = null;
+        if(a === user.uid) other = b;
+        else if(b === user.uid) other = a;
+        else if(String(id).indexOf(user.uid) !== -1){
+          other = a === user.uid ? b : a;
+        }
+        if(other) prefetchUser(other);
+        // Critical: ensure users[] contains BOTH parties so the other account's
+        // array-contains list query returns this chat. Rules allow read/update
+        // when uid is in chatId.split('_'), so both sides can heal the doc.
+        if(other && user && user.uid){
+          var hasUsers = Array.isArray(data.users)
+            && data.users.indexOf(user.uid) !== -1
+            && data.users.indexOf(other) !== -1;
+          if(!hasUsers){
+            if(!window.__gcUsersBackfill) window.__gcUsersBackfill = {};
+            if(!window.__gcUsersBackfill[id]){
+              window.__gcUsersBackfill[id] = true;
+              var sorted = [user.uid, other].sort();
+              data.users = sorted;
+              chatMap.set(id, { id: id, data: data });
+              db.collection('chats').doc(id).set({ users: sorted }, { merge: true }).catch(function(){});
+            }
           }
         }
       }
@@ -1920,16 +1967,19 @@ async function loadPeopleAndProbeChats(){
   var probe = uidList.slice(0, 200);
   await Promise.all(probe.map(function(otherUid){
     var cid = chatIdFor(otherUid);
-    if(chatMap.has(cid)) return Promise.resolve();
     return db.collection('chats').doc(cid).get().then(function(doc){
       if(doc.exists){
         var data = doc.data() || {};
-        if(!Array.isArray(data.users) || data.users.indexOf(user.uid) === -1){
-          var sorted = [user.uid, otherUid].sort();
+        var sorted = [user.uid, otherUid].sort();
+        var needs = !Array.isArray(data.users)
+          || data.users.indexOf(user.uid) === -1
+          || data.users.indexOf(otherUid) === -1;
+        if(needs){
           db.collection('chats').doc(cid).set({ users: sorted }, { merge: true }).catch(function(){});
           data.users = sorted;
         }
         chatMap.set(doc.id, { id: doc.id, data: data });
+        prefetchUser(otherUid);
       }
     }).catch(function(){});
   }));
@@ -2009,15 +2059,16 @@ function renderChats(){
     var avatars = data.avatars || {};
     var displayName = u.name || u.displayName || names[other] || 'GoChat user';
     var displayAv = u.avatar || u.photoURL || avatars[other] || avatar({ name: displayName });
+    // Unread = other person sent the latest message and we have not marked the chat read
     var isUnread = !!(data.lastSender && data.lastSender !== user.uid && data.isRead === false);
-    // Prefer explicit unreadCount; otherwise use locally cached count, fall back to 1
     var uCount = 0;
     if(isUnread){
       var raw = data.unreadCount;
       var cached = (window.__gcUnreadCache && window.__gcUnreadCache[id]) || 0;
       if(typeof raw === 'number' && raw > 0) uCount = Math.min(99, Math.floor(raw));
+      else if(typeof raw === 'string' && Number(raw) > 0) uCount = Math.min(99, Math.floor(Number(raw)));
       else if(cached > 0) uCount = Math.min(99, cached);
-      else uCount = 1;
+      else uCount = 1; // provisional until enrichUnreadCounts resolves exact number
     }
     rows.push({
       kind: 'chat', id: id, data: data, uid: other, group: false,
@@ -2075,31 +2126,61 @@ function enrichUnreadCounts(rows){
   if(!window.__gcUnreadCache) window.__gcUnreadCache = {};
   var unreadRows = rows.filter(function(x){ return x.unread && x.id && !x.group; });
   if(!unreadRows.length) return;
-  // Cap concurrent fetches
-  unreadRows.slice(0, 8).forEach(function(x){
+  // Cap concurrent fetches; prefer chats that still show provisional count (1)
+  unreadRows.slice(0, 12).forEach(function(x){
     var cid = x.id;
     if(window.__gcUnreadPending && window.__gcUnreadPending[cid]) return;
+    // Skip re-fetch if we already have a solid cached count matching the chat doc
+    var cached = window.__gcUnreadCache[cid];
+    var docCount = (chatMap.get(cid) && chatMap.get(cid).data && chatMap.get(cid).data.unreadCount) || 0;
+    if(typeof cached === 'number' && cached > 1 && cached === docCount) return;
     if(!window.__gcUnreadPending) window.__gcUnreadPending = {};
     window.__gcUnreadPending[cid] = true;
     db.collection('chats').doc(cid).collection('messages')
       .orderBy('createdAt', 'desc')
-      .limit(40)
+      .limit(50)
       .get()
       .then(function(snap){
+        // Count consecutive trailing messages from the other person until we hit
+        // our own message or a message already marked read. This matches "N new
+        // messages since you last opened the chat".
         var n = 0;
-        snap.forEach(function(d){
-          var m = d.data() || {};
-          if(m.uid && m.uid !== user.uid && !m.read && !m.isSystem && !m.deletedForEveryone) n++;
-        });
+        var docs = snap.docs || [];
+        for(var i = 0; i < docs.length; i++){
+          var m = docs[i].data() || {};
+          if(m.isSystem || m.deletedForEveryone) continue;
+          if(!m.uid || m.uid === user.uid) break; // our message ends the unread streak
+          if(m.read === true) break; // already seen
+          n++;
+        }
+        // Prefer explicit chat-doc unreadCount when it is higher (increment path)
+        var entry = chatMap.get(cid);
+        var docN = entry && entry.data && typeof entry.data.unreadCount === 'number' ? entry.data.unreadCount : 0;
+        if(docN > n) n = docN;
+        if(n < 1 && x.unread) n = 1;
         window.__gcUnreadCache[cid] = n;
         var badge = document.querySelector('[data-chat-badge="'+CSS.escape(cid)+'"]');
         if(badge){
           if(n > 0) badge.textContent = n > 99 ? '99+' : String(n);
           else badge.remove();
+        } else if(n > 0){
+          // Badge missing in DOM (provisional render) — soft-update the row
+          var row = document.querySelector('.chat-row[data-chat="'+CSS.escape(cid)+'"]');
+          if(row && !row.querySelector('[data-chat-badge]')){
+            var span = document.createElement('span');
+            span.className = 'unread';
+            span.setAttribute('data-chat-badge', cid);
+            span.textContent = n > 99 ? '99+' : String(n);
+            row.appendChild(span);
+            try{
+              var nameEl = row.querySelector('.name');
+              var prevEl = row.querySelector('.preview');
+              if(nameEl) nameEl.classList.add('is-unread');
+              if(prevEl) prevEl.classList.add('is-unread');
+            }catch(e){}
+          }
         }
-        // Keep chatMap in sync so next full render uses the real count
         try{
-          var entry = chatMap.get(cid);
           if(entry && entry.data){
             entry.data.unreadCount = n;
             if(n === 0) entry.data.isRead = true;
@@ -2512,7 +2593,8 @@ function renderActiveList(){
         avatars: (function(){ var o={}; o[user.uid]=(userData&&userData.avatar)||''; o[otherUid]=otherAvatar; return o; })(),
         lastSender: user.uid,
         isRead: false,
-        users: [user.uid, otherUid]
+        unreadCount: firebase.firestore.FieldValue.increment(1),
+        users: [user.uid, otherUid].sort()
       }, {merge:true});
       if(inp) inp.value='';
       toast('Reply sent');
@@ -3336,7 +3418,8 @@ async function confirmForward(){
           lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           lastSender: user.uid,
-          isRead: false
+          isRead: false,
+          unreadCount: firebase.firestore.FieldValue.increment(1)
         };
         if(fparts.length >= 2 && fid.indexOf('group_') !== 0){
           fpatch.users = [fparts[0], fparts.slice(1).join('_')].sort();
