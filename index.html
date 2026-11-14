@@ -1309,10 +1309,12 @@ async function gcSubmitComposer(){
   var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
   if(sendBtn) sendBtn.disabled = true;
   try{
-    // Main GoChat pattern: do NOT clear input until Firestore write succeeds
-    await sendPayload({ text: t });
+    // Optimistic: clear input immediately, then write
+    var textToSend = t;
     input.value = '';
     try{ updateSendBtnState(); }catch(e){}
+    try{ cancelReplyComposer(); }catch(e){}
+    await sendPayload({ text: textToSend });
     // Guarantee the bubble appears even if the ordered snapshot is briefly lagging
     // (serverTimestamp can be null locally for a moment and drop out of orderBy queries)
     try{
