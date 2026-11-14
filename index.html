@@ -1,16 +1,16 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f4f6f8"><title>GoChat — Messages</title><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script><style>
 :root{color-scheme:light;--bg:#f4f6f8;--surface:#fff;--surface2:#edf1f4;--text:#17212b;--muted:#71808e;--line:#e7ebef;--accent:#087f5b;--accent-soft:#e3f5ee;--shadow:0 8px 28px rgba(20,40,55,.07);--nav:rgba(255,255,255,.92)}
 @media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#10171d;--surface:#182229;--surface2:#22313a;--text:#edf4f5;--muted:#9aabb4;--line:#2a3942;--accent:#46d6a2;--accent-soft:#1c3c34;--shadow:0 8px 28px rgba(0,0,0,.22);--nav:rgba(24,34,41,.94)}}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}button{color:inherit;cursor:pointer;border:0}.app{max-width:520px;min-height:100dvh;margin:auto;background:var(--bg);position:relative;padding-bottom:88px;overflow:hidden}.topbar{height:70px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}.page-title{font-size:27px;font-weight:800;letter-spacing:-.8px}.top-actions{display:flex;gap:10px}.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}.icon-btn svg{width:22px;height:22px}.screen{display:none;padding:0 16px 18px;animation:appear .18s ease}.screen.active{display:block}@keyframes appear{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}.searchbar{height:40px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;gap:8px;padding:0 12px;margin:0 0 12px;color:var(--muted)}.searchbar input{border:0;outline:0;background:transparent;color:var(--text);width:100%;font-size:14px}.filters{display:flex;gap:8px;overflow:auto;padding-bottom:14px}.chip{padding:9px 15px;border-radius:99px;background:var(--surface);color:var(--muted);font-size:13px;font-weight:650;white-space:nowrap;border:1px solid var(--line)}.chip.selected{background:var(--accent);color:white;border-color:var(--accent)}.chat-row,.person-row{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid var(--line);width:100%;text-align:left;background:transparent}.avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none;background:var(--surface2)}.avatar.small{width:46px;height:46px}.avatar.large{width:104px;height:104px}.avatar-wrap{position:relative;flex:none}.online-dot{position:absolute;width:13px;height:13px;border-radius:50%;background:#20c982;border:2px solid var(--bg);right:0;bottom:2px}.chat-main,.person-main{min-width:0;flex:1}.name-line{display:flex;justify-content:space-between;gap:8px;align-items:center}.name{font-size:15px;font-weight:750}.time,.subtle{font-size:12px;color:var(--muted)}.preview{font-size:13px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.unread{background:var(--accent);color:#fff;border-radius:99px;min-width:20px;height:20px;padding:0 6px;display:grid;place-items:center;font-size:11px;font-weight:800}.fab{position:fixed;right:max(22px,calc((100vw - 520px)/2 + 22px));bottom:100px;width:58px;height:58px;border-radius:20px;background:var(--accent);color:white;display:grid;place-items:center;box-shadow:0 9px 24px rgba(0,130,90,.28)}.fab svg{width:25px;height:25px}.bottom-nav{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:78px;padding:8px 12px max(8px,env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:var(--nav);backdrop-filter:blur(18px);border-top:1px solid var(--line)}.nav-item{flex:1;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.nav-item svg{width:25px;height:25px;fill:currentColor}.nav-item.selected{color:var(--accent)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input{font:inherit}button{color:inherit;cursor:pointer;border:0}.app{max-width:520px;min-height:100dvh;margin:auto;background:var(--bg);position:relative;padding-bottom:88px;overflow:hidden}.topbar{height:70px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}.page-title{font-size:27px;font-weight:800;letter-spacing:-.8px}.top-actions{display:flex;gap:10px}.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}.icon-btn svg{width:22px;height:22px}.screen{display:none;padding:0 16px 18px;animation:appear .18s ease}.screen.active{display:block}@keyframes appear{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}.searchbar{height:40px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;gap:8px;padding:0 12px;margin:0 0 12px;color:var(--muted)}.searchbar input{border:0;outline:0;background:transparent;color:var(--text);width:100%;font-size:14px}.filters{display:flex;gap:8px;overflow:auto;padding-bottom:14px}.chip{padding:9px 15px;border-radius:99px;background:var(--surface);color:var(--muted);font-size:13px;font-weight:650;white-space:nowrap;border:1px solid var(--line)}.chip.selected{background:var(--accent);color:white;border-color:var(--accent)}.chat-row,.person-row{display:flex;align-items:center;gap:13px;padding:13px 2px;border-bottom:1px solid var(--line);width:100%;text-align:left;background:transparent}.avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none;background:var(--surface2)}.avatar.small{width:46px;height:46px}.avatar.large{width:104px;height:104px}.avatar-wrap{position:relative;flex:none}.online-dot{position:absolute;width:13px;height:13px;border-radius:50%;background:#20c982;border:2px solid var(--bg);right:0;bottom:2px}.chat-main,.person-main{min-width:0;flex:1}.name-line{display:flex;justify-content:space-between;gap:8px;align-items:center}.name{font-size:15px;font-weight:750}.time,.subtle{font-size:12px;color:var(--muted)}.preview{font-size:13px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.preview.is-unread{color:var(--text);font-weight:650}.name.is-unread{font-weight:800}.unread{background:var(--accent);color:#fff;border-radius:99px;min-width:20px;height:20px;padding:0 6px;display:grid;place-items:center;font-size:11px;font-weight:800}.fab{position:fixed;right:max(22px,calc((100vw - 520px)/2 + 22px));bottom:100px;width:58px;height:58px;border-radius:20px;background:var(--accent);color:white;display:grid;place-items:center;box-shadow:0 9px 24px rgba(0,130,90,.28)}.fab svg{width:25px;height:25px}.bottom-nav{position:fixed;z-index:10;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:78px;padding:8px 12px max(8px,env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:var(--nav);backdrop-filter:blur(18px);border-top:1px solid var(--line)}.nav-item{flex:1;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.nav-item svg{width:25px;height:25px;fill:currentColor}.nav-item.selected{color:var(--accent)}
 .nav-item .nav-user-avatar{width:25px;height:25px;border-radius:50%;object-fit:cover;border:1.5px solid currentColor;display:block}
 .nav-item.selected .nav-user-avatar{border-color:var(--accent)}
 .nav-item-profile svg{display:none!important}
 .coming-soon{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center;color:var(--muted);min-height:50dvh}
 .coming-soon h2{margin:0 0 8px;font-size:20px;font-weight:800;color:var(--text)}
 .coming-soon p{margin:0;font-size:14px;line-height:1.5;max-width:280px}
-.nav-avatar{width:27px;height:27px;border-radius:50%;object-fit:cover;border:2px solid var(--muted)}.nav-item.selected .nav-avatar{border-color:var(--accent)}.section-heading{font-size:17px;font-weight:800;margin:16px 0 12px}.online-strip{display:flex;gap:15px;overflow:auto;padding:5px 0 18px}.story-person{min-width:68px;text-align:center;background:none}.story-ring{width:64px;height:64px;padding:3px;border-radius:50%;background:linear-gradient(135deg,#00b87a,#55b7ff,#a56cff);margin:0 auto 7px}.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid var(--bg);object-fit:cover}.story-person span{font-size:12px;font-weight:650}.add-story{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;background:var(--accent-soft);color:var(--accent);border:2px dashed var(--accent)}.story-card{border-radius:22px;overflow:hidden;background:var(--surface);margin:12px 0;box-shadow:var(--shadow)}.story-image{height:280px;width:100%;object-fit:cover;display:block}.story-meta{display:flex;align-items:center;gap:10px;padding:13px}.profile-head{text-align:center;padding:18px 0 20px}.profile-head .avatar{margin:0 auto 13px;display:block}.profile-name{font-size:21px;font-weight:850}.about{font-size:13px;color:var(--muted);margin-top:7px}.profile-stats{display:flex;justify-content:center;gap:35px;margin:20px 0}.stat strong{display:block;font-size:17px}.stat span{font-size:12px;color:var(--muted)}.settings-list{background:var(--surface);border-radius:18px;overflow:hidden;border:1px solid var(--line)}.setting{display:flex;align-items:center;gap:13px;padding:16px;background:transparent;width:100%;text-align:left;border-bottom:1px solid var(--line)}.setting:last-child{border:0}.setting-icon{width:38px;height:38px;border-radius:12px;background:var(--surface2);display:grid;place-items:center;color:var(--accent)}.setting-icon svg{width:20px;height:20px}.setting-copy{flex:1}.setting-copy strong{font-size:14px}.setting-copy small{display:block;color:var(--muted);margin-top:3px;font-size:12px}.chevron{color:var(--muted);font-size:22px}.subpage{display:none;position:absolute;inset:0;background:var(--bg);z-index:5;padding-bottom:20px;overflow:auto}.subpage.show{display:block}.sub-header{height:68px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:2}.back-btn{width:40px;height:40px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}.sub-title{font-size:18px;font-weight:800}.chat-detail{display:flex;flex-direction:column;height:calc(100dvh - 68px)}.messages{flex:1;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;gap:12px}.bubble{max-width:78%;padding:11px 14px;border-radius:17px;background:var(--surface);font-size:14px;line-height:1.45;box-shadow:0 2px 8px rgba(0,0,0,.04)}.bubble.mine{align-self:flex-end;background:var(--accent);color:white;border-bottom-right-radius:5px}.bubble:not(.mine){align-self:flex-start;border-bottom-left-radius:5px}.composer{display:flex;gap:9px;padding:12px 14px;background:var(--surface);border-top:1px solid var(--line)}.composer input{flex:1;min-width:0;border:0;outline:0;background:var(--surface2);border-radius:99px;padding:0 16px;color:var(--text)}.send{width:44px;height:44px;border-radius:50%;background:var(--accent);color:white}.empty{padding:35px 10px;text-align:center;color:var(--muted);font-size:14px}.modal-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end;justify-content:center}.modal-backdrop.show{display:flex}.sheet{width:min(520px,100%);background:var(--surface);border-radius:24px 24px 0 0;padding:22px 20px 30px;box-shadow:var(--shadow)}.sheet h3{margin:0 0 8px}.sheet p{color:var(--muted);font-size:13px}.sheet input{width:100%;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);color:var(--text);margin:8px 0 14px}.primary{width:100%;padding:14px;border-radius:14px;background:var(--accent);color:white;font-weight:800}.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:#17212b;color:white;padding:10px 16px;border-radius:99px;font-size:12px;z-index:30;display:none}.toast.show{display:block}.theme-toggle{font-size:12px;color:var(--muted);margin:16px 0;text-align:center}
+.nav-avatar{width:27px;height:27px;border-radius:50%;object-fit:cover;border:2px solid var(--muted)}.nav-item.selected .nav-avatar{border-color:var(--accent)}.section-heading{font-size:17px;font-weight:800;margin:16px 0 12px}.online-strip{display:flex;gap:15px;overflow:auto;padding:5px 0 18px}.story-person{min-width:68px;text-align:center;background:none}.story-ring{width:64px;height:64px;padding:3px;border-radius:50%;background:linear-gradient(135deg,#00b87a,#55b7ff,#a56cff);margin:0 auto 7px}.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid var(--bg);object-fit:cover}.story-person span{font-size:12px;font-weight:650}.add-story{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;background:var(--accent-soft);color:var(--accent);border:2px dashed var(--accent)}.story-card{border-radius:22px;overflow:hidden;background:var(--surface);margin:12px 0;box-shadow:var(--shadow)}.story-image{height:280px;width:100%;object-fit:cover;display:block}.story-meta{display:flex;align-items:center;gap:10px;padding:13px}.profile-head{text-align:center;padding:18px 0 20px}.profile-head .avatar{margin:0 auto 13px;display:block}.profile-name{font-size:21px;font-weight:850}.about{font-size:13px;color:var(--muted);margin-top:7px}.profile-stats{display:flex;justify-content:center;gap:35px;margin:20px 0}.stat strong{display:block;font-size:17px}.stat span{font-size:12px;color:var(--muted)}.settings-list{background:var(--surface);border-radius:18px;overflow:hidden;border:1px solid var(--line)}.setting{display:flex;align-items:center;gap:13px;padding:16px;background:transparent;width:100%;text-align:left;border-bottom:1px solid var(--line)}.setting:last-child{border:0}.setting-icon{width:38px;height:38px;border-radius:12px;background:var(--surface2);display:grid;place-items:center;color:var(--accent)}.setting-icon svg{width:20px;height:20px}.setting-copy{flex:1}.setting-copy strong{font-size:14px}.setting-copy small{display:block;color:var(--muted);margin-top:3px;font-size:12px}.chevron{color:var(--muted);font-size:22px}.subpage{display:none;position:absolute;inset:0;background:var(--bg);z-index:5;padding-bottom:20px;overflow:auto}.subpage.show{display:block}.sub-header{height:68px;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:2}.back-btn{width:40px;height:40px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}.sub-title{font-size:18px;font-weight:800}.chat-detail{display:flex;flex-direction:column;height:calc(100dvh - 68px)}.messages{flex:1;overflow:auto;padding:18px 14px;display:flex;flex-direction:column;gap:12px}.bubble{max-width:78%;padding:11px 14px;border-radius:17px;background:var(--surface);font-size:14px;line-height:1.45;box-shadow:0 2px 8px rgba(0,0,0,.04)}.bubble.mine{align-self:flex-end;background:var(--accent);color:white;border-bottom-right-radius:5px}.bubble:not(.mine){align-self:flex-start;border-bottom-left-radius:5px}.composer{display:flex;gap:9px;padding:12px 14px;background:var(--surface);border-top:1px solid var(--line)}.composer input{flex:1;min-width:0;border:0;outline:0;background:var(--surface2);border-radius:99px;padding:0 16px;color:var(--text)}.send{width:44px;height:44px;border-radius:50%}.empty{padding:35px 10px;text-align:center;color:var(--muted);font-size:14px}.modal-backdrop{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end;justify-content:center}.modal-backdrop.show{display:flex}.sheet{width:min(520px,100%);background:var(--surface);border-radius:24px 24px 0 0;padding:22px 20px 30px;box-shadow:var(--shadow)}.sheet h3{margin:0 0 8px}.sheet p{color:var(--muted);font-size:13px}.sheet input{width:100%;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);color:var(--text);margin:8px 0 14px}.primary{width:100%;padding:14px;border-radius:14px;background:var(--accent);color:white;font-weight:800}.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:#17212b;color:white;padding:10px 16px;border-radius:99px;font-size:12px;z-index:30;display:none}.toast.show{display:block}.theme-toggle{font-size:12px;color:var(--muted);margin:16px 0;text-align:center}
 
-.bottom-nav{position:fixed;z-index:12;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:76px;padding:8px 12px max(8px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:var(--nav);backdrop-filter:blur(18px);border-top:1px solid var(--line)}.nav-item{flex:1;height:58px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.nav-item svg{width:23px;height:23px;fill:currentColor;display:block}.nav-item.selected{color:var(--accent)}.app-shell{padding-bottom:90px}.main-page{display:none;padding:0 16px 18px}.main-page.active{display:block}.nav-user-avatar{width:25px;height:25px;border-radius:50%;object-fit:cover;border:1px solid currentColor}.auth-wrap{min-height:100dvh;display:grid;place-items:center;padding:28px 22px;background:var(--bg)}.auth-card{width:100%;max-width:390px}.brand{font-size:29px;font-weight:850;letter-spacing:-1.1px;margin-bottom:10px}.auth-sub{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:34px}.auth-card h1{font-size:25px;margin:0 0 8px;letter-spacing:-.5px}.field{height:54px;border-radius:99px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;padding:0 18px;margin:12px 0}.field input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px}.field button{background:transparent;padding:5px;color:var(--muted);display:grid;place-items:center}.field button svg{width:21px;height:21px}.login-btn{height:54px;width:100%;border-radius:99px;background:var(--accent);color:white;font-weight:800;margin-top:12px}.error{color:#d94a4a;font-size:13px;min-height:20px;margin:10px 8px}.hidden{display:none!important}.app-shell{max-width:520px;min-height:100dvh;margin:auto;padding-bottom:12px}.topbar{justify-content:space-between}.icon-btn{border:0}.chat-row{cursor:pointer}.chat-view{position:fixed;z-index:40;inset:0;background:var(--bg);display:none;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;width:100%;height:100%;overflow:hidden}.chat-view.open{display:flex}.chat-head{height:68px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);flex:none}.chat-head .back-btn{width:40px;height:40px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}.chat-head .back-btn svg{width:21px;height:21px}.chat-head .avatar{width:42px;height:42px}.chat-head-info{min-width:0;flex:1}.chat-head-info strong{display:block;font-size:15px}.chat-head-info small{color:var(--muted);font-size:12px}.messages{flex:1;overflow:auto;padding:16px 13px 20px;display:flex;flex-direction:column;gap:9px}.msg{max-width:82%;padding:10px 12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.45;overflow-wrap:anywhere;position:relative}.msg.mine{align-self:flex-end;background:var(--accent);color:#fff;border-color:transparent;border-bottom-right-radius:5px}.msg:not(.mine){align-self:flex-start;border-bottom-left-radius:5px}.msg time{display:block;font-size:10px;opacity:.68;text-align:right;margin-top:4px}.msg img,.msg video{max-width:100%;max-height:260px;border-radius:10px;display:block}.msg audio{max-width:230px}.msg-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.msg-actions button{font-size:11px;background:var(--surface2);color:var(--text);padding:5px 8px;border-radius:20px}.reply-bar{display:none;padding:8px 14px;background:var(--surface2);font-size:12px;color:var(--muted);align-items:center;justify-content:space-between}.reply-bar.show{display:flex}.composer{display:flex;align-items:center;gap:7px;padding:10px 10px max(10px,env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}.composer input[type=text]{flex:1;min-width:0;height:44px;border:0;outline:0;background:var(--surface2);border-radius:99px;padding:0 15px;color:var(--text)}.tool-btn,.send{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--text);flex:none}.tool-btn svg,.send svg{width:21px;height:21px}.send{background:var(--accent);color:#fff}.file-input{display:none}.empty{padding:35px 10px;text-align:center;color:var(--muted);font-size:14px}.toast{z-index:40}.searchbar{margin-top:4px}.avatar-fallback{display:grid;place-items:center;font-weight:800;color:white;background:linear-gradient(135deg,#f59e0b,#ec4899)}
+.bottom-nav{position:fixed;z-index:12;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:76px;padding:8px 12px max(8px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:var(--nav);backdrop-filter:blur(18px);border-top:1px solid var(--line)}.nav-item{flex:1;height:58px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px;font-weight:700}.nav-item svg{width:23px;height:23px;fill:currentColor;display:block}.nav-item.selected{color:var(--accent)}.app-shell{padding-bottom:90px}.main-page{display:none;padding:0 16px 18px}.main-page.active{display:block}.nav-user-avatar{width:25px;height:25px;border-radius:50%;object-fit:cover;border:1px solid currentColor}.auth-wrap{min-height:100dvh;display:grid;place-items:center;padding:28px 22px;background:var(--bg)}.auth-card{width:100%;max-width:390px}.brand{font-size:29px;font-weight:850;letter-spacing:-1.1px;margin-bottom:10px}.auth-sub{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:34px}.auth-card h1{font-size:25px;margin:0 0 8px;letter-spacing:-.5px}.field{height:54px;border-radius:99px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;padding:0 18px;margin:12px 0}.field input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px}.field button{background:transparent;padding:5px;color:var(--muted);display:grid;place-items:center}.field button svg{width:21px;height:21px}.login-btn{height:54px;width:100%;border-radius:99px;background:var(--accent);color:white;font-weight:800;margin-top:12px}.error{color:#d94a4a;font-size:13px;min-height:20px;margin:10px 8px}.hidden{display:none!important}.app-shell{max-width:520px;min-height:100dvh;margin:auto;padding-bottom:12px}.topbar{justify-content:space-between}.icon-btn{border:0}.chat-row{cursor:pointer}.chat-view{position:fixed;z-index:40;inset:0;background:var(--bg);display:none;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;width:100%;height:100%;overflow:hidden}.chat-view.open{display:flex}.chat-head{height:68px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--line);flex:none}.chat-head .back-btn{width:40px;height:40px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}.chat-head .back-btn svg{width:21px;height:21px}.chat-head .avatar{width:42px;height:42px}.chat-head-info{min-width:0;flex:1}.chat-head-info strong{display:block;font-size:15px}.chat-head-info small{color:var(--muted);font-size:12px}.messages{flex:1;overflow:auto;padding:16px 13px 20px;display:flex;flex-direction:column;gap:9px}.msg{max-width:82%;padding:10px 12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.45;overflow-wrap:anywhere;position:relative}.msg.mine{align-self:flex-end;background:var(--accent);color:#fff;border-color:transparent;border-bottom-right-radius:5px}.msg:not(.mine){align-self:flex-start;border-bottom-left-radius:5px}.msg time{display:block;font-size:10px;opacity:.68;text-align:right;margin-top:4px}.msg img,.msg video{max-width:100%;max-height:260px;border-radius:10px;display:block}.msg audio{max-width:230px}.msg-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.msg-actions button{font-size:11px;background:var(--surface2);color:var(--text);padding:5px 8px;border-radius:20px}.reply-bar{display:none;padding:8px 14px;background:var(--surface2);font-size:12px;color:var(--muted);align-items:center;justify-content:space-between}.reply-bar.show{display:flex}.composer{display:flex;align-items:center;gap:7px;padding:10px 10px max(10px,env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}.composer input[type=text]{flex:1;min-width:0;height:44px;border:0;outline:0;background:var(--surface2);border-radius:99px;padding:0 15px;color:var(--text)}.tool-btn,.send{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--text);flex:none}.tool-btn svg,.send svg{width:21px;height:21px}.send{background:var(--surface2);color:var(--muted);transition:background .15s ease,color .15s ease}.send.is-active{background:var(--accent);color:#fff}.file-input{display:none}.empty{padding:35px 10px;text-align:center;color:var(--muted);font-size:14px}.toast{z-index:40}.searchbar{margin-top:4px}.avatar-fallback{display:grid;place-items:center;font-weight:800;color:white;background:linear-gradient(135deg,#f59e0b,#ec4899)}
 
 /* Active tab · online people strip */
 .active-wrap{padding:8px 0 24px}
@@ -439,7 +439,7 @@ article.msg.gc-msg-new{animation:gcMsgFlash 1.6s ease}
 article.msg.mine.gc-msg-new{animation:none}
 
 </style></head><body>
-<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><div class="brand">gochat</div><div class="auth-sub">Your conversations, together.</div><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
+<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
 <div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
 <section id="chatsPage" class="main-page active"><div class="searchbar"><input id="chatSearch" placeholder="Search friends by name or username" autocomplete="off"></div><div id="searchResults" class="search-results"></div><div id="chatList"><div class="empty">Loading your chats…</div></div></section>
 <section id="activePage" class="main-page"><div class="active-wrap"><div id="activeList" class="active-grid"><div class="active-empty">Loading active people…</div></div></div></section>
@@ -492,12 +492,12 @@ article.msg.mine.gc-msg-new{animation:none}
   <div class="ms-theme-body">
     <button type="button" class="theme-opt" data-theme="light" id="themeOptLight">
       <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M18 12C18 15.3137 15.3137 18 12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12Z"/><path fill="currentColor" fill-rule="evenodd" d="M12 1.25C12.4142 1.25 12.75 1.58579 12.75 2V3C12.75 3.41421 12.4142 3.75 12 3.75C11.5858 3.75 11.25 3.41421 11.25 3V2C11.25 1.58579 11.5858 1.25 12 1.25ZM4.39861 4.39861C4.6915 4.10572 5.16638 4.10572 5.45927 4.39861L5.85211 4.79145C6.145 5.08434 6.145 5.55921 5.85211 5.85211C5.55921 6.145 5.08434 6.145 4.79145 5.85211L4.39861 5.45927C4.10572 5.16638 4.10572 4.6915 4.39861 4.39861ZM19.6011 4.39887C19.894 4.69176 19.894 5.16664 19.6011 5.45953L19.2083 5.85237C18.9154 6.14526 18.4405 6.14526 18.1476 5.85237C17.8547 5.55947 17.8547 5.0846 18.1476 4.79171L18.5405 4.39887C18.8334 4.10598 19.3082 4.10598 19.6011 4.39887ZM1.25 12C1.25 11.5858 1.58579 11.25 2 11.25H3C3.41421 11.25 3.75 11.5858 3.75 12C3.75 12.4142 3.41421 12.75 3 12.75H2C1.58579 12.75 1.25 12.4142 1.25 12ZM20.25 12C20.25 11.5858 20.5858 11.25 21 11.25H22C22.4142 11.25 22.75 11.5858 22.75 12C22.75 12.4142 22.4142 12.75 22 12.75H21C20.5858 12.75 20.25 12.4142 20.25 12ZM18.1476 18.1476C18.4405 17.8547 18.9154 17.8547 19.2083 18.1476L19.6011 18.5405C19.894 18.8334 19.894 19.3082 19.6011 19.6011C19.3082 19.894 18.8334 19.894 18.5405 19.6011L18.1476 19.2083C17.8547 18.9154 17.8547 18.4405 18.1476 18.1476ZM5.85211 18.1479C6.145 18.4408 6.145 18.9157 5.85211 19.2086L5.45927 19.6014C5.16638 19.8943 4.6915 19.8943 4.39861 19.6014C4.10572 19.3085 4.10572 18.8336 4.39861 18.5407L4.79145 18.1479C5.08434 17.855 5.55921 17.855 5.85211 18.1479ZM12 20.25C12.4142 20.25 12.75 20.5858 12.75 21V22C12.75 22.4142 12.4142 22.75 12 22.75C11.5858 22.75 11.25 22.4142 11.25 22V21C11.25 20.5858 11.5858 20.25 12 20.25Z" clip-rule="evenodd"/></svg></span>
-      <span class="theme-opt-copy"><strong>Light</strong><small>Bright interface</small></span>
+      <span class="theme-opt-copy"><strong>Light mode</strong></span>
       <span class="theme-opt-check" aria-hidden="true"></span>
     </button>
     <button type="button" class="theme-opt" data-theme="dark" id="themeOptDark">
       <span class="theme-opt-ico"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/></svg></span>
-      <span class="theme-opt-copy"><strong>Dark</strong><small>Dim interface</small></span>
+      <span class="theme-opt-copy"><strong>Dark mode</strong></span>
       <span class="theme-opt-check" aria-hidden="true"></span>
     </button>
   </div>
@@ -934,19 +934,22 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   listenMessages(currentChat || chatId);
   try{ listenTyping(currentChat || chatId); }catch(e){}
   if(!isGroup && otherUid && otherUid !== 'group') listenOtherStatus(otherUid);
-  // Backfill users[] so list queries work across both apps
-  if(!isGroup && otherUid && otherUid !== 'group' && chatId && user){
-    db.collection('chats').doc(chatId).get().then(function(doc){
-      if(!doc.exists) return;
-      var data = doc.data() || {};
-      var needsUsers = !Array.isArray(data.users) || data.users.indexOf(user.uid) === -1;
+  try{ if(typeof updateSendBtnState === 'function') updateSendBtnState(); }catch(e){}
+  // Backfill users[] on the CANONICAL chat id so list queries work across both apps
+  if(!isGroup && currentOther && currentOther !== 'group' && currentChat && user){
+    var cid = currentChat;
+    db.collection('chats').doc(cid).get().then(function(doc){
+      var data = doc.exists ? (doc.data() || {}) : {};
+      var sorted = [user.uid, currentOther].filter(Boolean).sort();
+      var needsUsers = !Array.isArray(data.users) || data.users.indexOf(user.uid) === -1 || data.users.indexOf(currentOther) === -1;
+      var patch = { isRead: true, unreadCount: 0 };
       if(needsUsers){
-        var parts = String(chatId).split('_');
-        var users = (parts.length === 2) ? [parts[0], parts[1]] : [user.uid, otherUid];
-        db.collection('chats').doc(chatId).set({ users: users, isRead: true }, { merge: true }).catch(function(){});
-      } else {
-        db.collection('chats').doc(chatId).set({ isRead: true }, { merge: true }).catch(function(){});
+        patch.users = sorted;
+        patch.names = data.names || {};
+        patch.names[user.uid] = (userData && (userData.name || userData.displayName)) || 'User';
+        if(currentOther) patch.names[currentOther] = otherName || patch.names[currentOther] || 'User';
       }
+      db.collection('chats').doc(cid).set(patch, { merge: true }).catch(function(){});
     }).catch(function(){});
   }
 }
@@ -1023,6 +1026,7 @@ function listenTyping(cid){
 function listenMessages(cid){
   if(msgUnsub){ try{ msgUnsub(); }catch(e){} msgUnsub=null; }
   seenMsgIds = new Set(); // reset so reopen doesn't re-flash old messages
+  window.__gcMsgDataCache = {}; // scoped to this chat — double-tap opens instantly
   var box = $('messages');
   if(box) box.innerHTML = '<div class="sk-msg" aria-hidden="true"><div class="sk-bubble w80"></div><div class="sk-bubble me w60"></div><div class="sk-bubble w50"></div><div class="sk-bubble me w80"></div><div class="sk-bubble w40"></div></div>';
   var q = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','desc').limit(50);
@@ -1043,9 +1047,13 @@ function listenMessages(cid){
       var prevTop = box.scrollTop;
       var isFirstPaint = !painted;
       var newIds = [];
+      if(!window.__gcMsgDataCache) window.__gcMsgDataCache = {};
+      // Keep cache scoped to the current chat so double-tap can open instantly
+      var cache = window.__gcMsgDataCache;
       box.innerHTML = docs.map(function(d){
-        var html = renderMessage(d.id, d.data());
         var data = d.data() || {};
+        cache[d.id] = data;
+        var html = renderMessage(d.id, data);
         // Subtle highlight for newly arrived messages from the other user (not on first paint)
         if(!isFirstPaint && user && data.uid && data.uid !== user.uid && !seenMsgIds.has(d.id)){
           newIds.push(d.id);
@@ -1076,7 +1084,7 @@ function listenMessages(cid){
         try{ d.ref.update({ read:true, readAt: firebase.firestore.FieldValue.serverTimestamp() }); }catch(e){}
       }
     });
-    try{ db.collection('chats').doc(cid).set({ isRead: true }, { merge: true }); }catch(e){}
+    try{ db.collection('chats').doc(cid).set({ isRead: true, unreadCount: 0 }, { merge: true }); }catch(e){}
   }
   // Fast first paint via get(), then live updates
   q.get().then(function(snap){ if(!painted) paint(snap); }).catch(function(){});
@@ -1153,7 +1161,8 @@ function renderMessage(id,m){
       + '<div class="rr-text">'+esc(m.replyText||'Message')+'</div>'
       + '</div>';
   }
-  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+fmt(m.createdAt)+((m.edited||m.isEdited)?' · Edited':'')+(mine?(m.read?' · Seen':' · Sent'):'')+'</time></article>';
+  var timeLabel = (m.createdAt ? fmt(m.createdAt) : (mine ? 'Sending…' : ''));
+  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+timeLabel+((m.edited||m.isEdited)?' · Edited':'')+(mine && m.createdAt ?(m.read?' · Seen':' · Sent'):'')+'</time></article>';
 }
 
 async function sendPayload(payload){
@@ -1215,7 +1224,8 @@ async function sendPayload(payload){
     lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     lastSender: user.uid,
-    isRead: false
+    isRead: false,
+    unreadCount: firebase.firestore.FieldValue.increment(1)
   };
   if(otherUid && otherUid !== 'group' && activeCid.indexOf('group_') !== 0){
     var sorted = [user.uid, otherUid].filter(Boolean).sort();
@@ -1253,6 +1263,21 @@ async function sendPayload(payload){
     if($('replyBar')) $('replyBar').classList.remove('show');
   }
 
+  // Immediately reflect in local chat list (snapshot will reconcile)
+  try{
+    var prev = (chatMap.get(activeCid) || {}).data || {};
+    var merged = Object.assign({}, prev, patch);
+    merged.lastAt = new Date();
+    merged.lastMessageAt = merged.lastAt;
+    merged.lastSender = user.uid;
+    merged.isRead = false;
+    // Local estimate: FieldValue.increment is not a number yet — keep previous + 1 for UI
+    var prevUC = (typeof prev.unreadCount === 'number') ? prev.unreadCount : 0;
+    merged.unreadCount = prevUC + 1;
+    chatMap.set(activeCid, { id: activeCid, data: merged });
+    if(typeof renderChats === 'function') renderChats();
+  }catch(e){}
+
   try{
     var known = JSON.parse(localStorage.getItem('gc_msg_known_chats') || '[]');
     if(!Array.isArray(known)) known = [];
@@ -1270,20 +1295,32 @@ async function gcSubmitComposer(){
   if(!input) return false;
   var t = input.value.trim();
   if(!t) return false;
-  if(!currentChat || !user){ toast('Open a chat first'); return false; }
+  if(!user){ toast('Not signed in'); return false; }
+  if(!currentChat){ toast('Open a chat first'); return false; }
+  // Force canonical sorted id one more time right before write
+  if(currentOther && currentOther !== 'group' && String(currentChat).indexOf('group_') !== 0){
+    var can = [user.uid, currentOther].filter(Boolean).sort().join('_');
+    if(can && can !== currentChat){
+      currentChat = can;
+      try{ listenMessages(can); }catch(e){}
+    }
+  }
   window.__gcSendBusy = true;
   var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
   if(sendBtn) sendBtn.disabled = true;
   // Clear immediately for snappy UX; restore only if write fails
   input.value = '';
+  try{ updateSendBtnState(); }catch(e){}
   try{ input.blur(); }catch(e){}
   try{
     await sendPayload({ text: t });
     try{ input.focus(); }catch(e){}
     return true;
   }catch(err){
-    // Restore text so the user can retry
+    console.error('gcSubmitComposer failed', err);
+    // Restore text so the user can retry — never leave a silent failure
     input.value = t;
+    try{ updateSendBtnState(); }catch(e){}
     toast('Message failed: ' + (err.message || err));
     try{ input.focus(); }catch(e){}
     return false;
@@ -1307,13 +1344,22 @@ $('composer').addEventListener('submit', function(e){
   }
 })();
 
-/* Composer → typing signal */
+function updateSendBtnState(){
+  var input = $('messageInput');
+  var sb = document.querySelector('#composer .send, #composer button[type=submit]');
+  if(!input || !sb) return;
+  var has = !!(input.value && input.value.trim());
+  if(has) sb.classList.add('is-active');
+  else sb.classList.remove('is-active');
+}
+/* Composer → typing signal + send button state */
 (function(){
   var input = $('messageInput');
   if(!input || input._typingWired) return;
   input._typingWired = true;
   var debounce = null;
   input.addEventListener('input', function(){
+    updateSendBtnState();
     if(!currentChat || !user) return;
     setMyTyping(true);
     if(debounce) clearTimeout(debounce);
@@ -1323,6 +1369,8 @@ $('composer').addEventListener('submit', function(e){
     if(debounce) clearTimeout(debounce);
     setMyTyping(false);
   });
+  // initial state
+  updateSendBtnState();
 })();
 
 
@@ -1929,12 +1977,20 @@ function renderChats(){
     var avatars = data.avatars || {};
     var displayName = u.name || u.displayName || names[other] || 'GoChat user';
     var displayAv = u.avatar || u.photoURL || avatars[other] || avatar({ name: displayName });
+    var isUnread = !!(data.lastSender && data.lastSender !== user.uid && data.isRead === false);
+    // Prefer explicit unreadCount when present; otherwise 1 for the latest unread message
+    var uCount = 0;
+    if(isUnread){
+      var raw = data.unreadCount;
+      uCount = (typeof raw === 'number' && raw > 0) ? Math.min(99, Math.floor(raw)) : 1;
+    }
     rows.push({
       kind: 'chat', id: id, data: data, uid: other, group: false,
       name: displayName, avatar: displayAv,
       preview: (typingMap[id] ? '__TYPING__' : (formatChatPreview(data.lastMsg || data.lastMessage) || 'Start chatting')),
       sort: toMs(data.lastAt) || 1,
-      unread: !!(data.lastSender && data.lastSender !== user.uid && data.isRead === false)
+      unread: isUnread,
+      unreadCount: uCount
     });
   });
 
@@ -1955,11 +2011,14 @@ function renderChats(){
   }
 
   listEl.innerHTML = rows.map(function(x){
+    var un = x.unread ? ' is-unread' : '';
+    var count = x.unreadCount || 0;
+    var badge = (x.unread && count > 0) ? '<span class="unread">'+(count > 99 ? '99+' : String(count))+'</span>' : '';
     return '<button class="chat-row" type="button" data-chat="'+esc(x.id)+'" data-uid="'+esc(x.uid)+'" data-name="'+esc(x.name)+'" data-avatar="'+esc(x.avatar)+'" data-group="'+(x.group?'true':'false')+'">'
       + '<img class="avatar" src="'+esc(x.avatar)+'" alt="">'
-      + '<span class="chat-main"><span class="name-line"><span class="name">'+esc(x.name)+'</span><span class="time">'+esc(fmt(x.data.lastAt))+'</span></span>'
-      + '<span class="preview'+(x.preview==='__TYPING__'?' gc-typing-preview':'')+'">'+(x.preview==='__TYPING__'?gcTypingDotsHtml()+' typing…':esc(x.preview || ''))+'</span></span>'
-      + (x.unread ? '<span class="unread">•</span>' : '')
+      + '<span class="chat-main"><span class="name-line"><span class="name'+un+'">'+esc(x.name)+'</span><span class="time">'+esc(fmt(x.data.lastAt))+'</span></span>'
+      + '<span class="preview'+un+(x.preview==='__TYPING__'?' gc-typing-preview':'')+'">'+(x.preview==='__TYPING__'?gcTypingDotsHtml()+' typing…':esc(x.preview || ''))+'</span></span>'
+      + badge
       + '</button>';
   }).join('');
   // Persist for instant next open
@@ -2066,7 +2125,16 @@ function renderActiveList(){
     if(!user) return;
     var list = $('msStoriesList');
     if(!list) return;
-    if(storyUnsub){ try{ storyUnsub(); }catch(e){} storyUnsub=null; }
+    // Root-cause fix for disappear/flicker: do NOT tear down and recreate the
+    // onSnapshot listener on every tab switch. Keep one live subscription for
+    // the session; only re-render from the in-memory storyGroups cache.
+    if(storyUnsub){
+      try{ renderList(); }catch(e){}
+      return;
+    }
+    if(!list.innerHTML || list.innerHTML.indexOf('ms-story-card') < 0){
+      list.innerHTML = '<div class="active-empty">Loading stories…</div>';
+    }
     storyUnsub = db.collection('stories').onSnapshot(function(snap){
       var all = [];
       snap.forEach(function(d){
@@ -3067,9 +3135,15 @@ function closeForwardSheet(fromPop){
   var sheet = $('gcFwdSheet');
   if(sheet){ sheet.classList.remove('open'); sheet.setAttribute('aria-hidden','true'); }
   gcFwdMsgId = null; gcFwdSelected = {};
+  window.__gcFwdMsgData = null;
+  // Mirror closeMsgCtx: NEVER history.back() — that was popping the chat and dumping user to Chat List.
+  // Replace the fwd history entry so the underlying chat (or list) state stays intact.
   if(!fromPop && fwdNavPushed){
     fwdNavPushed = false;
-    try{ history.back(); }catch(e){}
+    try{
+      if(currentChat) history.replaceState({ page: 'chat', chat: currentChat, returnPage: chatReturnPage || 'chatsPage' }, '', '#chat/' + currentChat);
+      else history.replaceState({ page: 'chatsPage' }, '', '#chats');
+    }catch(e){}
   } else {
     fwdNavPushed = false;
   }
@@ -3235,38 +3309,78 @@ closeMediaViewer = hardCloseMediaViewer;
 function bindMsgHold(listEl){
   if(!listEl || listEl._holdBound) return;
   listEl._holdBound = true;
-  function startHold(e){
+  var lastTapTs = 0, lastTapId = null, touchStartY = 0, touchStartX = 0, touchMoved = false;
+  // In-memory cache of messages currently painted in this chat (filled by listenMessages paint)
+  if(!window.__gcMsgDataCache) window.__gcMsgDataCache = {};
+  function openCtxFor(id){
+    if(!id || !currentChat) return;
+    var cached = (window.__gcMsgDataCache && window.__gcMsgDataCache[id]) || null;
+    if(cached){
+      openMsgCtx(id, cached);
+      return;
+    }
+    // Fallback: fetch once, then open (should be rare after first paint)
+    db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
+      if(snap.exists){
+        if(window.__gcMsgDataCache) window.__gcMsgDataCache[id] = snap.data();
+        openMsgCtx(id, snap.data());
+      }
+    }).catch(function(){});
+  }
+  function onDoubleTap(e){
+    var art = e.target.closest('article.msg');
+    if(!art || e.target.closest('a,button,.gc-vp-play,input,textarea')) return;
+    var id = art.getAttribute('data-id');
+    if(!id) return;
+    var now = Date.now();
+    // 300ms window — snappy enough, still rejects accidental double single-taps
+    if(id === lastTapId && (now - lastTapTs) < 300){
+      lastTapTs = 0;
+      lastTapId = null;
+      try{ if(e.cancelable) e.preventDefault(); e.stopPropagation(); }catch(err){}
+      openCtxFor(id);
+    } else {
+      lastTapTs = now;
+      lastTapId = id;
+    }
+  }
+  listEl.addEventListener('touchstart', function(e){
+    if(!e.touches || e.touches.length !== 1) return;
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+    touchMoved = false;
+  }, {passive:true});
+  listEl.addEventListener('touchmove', function(e){
+    if(!e.touches || e.touches.length !== 1) return;
+    var dy = Math.abs(e.touches[0].clientY - touchStartY);
+    var dx = Math.abs(e.touches[0].clientX - touchStartX);
+    if(dy > 10 || dx > 10) touchMoved = true;
+  }, {passive:true});
+  listEl.addEventListener('touchend', function(e){
+    if(touchMoved) return;
+    if(e.changedTouches && e.changedTouches.length > 1) return;
+    onDoubleTap(e);
+  }, {passive:false});
+  // Desktop: native dblclick
+  listEl.addEventListener('dblclick', function(e){
     var art = e.target.closest('article.msg');
     if(!art || e.target.closest('a,button,.gc-vp-play')) return;
-    // Allow hold on media too
-    msgHoldTarget = art;
-    clearTimeout(msgHoldTimer);
-    msgHoldTimer = setTimeout(function(){
-      var id = art.getAttribute('data-id');
-      if(!id || !currentChat) return;
-      db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
-        if(snap.exists) openMsgCtx(id, snap.data());
-      }).catch(function(){});
-    }, 180);
-  }
-  function cancelHold(){ clearTimeout(msgHoldTimer); msgHoldTimer = null; }
-  listEl.addEventListener('touchstart', startHold, {passive:true});
-  listEl.addEventListener('touchend', cancelHold);
-  listEl.addEventListener('touchmove', cancelHold, {passive:true});
-  listEl.addEventListener('touchcancel', cancelHold);
-  listEl.addEventListener('mousedown', function(e){ if(e.button===0) startHold(e); });
-  listEl.addEventListener('mouseup', cancelHold);
-  listEl.addEventListener('mouseleave', cancelHold);
+    e.preventDefault();
+    var id = art.getAttribute('data-id');
+    openCtxFor(id);
+  });
+  // Desktop right-click only. On touch devices long-press often synthesizes
+  // contextmenu — we must NOT open the action popup on long-press.
   listEl.addEventListener('contextmenu', function(e){
     var art = e.target.closest('article.msg');
     if(!art) return;
     e.preventDefault();
-    cancelHold();
+    // Touch / long-press generated contextmenu → ignore completely
+    if(e.pointerType === 'touch' || (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) || ('ontouchstart' in window && e.button === 0)){
+      return;
+    }
     var id = art.getAttribute('data-id');
-    if(!id || !currentChat) return;
-    db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
-      if(snap.exists) openMsgCtx(id, snap.data());
-    });
+    openCtxFor(id);
   });
 }
 if($('messages')) bindMsgHold($('messages'));
@@ -3448,10 +3562,15 @@ document.addEventListener('click', function(e){
   if(e.target === $('msgCtx')){ closeMsgCtx(false); return; }
   var ctxBtn = e.target.closest('#msgCtx [data-ctx]');
   if(ctxBtn){ Promise.resolve(runCtxAction(ctxBtn.getAttribute('data-ctx'))).catch(function(err){ toast((err && err.message) || 'Action failed'); }); return; }
-  // Forward sheet
-  if(e.target === $('gcFwdSheet') || e.target.closest('#gcFwdClose')){ closeForwardSheet(false); return; }
-  var fwdRow = e.target.closest('[data-fwd]');
+  // Forward sheet — outside / X only closes the sheet; never navigates away from chat
+  if(e.target === $('gcFwdSheet') || e.target.closest('#gcFwdClose')){
+    e.preventDefault(); e.stopPropagation();
+    closeForwardSheet(false);
+    return;
+  }
+  var fwdRow = e.target.closest('#gcFwdSheet [data-fwd]');
   if(fwdRow){
+    e.preventDefault(); e.stopPropagation();
     var id = fwdRow.getAttribute('data-fwd');
     if(gcFwdSelected[id]) delete gcFwdSelected[id];
     else {
@@ -3459,17 +3578,38 @@ document.addEventListener('click', function(e){
       gcFwdSelected[id] = true;
     }
     var n = Object.keys(gcFwdSelected).length;
-    $('gcFwdSend').disabled = n === 0;
-    $('gcFwdSub').textContent = n ? (n + ' selected') : 'Select up to 5 chats';
+    if($('gcFwdSend')) $('gcFwdSend').disabled = n === 0;
+    if($('gcFwdSub')) $('gcFwdSub').textContent = n ? (n + ' selected') : 'Select up to 5 chats';
     renderForwardList(($('gcFwdSearch') && $('gcFwdSearch').value) || '');
     return;
   }
-  if(e.target.closest('#gcFwdSend')){ confirmForward(); return; }
+  if(e.target.closest('#gcFwdSend')){
+    e.preventDefault(); e.stopPropagation();
+    confirmForward();
+    return;
+  }
 });
 
 if($('gcFwdSearch')){
   $('gcFwdSearch').addEventListener('input', function(){ renderForwardList(this.value); });
 }
+/* Direct wire for Forward close — reliable on Android WebView (same pattern as mediaCloseBtn) */
+(function(){
+  function wireFwdClose(){
+    var btn = document.getElementById('gcFwdClose');
+    if(!btn || btn._fwdWired) return;
+    btn._fwdWired = true;
+    function doClose(e){
+      if(e){ try{ e.preventDefault(); e.stopPropagation(); }catch(err){} }
+      closeForwardSheet(false);
+    }
+    btn.addEventListener('click', doClose, true);
+    btn.addEventListener('touchend', doClose, {passive:false, capture:true});
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireFwdClose);
+  else wireFwdClose();
+  setTimeout(wireFwdClose, 0);
+})();
 if($('mvcBar')){
   $('mvcBar').onclick = function(e){
     e.stopPropagation();
