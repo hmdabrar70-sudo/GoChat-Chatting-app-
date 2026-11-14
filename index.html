@@ -2741,14 +2741,19 @@ function openThemePage(){
 function closeThemePage(fromPop){
   var el = $('msThemePage');
   if(!el) return;
-  el.classList.remove('open');
-  el.setAttribute('aria-hidden','true');
+
   if(!fromPop){
     try{
-      if(history.state && history.state.page === 'themePage') history.back();
-      else history.replaceState({ page: 'appSettings' }, '', '#profile/settings');
+      if(history.state && history.state.page === 'themePage'){
+        history.back();
+        return;
+      }
+      history.replaceState({ page: 'appSettings' }, '', '#profile/settings');
     }catch(e){}
   }
+
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden','true');
 }
 window.openThemePage = openThemePage;
 window.closeThemePage = closeThemePage;
