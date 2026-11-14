@@ -442,7 +442,83 @@ article.msg.gc-msg-new{animation:gcMsgFlash 1.6s ease}
 @keyframes gcMsgFlash{0%{background:var(--accent-soft)}100%{background:transparent}}
 article.msg.mine.gc-msg-new{animation:none}
 
-</style></head><body>
+
+/* Selected media preview */
+.gc-media-preview{
+  display:none;
+  padding:12px 14px;
+  background:var(--surface);
+  border-top:1px solid var(--line);
+}
+.gc-media-preview.show{display:block}
+.gc-media-preview-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.gc-media-preview-title{
+  font-size:13px;
+  font-weight:800;
+  color:var(--text);
+}
+.gc-media-preview-hint{
+  font-size:11px;
+  color:var(--muted);
+}
+.gc-media-preview-grid{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding:2px 2px 7px;
+}
+.gc-media-preview-item{
+  position:relative;
+  width:86px;
+  height:86px;
+  flex:none;
+  border-radius:13px;
+  overflow:hidden;
+  background:var(--surface2);
+  border:1px solid var(--line);
+}
+.gc-media-preview-item img,
+.gc-media-preview-item video{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.gc-media-preview-remove{
+  position:absolute;
+  top:5px;
+  right:5px;
+  width:23px;
+  height:23px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  font-size:17px;
+  line-height:1;
+  padding:0;
+}
+.gc-media-preview-type{
+  position:absolute;
+  left:5px;
+  bottom:5px;
+  padding:3px 6px;
+  border-radius:6px;
+  background:rgba(0,0,0,.65);
+  color:#fff;
+  font-size:9px;
+  font-weight:750;
+}
+</style>
+</head>
+<body>
 <div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
 <div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
 <section id="chatsPage" class="main-page active"><div class="searchbar"><input id="chatSearch" placeholder="Search friends by name or username" autocomplete="off"></div><div id="searchResults" class="search-results"></div><div id="chatList"><div class="empty">Loading your chats…</div></div></section>
@@ -545,6 +621,17 @@ article.msg.mine.gc-msg-new{animation:none}
     <span class="voice-rec-time" id="voiceRecTime">0:00</span>
   </div>
   <button type="button" class="voice-rec-send" id="voiceRecSend" aria-label="Send voice">Send</button>
+</div>
+<div id="gcMediaPreview" class="gc-media-preview">
+  <div class="gc-media-preview-head">
+    <div class="gc-media-preview-title" id="gcMediaCount">
+      Selected media
+    </div>
+    <div class="gc-media-preview-hint">
+      Remove any item before sending
+    </div>
+  </div>
+  <div id="gcMediaPreviewGrid" class="gc-media-preview-grid"></div>
 </div>
 <form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section><div id="toast" class="toast"></div>
 
@@ -1325,7 +1412,8 @@ async function gcSubmitComposer(){
   var input = $('messageInput');
   if(!input) return false;
   var t = input.value.trim();
-  if(!t) return false;
+
+  if(!t && !gcPendingMedia.length) return false;
   if(!user){ toast('Not signed in'); return false; }
   if(!currentChat){ toast('Open a chat first'); return false; }
   // Force canonical sorted id (same as Main GoChat currentChatId)
@@ -1338,6 +1426,16 @@ async function gcSubmitComposer(){
   var sendBtn = document.querySelector('#composer .send, #composer button[type=submit]');
   if(sendBtn) sendBtn.disabled = true;
   try{
+      /* Send selected media first */
+    if(gcPendingMedia.length){
+      await gcSendSelectedMedia();
+    }
+
+    /* Nothing else to send */
+    if(!t){
+      try{ input.focus(); }catch(e){}
+      return true;
+    }
     // Optimistic: clear input immediately, then write
     var textToSend = t;
     input.value = '';
@@ -1409,7 +1507,10 @@ function updateSendBtnState(){
   var input = $('messageInput');
   var sb = document.querySelector('#composer .send, #composer button[type=submit]');
   if(!input || !sb) return;
-  var has = !!(input.value && input.value.trim());
+  var has = !!(
+    (input.value && input.value.trim()) ||
+    (typeof gcPendingMedia !== 'undefined' && gcPendingMedia.length)
+  );
   if(has) sb.classList.add('is-active');
   else sb.classList.remove('is-active');
 }
@@ -1437,29 +1538,164 @@ function updateSendBtnState(){
 
 $('messages').addEventListener('click',async e=>{let b=e.target.closest('[data-action]');if(!b)return;let id=b.dataset.id,act=b.dataset.action,ref=db.collection('chats').doc(currentChat).collection('messages').doc(id),snap=await ref.get();if(!snap.exists)return;let m=snap.data();if(act==='reply'){replyTarget={id,...m};$('replyText').textContent='Replying to '+(m.senderName||'User')+': '+(m.text||'Media message');$('replyBar').classList.add('show');$('messageInput').focus()}else if(act==='forward'){let target=prompt('Enter the recipient chat ID to forward this message:');if(!target)return;let f={uid:user.uid,senderName:userData.name||'User',createdAt:firebase.firestore.FieldValue.serverTimestamp(),forwarded:true};['text','imageUrl','videoUrl','audioUrl','voiceUrl'].forEach(k=>{if(m[k])f[k]=m[k]});await db.collection('chats').doc(target).collection('messages').add(f);await db.collection('chats').doc(target).set({lastMsg:'Forwarded message',lastAt:firebase.firestore.FieldValue.serverTimestamp(),lastSender:user.uid,isRead:false},{merge:true});toast('Forwarded')}else if(act==='unsend'){if(m.uid!==user.uid){toast('You can only unsend your own message');return}if(confirm('Unsend this message for everyone?')){await ref.delete();toast('Message unsent')}}else if(act==='delete'){await ref.set({deletedFor:firebase.firestore.FieldValue.arrayUnion(user.uid)},{merge:true});toast('Deleted for you')}});
 if($('cancelReply')) $('cancelReply').onclick=function(){ cancelReplyComposer(); };
-$('mediaButton').onclick=()=>$('mediaInput').click();$('mediaInput').onchange=async e=>{
-  for(let f of [...e.target.files]){
-    if(f.size>25*1024*1024){toast('File exceeds 25 MB');continue}
-    try{
-      toast('Uploading…');
-      if(f.type.startsWith('video/')){
-        var thumbBlob = await captureVideoThumbBlob(f);
-        var videoUrl = await uploadBlobToCloudinary(f, f.name||'video.mp4', 'video');
-        var thumbUrl = '';
-        if(thumbBlob){
-          try{ thumbUrl = await uploadBlobToCloudinary(thumbBlob, 'thumb.jpg', 'image'); }catch(te){}
-        }
-        if(!thumbUrl) thumbUrl = cloudinaryVideoPoster(videoUrl);
-        await sendPayload({ videoUrl: videoUrl, videoThumb: thumbUrl || '' });
-      } else {
-        var imageUrl = await uploadBlobToCloudinary(f, f.name||'photo.jpg', 'image');
-        await sendPayload({ imageUrl: imageUrl });
-      }
-      toast('Sent');
-    }catch(err){ toast(err.message||'Upload failed'); }
+/* Selected media queue — upload only after explicit Send */
+var gcPendingMedia = [];
+
+function gcRenderMediaPreview(){
+  var panel = $('gcMediaPreview');
+  var grid = $('gcMediaPreviewGrid');
+  var count = $('gcMediaCount');
+
+  if(!panel || !grid || !count) return;
+
+  grid.innerHTML = '';
+
+  if(!gcPendingMedia.length){
+    panel.classList.remove('show');
+    updateSendBtnState();
+    return;
   }
-  e.target.value='';
+
+  panel.classList.add('show');
+  count.textContent = gcPendingMedia.length + ' item' +
+    (gcPendingMedia.length > 1 ? 's' : '') + ' selected';
+
+  gcPendingMedia.forEach(function(item, index){
+    var card = document.createElement('div');
+    card.className = 'gc-media-preview-item';
+
+    var media;
+
+    if(item.file.type.startsWith('video/')){
+      media = document.createElement('video');
+      media.muted = true;
+      media.playsInline = true;
+      media.preload = 'metadata';
+    } else {
+      media = document.createElement('img');
+      media.alt = 'Selected photo';
+    }
+
+    media.src = item.previewUrl;
+    card.appendChild(media);
+
+    var type = document.createElement('span');
+    type.className = 'gc-media-preview-type';
+    type.textContent = item.file.type.startsWith('video/') ? 'VIDEO' : 'PHOTO';
+    card.appendChild(type);
+
+    var remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'gc-media-preview-remove';
+    remove.textContent = '×';
+    remove.setAttribute('aria-label', 'Remove selected media');
+
+    remove.onclick = function(){
+      var removed = gcPendingMedia.splice(index, 1)[0];
+
+      if(removed && removed.previewUrl){
+        URL.revokeObjectURL(removed.previewUrl);
+      }
+
+      gcRenderMediaPreview();
+    };
+
+    card.appendChild(remove);
+    grid.appendChild(card);
+  });
+
+  updateSendBtnState();
+}
+
+$('mediaButton').onclick = function(){
+  $('mediaInput').click();
 };
+
+$('mediaInput').onchange = function(e){
+  var files = Array.from(e.target.files || []);
+
+  files.forEach(function(file){
+    if(file.size > 25 * 1024 * 1024){
+      toast('File exceeds 25 MB');
+      return;
+    }
+
+    if(!file.type.startsWith('image/') &&
+       !file.type.startsWith('video/')){
+      toast('Unsupported media type');
+      return;
+    }
+
+    gcPendingMedia.push({
+      file: file,
+      previewUrl: URL.createObjectURL(file)
+    });
+  });
+
+  e.target.value = '';
+  gcRenderMediaPreview();
+};
+
+/* Upload and send selected media only after Send is pressed */
+async function gcSendSelectedMedia(){
+  while(gcPendingMedia.length){
+    var item = gcPendingMedia[0];
+    var file = item.file;
+
+    if(file.type.startsWith('video/')){
+      var thumbBlob = await captureVideoThumbBlob(file);
+
+      var videoUrl = await uploadBlobToCloudinary(
+        file,
+        file.name || 'video.mp4',
+        'video'
+      );
+
+      var thumbUrl = '';
+
+      if(thumbBlob){
+        try{
+          thumbUrl = await uploadBlobToCloudinary(
+            thumbBlob,
+            'thumb.jpg',
+            'image'
+          );
+        }catch(te){}
+      }
+
+      if(!thumbUrl){
+        thumbUrl = cloudinaryVideoPoster(videoUrl);
+      }
+
+      await sendPayload({
+        videoUrl: videoUrl,
+        videoThumb: thumbUrl || ''
+      });
+
+    }else{
+      var imageUrl = await uploadBlobToCloudinary(
+        file,
+        file.name || 'photo.jpg',
+        'image'
+      );
+
+      await sendPayload({
+        imageUrl: imageUrl
+      });
+    }
+
+    /* Remove only after successful upload and message send */
+    gcPendingMedia.shift();
+
+    if(item.previewUrl){
+      URL.revokeObjectURL(item.previewUrl);
+    }
+
+    gcRenderMediaPreview();
+  }
+
+  toast('Media sent');
+}
 (function(){
   var voiceRecTimer = null, voiceRecStarted = 0, voiceDiscard = false;
   function fmtRec(ms){
