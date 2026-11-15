@@ -257,6 +257,38 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 }
 .chat-row:focus,.person-row:focus,.nav-item:focus{outline:none;background:inherit}
 .chat-row:active,.person-row:active{background:var(--surface2)}
+
+.chat-avatar-story{
+  width:60px;
+  height:60px;
+  padding:3px;
+  display:block;
+  flex:none;
+  border-radius:50%;
+  background:transparent;
+  cursor:pointer;
+}
+
+.chat-avatar-story.has-story{
+  background:linear-gradient(
+    135deg,
+    #87F5F5 0%,
+    #FFE5F1 50%,
+    #F042FF 100%
+  );
+}
+
+.chat-avatar-story.has-story.is-seen{
+  background:#d1d5db;
+}
+
+.chat-avatar-story .avatar{
+  display:block;
+  width:54px;
+  height:54px;
+  border:2px solid var(--bg);
+  pointer-events:none;
+}
 .gc-chat-video-bubble,.gc-chat-video-poster{
   width:100%;
   max-width:240px;
@@ -2487,8 +2519,20 @@ function renderChats(){
     var un = x.unread ? ' is-unread' : '';
     var count = x.unreadCount || 0;
     var badge = (x.unread && count > 0) ? '<span class="unread" data-chat-badge="'+esc(x.id)+'">'+(count > 99 ? '99+' : String(count))+'</span>' : '';
+
+    var storyState = (!x.group && typeof window.msGetChatStoryState === 'function')
+      ? window.msGetChatStoryState(x.uid) : null;
+
+    var storyRing = storyState
+      ? (' has-story' + (storyState.seen ? ' is-seen' : ' is-unseen'))
+      : '';
+
+    var chatAvatar = x.group
+      ? '<img class="avatar" src="'+esc(x.avatar)+'" alt="">'
+      : '<span class="chat-avatar-story'+storyRing+'" data-story-uid="'+esc(x.uid)+'"><img class="avatar" src="'+esc(x.avatar)+'" alt=""></span>';
+
     return '<button class="chat-row" type="button" data-chat="'+esc(x.id)+'" data-uid="'+esc(x.uid)+'" data-name="'+esc(x.name)+'" data-avatar="'+esc(x.avatar)+'" data-group="'+(x.group?'true':'false')+'">'
-      + '<img class="avatar" src="'+esc(x.avatar)+'" alt="">'
+      + chatAvatar
       + '<span class="chat-main"><span class="name-line"><span class="name'+un+'">'+esc(x.name)+'</span><span class="time">'+esc(fmt(x.data.lastAt))+'</span></span>'
       + '<span class="preview'+un+(x.preview==='__TYPING__'?' gc-typing-preview':'')+'">'+(x.preview==='__TYPING__'?gcTypingDotsHtml()+' typing…':esc(x.preview || ''))+'</span></span>'
       + badge
@@ -2631,6 +2675,75 @@ function renderActiveList(){
   var pendingUrl = null;
   var pendingIsVideo = false;
   var storySoundEnabled = true;
+  var storyReturnPage = 'storiesPage';
+  
+  // Persistent per-user story seen cache
+function msReadLocalSeenStoryMap(){
+  if(!user) return {};
+
+  var key = 'gc_ms_seen_stories_v1_' + user.uid;
+  var map = {};
+
+  try{
+    map = JSON.parse(localStorage.getItem(key) || '{}');
+
+    if(!map || typeof map !== 'object' || Array.isArray(map)){
+      map = {};
+    }
+  }catch(e){
+    map = {};
+  }
+
+  var now = Date.now();
+  var changed = false;
+
+  Object.keys(map).forEach(function(id){
+    var seenAt = Number(map[id] || 0);
+
+    // Stories expire after 24 hours.
+    // Keep local seen records for a maximum of 48 hours.
+    if(!seenAt || now - seenAt > STORY_MS * 2){
+      delete map[id];
+      changed = true;
+    }
+  });
+
+  if(changed){
+    try{
+      localStorage.setItem(key, JSON.stringify(map));
+    }catch(e){}
+  }
+
+  return map;
+}
+
+function msRememberLocalSeenStory(storyId){
+  if(!user || !storyId) return;
+
+  try{
+    var key = 'gc_ms_seen_stories_v1_' + user.uid;
+    var map = msReadLocalSeenStoryMap();
+
+    map[storyId] = Date.now();
+
+    localStorage.setItem(key, JSON.stringify(map));
+  }catch(e){}
+}
+
+function msStoryIsSeen(s, localSeen){
+  if(!user || !s || !s.id) return false;
+
+  var firestoreSeen = Array.isArray(s.views)
+    && s.views.indexOf(user.uid) !== -1;
+
+  var localSeenAlready = !!(
+    localSeen &&
+    Object.prototype.hasOwnProperty.call(localSeen, s.id)
+  );
+
+  return firestoreSeen || localSeenAlready;
+}
+
 
   function $(id){ return document.getElementById(id); }
   function toast(m){ try{ if(typeof showToast==='function') showToast(m); else console.log(m); }catch(e){} }
@@ -2746,6 +2859,12 @@ function renderActiveList(){
       });
       storyGroups = groups;
       renderList();
+
+      try{
+        if(typeof window.msRefreshChatStoryRings === 'function'){
+          window.msRefreshChatStoryRings();
+        }
+      }catch(e){}
     }, function(err){
       if(list) list.innerHTML = '<div class="ms-story-empty">Could not load stories</div>';
       console.warn(err);
@@ -2801,13 +2920,76 @@ function renderActiveList(){
     list.innerHTML = html;
   }
 
-  function openViewer(gi, startIdx){
+  window.msGetChatStoryState = function(uid){
+  if(!user || !uid) return null;
+
+  var group = storyGroups.find(function(g){
+    return g.uid === uid;
+  });
+
+  if(!group || !group.items || !group.items.length){
+    return null;
+  }
+
+  var localSeen = msReadLocalSeenStoryMap();
+
+  // A user is considered fully seen only when
+  // every active story has been viewed.
+  var allSeen = group.items.every(function(s){
+    return msStoryIsSeen(s, localSeen);
+  });
+
+  return {
+    seen: allSeen
+  };
+};
+
+  window.msRefreshChatStoryRings = function(){
+    var list = $('chatList');
+    if(!list) return;
+
+    list.querySelectorAll('.chat-avatar-story[data-story-uid]').forEach(function(el){
+      var state = window.msGetChatStoryState(
+        el.getAttribute('data-story-uid')
+      );
+
+      el.classList.toggle('has-story', !!state);
+      el.classList.toggle('is-seen', !!(state && state.seen));
+      el.classList.toggle('is-unseen', !!(state && !state.seen));
+    });
+  };
+
+  window.msOpenStoryForChat = function(uid){
+    if(!uid) return false;
+
+    var gi = storyGroups.findIndex(function(g){
+      return g.uid === uid;
+    });
+
+    if(gi < 0 || !storyGroups[gi] || !storyGroups[gi].items || !storyGroups[gi].items.length) return false;
+
+    openViewer(gi, storyGroups[gi].items.length - 1, 'chatsPage');
+
+    return true;
+  };
+
+  function openViewer(gi, startIdx, returnPage){
   activeGroup = storyGroups[gi];
   if(!activeGroup || !activeGroup.items.length) return;
+
   activeIndex = Math.max(0, Math.min(startIdx||0, activeGroup.items.length-1));
+
   var v = $('msStoryViewer');
   if(!v) return;
+
   var wasOpen = v.classList.contains('open');
+
+  if(!wasOpen){
+    storyReturnPage = returnPage || (($('chatView') && $('chatView').classList.contains('open'))
+      ? 'chatsPage'
+      : ((document.querySelector('.main-page.active') || {}).id || 'storiesPage'));
+  }
+
   v.classList.add('open');
   v.setAttribute('aria-hidden','false');
 
@@ -2815,27 +2997,42 @@ function renderActiveList(){
     storySoundEnabled = true;
     updateStorySoundButton();
 
-    try{ history.pushState({page:'msStory'}, '', (location.hash||'#stories')+'/story'); }catch(e){}
+    try{
+      history.pushState(
+        {page:'msStory', returnPage:storyReturnPage},
+        '',
+        (location.hash||'#stories')+'/story'
+      );
+    }catch(e){}
   }
 
   showSegment();
 }
   function closeViewer(fromPop){
     stopProgress();
+
     var stage = $('msSvStage');
     if(stage) stage.innerHTML = '';
+
     var v = $('msStoryViewer');
-    if(v){ v.classList.remove('open'); v.setAttribute('aria-hidden','true'); }
+    if(v){
+      v.classList.remove('open');
+      v.setAttribute('aria-hidden','true');
+    }
+
     activeGroup = null;
-    // X button: replaceState so we land cleanly on Stories without an extra back.
-    // Android Back (popstate) already removed the history entry — skip history change.
+
+    // Restore the page that opened this story.
+    // Android Back already restored its URL.
     if(!fromPop){
       try{
-        if(history.state && history.state.page==='msStory'){
-          history.replaceState({ page: 'storiesPage' }, '', '#stories');
-        } else {
-          history.replaceState({ page: 'storiesPage' }, '', '#stories');
-        }
+        var returnPage = storyReturnPage || 'storiesPage';
+
+        var returnHash = returnPage === 'chatsPage' ? '#chats'
+          : returnPage === 'activePage' ? '#active'
+          : returnPage === 'settingsPage' ? '#profile' : '#stories';
+
+        history.replaceState({ page: returnPage }, '', returnHash);
       }catch(e){}
     }
   }
@@ -2851,16 +3048,76 @@ function renderActiveList(){
     }).join('');
   }
   function markView(s){
-    if(!user || !s || !s.id || s.uid===user.uid) return;
-    try{
+  if(!user || !s || !s.id || s.uid === user.uid) return;
+
+  try{
+    var serverSeen = Array.isArray(s.views)
+      && s.views.indexOf(user.uid) !== -1;
+
+    // Normalize local story views.
+    if(!Array.isArray(s.views)){
+      s.views = [];
+    }
+
+    // Update the current story immediately.
+    if(!serverSeen){
+      s.views.push(user.uid);
+    }
+
+    // Persist this exact story ID locally.
+    msRememberLocalSeenStory(s.id);
+
+    // Synchronize every cached copy of this story.
+    function updateSeenState(item){
+      if(!item || item.id !== s.id) return;
+
+      if(!Array.isArray(item.views)){
+        item.views = [];
+      }
+
+      if(item.views.indexOf(user.uid) === -1){
+        item.views.push(user.uid);
+      }
+    }
+
+    storyGroups.forEach(function(group){
+      if(!group.items) return;
+
+      group.items.forEach(function(item){
+        updateSeenState(item);
+      });
+    });
+
+    if(activeGroup && activeGroup.items){
+      activeGroup.items.forEach(function(item){
+        updateSeenState(item);
+      });
+    }
+
+    // Save to Firestore only if the server does not already
+    // contain this user's view record.
+    if(!serverSeen){
       db.collection('stories').doc(s.id).set({
         views: firebase.firestore.FieldValue.arrayUnion(user.uid),
         viewCount: firebase.firestore.FieldValue.increment(1)
-      }, {merge:true}).catch(function(){});
-      s.views = s.views || [];
-      if(s.views.indexOf(user.uid)===-1) s.views.push(user.uid);
+      }, {merge:true}).catch(function(err){
+        console.warn('Story view update failed:', err);
+      });
+    }
+
+    // Refresh chat avatar rings immediately.
+    try{
+      if(typeof window.msRefreshChatStoryRings === 'function'){
+        window.msRefreshChatStoryRings();
+      }
     }catch(e){}
+
+  }catch(e){
+    console.warn('markView failed:', e);
   }
+}
+
+
   function showSegment(){
     stopProgress();
     if(!activeGroup) return;
@@ -3444,8 +3701,39 @@ function switchMainPage(id, fromHistory){
 
 
 if($('chatList')) $('chatList').addEventListener('click', function(e){
+
+  // Avatar click opens Stories instead of Chat
+  var storyAvatar = e.target.closest('[data-story-uid]');
+
+  if(storyAvatar){
+    e.preventDefault();
+    e.stopPropagation();
+
+    try{
+      if(typeof window.msOpenStoryForChat === 'function'){
+        window.msOpenStoryForChat(
+          storyAvatar.getAttribute('data-story-uid')
+        );
+      }
+    }catch(err){}
+
+    return;
+  }
+
+  // Normal chat-row click remains unchanged
   var b = e.target.closest('[data-chat]');
-  if(b) openChat(b.dataset.chat, b.dataset.uid, b.dataset.name, b.dataset.avatar, b.dataset.group==='true', 'chatsPage');
+
+  if(b){
+    openChat(
+      b.dataset.chat,
+      b.dataset.uid,
+      b.dataset.name,
+      b.dataset.avatar,
+      b.dataset.group==='true',
+      'chatsPage'
+    );
+  }
+
 });
 if($('activeList')) $('activeList').addEventListener('click', function(e){
   var b = e.target.closest('[data-chat]');
@@ -3551,7 +3839,15 @@ $('loginForm').onsubmit=async e=>{
   }
 };
 
-auth.onAuthStateChanged(async u=>{authReady=true;if(!u){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}listUnsubs.forEach(x=>x());listUnsubs=[];user=null;userData={};closeMediaViewer(true);closeChat();showAuthOnly();return}user=u;try{let d=await db.collection('users').doc(u.uid).get();userData=d.exists?d.data():{name:u.email?.split('@')[0]||'User'};showAppOnly();$('settingsName').textContent=userData.name||userData.displayName||u.email?.split('@')[0]||'Your account';
+auth.onAuthStateChanged(async u=>{authReady=true;if(!u){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}listUnsubs.forEach(x=>x());listUnsubs=[];user=null;userData={};closeMediaViewer(true);closeChat();showAuthOnly();return}user=u;try{let d=await db.collection('users').doc(u.uid).get();userData=d.exists?d.data():{name:u.email?.split('@')[0]||'User'};
+
+try{
+  if(typeof window.msLoadStories === 'function'){
+    window.msLoadStories();
+  }
+}catch(e){}
+
+showAppOnly();$('settingsName').textContent=userData.name||userData.displayName||u.email?.split('@')[0]||'Your account';
 (function(){
   var un = (userData.username || userData.userName || '').toString().trim();
   var unEl = $('settingsUsername');
