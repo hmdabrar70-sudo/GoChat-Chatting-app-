@@ -2919,7 +2919,9 @@ function renderActiveList(){
       var card = e.target.closest('.ms-story-card');
       if(!card || card.classList.contains('ms-story-add-card')) return;
       var gi = parseInt(card.getAttribute('data-gi'),10);
-      if(!isNaN(gi)) openViewer(gi, 0);
+      if(!isNaN(gi) && storyGroups[gi] && storyGroups[gi].items.length){
+  openViewer(gi, storyGroups[gi].items.length - 1);
+}
     });
     if($('msStoryFileInput')) $('msStoryFileInput').onchange = onFilePicked;
     if($('msSvClose')) $('msSvClose').onclick = function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } closeViewer(false); };
