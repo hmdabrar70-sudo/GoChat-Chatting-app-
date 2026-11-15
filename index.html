@@ -476,6 +476,7 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .gc-typing-inline{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:650}
 .gc-typing-preview{color:var(--accent)!important;font-weight:650}
 #chatStatus.gc-is-typing{color:var(--accent);font-weight:650}
+#chatStatus.gc-status-online{color:var(--accent)}
 /* New incoming message subtle highlight */
 article.msg.gc-msg-new{animation:gcMsgFlash 1.6s ease}
 @keyframes gcMsgFlash{0%{background:var(--accent-soft)}100%{background:transparent}}
@@ -1076,7 +1077,10 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   }catch(e){}
   if($('chatName')) $('chatName').textContent = otherName || 'Chat';
   if($('chatAvatar')) $('chatAvatar').src = otherAvatar || avatar({ name: otherName });
-  if($('chatStatus')) $('chatStatus').textContent = '';
+  if($('chatStatus')) {
+  $('chatStatus').textContent = '';
+  $('chatStatus').classList.remove('gc-status-online');
+}
   if($('chatView')) $('chatView').classList.add('open');
   try{ history.pushState({ page: 'chat', chat: chatId, returnPage: chatReturnPage }, '', '#chat/' + chatId); }catch(e){}
   listenMessages(currentChat || chatId);
@@ -1126,7 +1130,33 @@ function closeChat(){
   try{ switchMainPage('chatsPage', true); }catch(e){}
   chatReturnPage = 'chatsPage';
 }
-function listenOtherStatus(uid){if(otherStatusUnsub)otherStatusUnsub();otherStatusUnsub=db.collection('users').doc(uid).onSnapshot(d=>{if(!d.exists)return;let x=d.data()||{};$('chatStatus').textContent=x.showActiveStatus===false?'':x.online===true?'Online':x.lastSeen?'Last seen '+fmt(x.lastSeen):''})}
+function listenOtherStatus(uid){
+  if(otherStatusUnsub) otherStatusUnsub();
+
+  otherStatusUnsub = db.collection('users').doc(uid).onSnapshot(function(d){
+    var status = $('chatStatus');
+    if(!status) return;
+
+    if(!d.exists){
+      status.classList.remove('gc-status-online');
+      status.textContent = '';
+      return;
+    }
+
+    var x = d.data() || {};
+    var isOnline = x.showActiveStatus !== false && x.online === true;
+
+    status.classList.toggle('gc-status-online', isOnline);
+
+    status.textContent = x.showActiveStatus === false
+      ? ''
+      : isOnline
+        ? 'Online'
+        : x.lastSeen
+          ? 'Last seen ' + fmt(x.lastSeen)
+          : '';
+  });
+}
 
 /* ═══ Typing indicator (same chat-doc fields as Main GoChat: typing, typingAt) ═══ */
 function gcTypingDotsHtml(){
