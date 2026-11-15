@@ -308,7 +308,7 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .ms-story-card .ms-sc-meta{position:absolute;left:10px;right:10px;bottom:10px;color:#fff;z-index:1}
 .ms-story-card .ms-sc-name{font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px}
 .ms-story-card .ms-sc-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:1.5px solid #fff}
-.ms-story-card .ms-sc-time{font-size:11px;opacity:.85;margin-top:2px}
+.ms-story-card .ms-sc-time{font-size:11px;opacity:.85;margin-top:2px;margin-left:28px}
 .ms-story-card.own{outline:2px solid var(--accent);outline-offset:1px}
 .ms-story-card .ms-sc-skel{width:100%;height:100%;background:linear-gradient(110deg,var(--surface2) 25%,var(--surface) 40%,var(--surface2) 55%);background-size:200% 100%;animation:msSkel 1.2s ease infinite}
 @keyframes msSkel{0%{background-position:100% 0}100%{background-position:-100% 0}}
@@ -2624,16 +2624,19 @@ function renderActiveList(){
   }
 
   function openViewer(gi, startIdx){
-    activeGroup = storyGroups[gi];
-    if(!activeGroup || !activeGroup.items.length) return;
-    activeIndex = Math.max(0, Math.min(startIdx||0, activeGroup.items.length-1));
-    var v = $('msStoryViewer');
-    if(!v) return;
-    v.classList.add('open');
-    v.setAttribute('aria-hidden','false');
+  activeGroup = storyGroups[gi];
+  if(!activeGroup || !activeGroup.items.length) return;
+  activeIndex = Math.max(0, Math.min(startIdx||0, activeGroup.items.length-1));
+  var v = $('msStoryViewer');
+  if(!v) return;
+  var wasOpen = v.classList.contains('open');
+  v.classList.add('open');
+  v.setAttribute('aria-hidden','false');
+  if(!wasOpen){
     try{ history.pushState({page:'msStory'}, '', (location.hash||'#stories')+'/story'); }catch(e){}
-    showSegment();
   }
+  showSegment();
+}
   function closeViewer(fromPop){
     stopProgress();
     var stage = $('msSvStage');
@@ -2757,16 +2760,23 @@ function renderActiveList(){
     }, 40);
   }
   function nextSegment(){
-    if(!activeGroup) return;
-    if(activeIndex < activeGroup.items.length-1){ activeIndex++; showSegment(); }
-    else {
-      // End of this person's stories → advance to next person if any.
-      // Do NOT close the viewer on a plain tap; only X / Android Back close it.
-      var gi = storyGroups.indexOf(activeGroup);
-      if(gi >= 0 && gi < storyGroups.length-1) openViewer(gi+1, 0);
-      // else: stay on last segment (user must use ✕ or system back)
+  if(!activeGroup) return;
+
+  if(activeIndex < activeGroup.items.length-1){
+    activeIndex++;
+    showSegment();
+  } else {
+    // End of this person's stories → advance to next person if any.
+    var gi = storyGroups.indexOf(activeGroup);
+
+    if(gi >= 0 && gi < storyGroups.length-1){
+      openViewer(gi+1, 0);
+    } else {
+      // All stories finished → automatically close the viewer.
+      closeViewer(false);
     }
   }
+}
   function prevSegment(){
     if(!activeGroup) return;
     if(activeIndex > 0){ activeIndex--; showSegment(); }
