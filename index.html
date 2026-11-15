@@ -2861,26 +2861,74 @@ function renderActiveList(){
   function nextSegment(){
   if(!activeGroup) return;
 
-  if(activeIndex < activeGroup.items.length-1){
+  var currentStory = activeGroup.items[activeIndex];
+
+  // Find the latest group by UID, not by object reference.
+  var gi = storyGroups.findIndex(function(group){
+    return group.uid === activeGroup.uid;
+  });
+
+  if(gi < 0) return;
+
+  activeGroup = storyGroups[gi];
+
+  // Restore the current story's latest position after Firestore updates.
+  if(currentStory && currentStory.id){
+    var latestIndex = activeGroup.items.findIndex(function(story){
+      return story.id === currentStory.id;
+    });
+
+    if(latestIndex >= 0){
+      activeIndex = latestIndex;
+    }
+  }
+
+  if(activeIndex < activeGroup.items.length - 1){
     activeIndex++;
     showSegment();
+  } else if(gi < storyGroups.length - 1){
+    openViewer(gi + 1, 0);
   } else {
-    // End of this person's stories → advance to next person if any.
-    var gi = storyGroups.indexOf(activeGroup);
+    closeViewer(false);
+  }
+}
 
-    if(gi >= 0 && gi < storyGroups.length-1){
-      openViewer(gi+1, 0);
-    } else {
-      // All stories finished → automatically close the viewer.
-      closeViewer(false);
+function prevSegment(){
+  if(!activeGroup) return;
+
+  var currentStory = activeGroup.items[activeIndex];
+
+  // Find the latest group by UID, not by object reference.
+  var gi = storyGroups.findIndex(function(group){
+    return group.uid === activeGroup.uid;
+  });
+
+  if(gi < 0) return;
+
+  activeGroup = storyGroups[gi];
+
+  // Restore the current story's latest position after Firestore updates.
+  if(currentStory && currentStory.id){
+    var latestIndex = activeGroup.items.findIndex(function(story){
+      return story.id === currentStory.id;
+    });
+
+    if(latestIndex >= 0){
+      activeIndex = latestIndex;
+    }
+  }
+
+  if(activeIndex > 0){
+    activeIndex--;
+    showSegment();
+  } else if(gi > 0){
+    var previousGroup = storyGroups[gi - 1];
+
+    if(previousGroup && previousGroup.items && previousGroup.items.length){
+      openViewer(gi - 1, previousGroup.items.length - 1);
     }
   }
 }
-  function prevSegment(){
-    if(!activeGroup) return;
-    if(activeIndex > 0){ activeIndex--; showSegment(); }
-    // else: stay on first segment — never close via left-tap
-  }
 
   async function toggleLike(){
     if(!user || !activeGroup) return;
