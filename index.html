@@ -1130,7 +1130,6 @@ function mediaFileExtension(url, mime, isVideo){
   return isVideo ? 'mp4' : 'jpg';
 }
 
-// --- নতুন আপডেট করা ডাউনলোড ফাংশন ---
 async function saveMediaCurrent(){
   closeMediaMenu();
   var url = mediaCurrentUrl;
@@ -1139,78 +1138,8 @@ async function saveMediaCurrent(){
   var isVideo = mediaCurrentKind === 'video';
   var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
 
-  // ১. AndroidBridge চেক করা
-  if(window.AndroidBridge && typeof window.AndroidBridge.downloadBlob === 'function'){
-    try{
-      toast('Downloading file...');
-      var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
-      var blob = await res.blob();
-      var reader = new FileReader();
-      reader.onloadend = function(){
-        window.AndroidBridge.downloadBlob(reader.result, blob.type || fallbackMime);
-      };
-      reader.readAsDataURL(blob);
-      return;
-    }catch(err){
-      // Fetch ফেইল করলে সরাসরি লিংকটা দিয়ে কল করবে
-      try {
-        window.AndroidBridge.downloadBlob(url, fallbackMime);
-      }catch(e){}
-      return;
-    }
-  }
-
-  // ২. যদি AndroidBridge না থাকে (যেমন ব্রাউজারে) তাহলে আগের রেগুলার ডাউনলোড লজিক চলবে
-  try{
-    var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
-    if(!res.ok) throw new Error('Media download failed: ' + res.status);
-    var blob = await res.blob();
-    if(!blob || !blob.size) throw new Error('Empty media file');
-    
-    var mime = blob.type || fallbackMime;
-    var ext = mediaFileExtension(url, mime, isVideo);
-    var fileName = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
-    
-    var downloadBlob = blob.type ? blob : new Blob([blob], {type:mime});
-    var objectUrl = URL.createObjectURL(downloadBlob);
-    
-    var a = document.createElement('a');
-    a.href = objectUrl;
-    a.download = fileName;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(objectUrl); }, 60000);
-    toast('Download started');
-  }catch(e){
-    var downloadUrl = getMediaDownloadUrl(url);
-    try{
-      var a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + (isVideo ? '.mp4' : '.jpg');
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast('Download started');
-    }catch(err){ toast('Could not download media'); }
-  }
-}
-
-
-async function saveMediaCurrent(){
-  closeMediaMenu();
-  var url = mediaCurrentUrl;
-  if(!url){ toast('Media not available'); return; }
-
-  var isVideo = mediaCurrentKind === 'video';
-  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
-
-  /* 🚀 ১. নতুন: AndroidBridge চেক (অ্যাপের ভেতর ডাউনলোডের জন্য) */
-  if(window.AndroidBridge && typeof window.AndroidBridge.downloadBlob === 'function'){
+  /* 🚀 AndroidBridge সরাসরি চেক করা */
+  if(window.AndroidBridge){
     try{
       toast('Downloading file...');
       var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
@@ -1229,7 +1158,7 @@ async function saveMediaCurrent(){
     }
   }
 
-  /* ২. ব্রাউজারের ডিফল্ট ডাউনলোড (ক্রোমের জন্য) */
+  /* ব্রাউজারের ডিফল্ট ডাউনলোড */
   try{
     var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
     if(!res.ok) throw new Error('Media download failed: ' + res.status);
@@ -1275,17 +1204,15 @@ async function shareMediaCurrent(){
   var url = mediaCurrentUrl;
   if(!url){ toast('Media not available'); return; }
 
-  /* 🚀 ১. নতুন: AndroidBridge চেক (অ্যাপের ভেতর শেয়ার করার জন্য) */
-  if(window.AndroidBridge && typeof window.AndroidBridge.shareApp === 'function'){
+  /* 🚀 AndroidBridge সরাসরি চেক করা */
+  if(window.AndroidBridge){
     try{
       window.AndroidBridge.shareApp('Butterfly Media', 'Shared from Butterfly', url);
       return;
-    }catch(e){
-      console.warn('Android share bridge failed:', e);
-    }
+    }catch(e){}
   }
 
-  /* ২. ব্রাউজারের ডিফল্ট শেয়ার (ক্রোমের জন্য) */
+  /* ব্রাউজারের ডিফল্ট শেয়ার */
   var isVideo = mediaCurrentKind === 'video';
   var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
 
