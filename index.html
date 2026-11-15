@@ -1130,229 +1130,197 @@ function mediaFileExtension(url, mime, isVideo){
   return isVideo ? 'mp4' : 'jpg';
 }
 
+// --- নতুন আপডেট করা ডাউনলোড ফাংশন ---
 async function saveMediaCurrent(){
   closeMediaMenu();
-
   var url = mediaCurrentUrl;
-
-  if(!url){
-    toast('Media not available');
-    return;
-  }
+  if(!url){ toast('Media not available'); return; }
 
   var isVideo = mediaCurrentKind === 'video';
   var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
 
+  // ১. AndroidBridge চেক করা
+  if(window.AndroidBridge && typeof window.AndroidBridge.downloadBlob === 'function'){
+    try{
+      toast('Downloading file...');
+      var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+      var blob = await res.blob();
+      var reader = new FileReader();
+      reader.onloadend = function(){
+        window.AndroidBridge.downloadBlob(reader.result, blob.type || fallbackMime);
+      };
+      reader.readAsDataURL(blob);
+      return;
+    }catch(err){
+      // Fetch ফেইল করলে সরাসরি লিংকটা দিয়ে কল করবে
+      try {
+        window.AndroidBridge.downloadBlob(url, fallbackMime);
+      }catch(e){}
+      return;
+    }
+  }
+
+  // ২. যদি AndroidBridge না থাকে (যেমন ব্রাউজারে) তাহলে আগের রেগুলার ডাউনলোড লজিক চলবে
   try{
-    var res = await fetch(url, {
-      mode: 'cors',
-      credentials: 'omit'
-    });
-
-    if(!res.ok){
-      throw new Error('Media download failed: ' + res.status);
-    }
-
+    var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+    if(!res.ok) throw new Error('Media download failed: ' + res.status);
     var blob = await res.blob();
-
-    if(!blob || !blob.size){
-      throw new Error('Empty media file');
-    }
-
+    if(!blob || !blob.size) throw new Error('Empty media file');
+    
     var mime = blob.type || fallbackMime;
     var ext = mediaFileExtension(url, mime, isVideo);
-
-    var fileName =
-      'GoChat_' +
-      (isVideo ? 'Video' : 'Photo') +
-      '_' + Date.now() + '.' + ext;
-
-    var downloadBlob = blob.type
-      ? blob
-      : new Blob([blob], {type:mime});
-
+    var fileName = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
+    
+    var downloadBlob = blob.type ? blob : new Blob([blob], {type:mime});
     var objectUrl = URL.createObjectURL(downloadBlob);
-
+    
     var a = document.createElement('a');
     a.href = objectUrl;
     a.download = fileName;
     a.style.display = 'none';
-
     document.body.appendChild(a);
     a.click();
     a.remove();
-
-    setTimeout(function(){
-      URL.revokeObjectURL(objectUrl);
-    }, 60000);
-
+    setTimeout(function(){ URL.revokeObjectURL(objectUrl); }, 60000);
     toast('Download started');
-    return;
-
   }catch(e){
-    console.warn('saveMediaCurrent:', e);
-
-    /*
-      Cloudinary fallback:
-      Force the server to deliver the media as an attachment,
-      so the browser can download it even when fetch is blocked by CORS.
-    */
     var downloadUrl = getMediaDownloadUrl(url);
-
     try{
       var a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = 'GoChat_' +
-        (isVideo ? 'Video' : 'Photo') +
-        '_' + Date.now() +
-        (isVideo ? '.mp4' : '.jpg');
-
+      a.download = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + (isVideo ? '.mp4' : '.jpg');
       a.target = '_blank';
       a.rel = 'noopener';
       a.style.display = 'none';
-
       document.body.appendChild(a);
       a.click();
       a.remove();
+      toast('Download started');
+    }catch(err){ toast('Could not download media'); }
+  }
+}
 
-      if(downloadUrl !== url){
-        toast('Download started');
-      }else{
-        toast('Opening media');
-      }
 
+async function saveMediaCurrent(){
+  closeMediaMenu();
+  var url = mediaCurrentUrl;
+  if(!url){ toast('Media not available'); return; }
+
+  var isVideo = mediaCurrentKind === 'video';
+  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
+
+  /* 🚀 ১. নতুন: AndroidBridge চেক (অ্যাপের ভেতর ডাউনলোডের জন্য) */
+  if(window.AndroidBridge && typeof window.AndroidBridge.downloadBlob === 'function'){
+    try{
+      toast('Downloading file...');
+      var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+      var blob = await res.blob();
+      var reader = new FileReader();
+      reader.onloadend = function(){
+        window.AndroidBridge.downloadBlob(reader.result, blob.type || fallbackMime);
+      };
+      reader.readAsDataURL(blob);
+      return;
     }catch(err){
-      console.warn('Media download fallback:', err);
-      toast('Could not download media');
+      try {
+        window.AndroidBridge.downloadBlob(url, fallbackMime);
+      }catch(e){}
+      return;
     }
+  }
+
+  /* ২. ব্রাউজারের ডিফল্ট ডাউনলোড (ক্রোমের জন্য) */
+  try{
+    var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+    if(!res.ok) throw new Error('Media download failed: ' + res.status);
+    var blob = await res.blob();
+    if(!blob || !blob.size) throw new Error('Empty media file');
+    
+    var mime = blob.type || fallbackMime;
+    var ext = mediaFileExtension(url, mime, isVideo);
+    var fileName = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
+    
+    var downloadBlob = blob.type ? blob : new Blob([blob], {type:mime});
+    var objectUrl = URL.createObjectURL(downloadBlob);
+    
+    var a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(objectUrl); }, 60000);
+    toast('Download started');
+  }catch(e){
+    var downloadUrl = getMediaDownloadUrl(url);
+    try{
+      var a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + (isVideo ? '.mp4' : '.jpg');
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      if(downloadUrl !== url) toast('Download started');
+      else toast('Opening media');
+    }catch(err){ toast('Could not download media'); }
   }
 }
 
 async function shareMediaCurrent(){
   closeMediaMenu();
-
   var url = mediaCurrentUrl;
+  if(!url){ toast('Media not available'); return; }
 
-  if(!url){
-    toast('Media not available');
-    return;
-  }
-
-  var isVideo = mediaCurrentKind === 'video';
-  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
-
-  /*
-    First attempt:
-    Share the actual image/video file through the device share sheet.
-  */
-  if(typeof navigator.share === 'function'){
+  /* 🚀 ১. নতুন: AndroidBridge চেক (অ্যাপের ভেতর শেয়ার করার জন্য) */
+  if(window.AndroidBridge && typeof window.AndroidBridge.shareApp === 'function'){
     try{
-      var res = await fetch(url, {
-        mode: 'cors',
-        credentials: 'omit'
-      });
-
-      if(!res.ok){
-        throw new Error('Media fetch failed: ' + res.status);
-      }
-
-      var blob = await res.blob();
-
-      if(blob && blob.size && typeof File !== 'undefined'){
-        var mime = blob.type || fallbackMime;
-        var ext = mediaFileExtension(url, mime, isVideo);
-
-        var fileName =
-          'GoChat_' +
-          (isVideo ? 'Video' : 'Photo') +
-          '_' + Date.now() + '.' + ext;
-
-        var file = new File([blob], fileName, {
-          type: mime
-        });
-
-        var shareData = {
-          files: [file],
-          title: 'GoChat media'
-        };
-
-        var canShareFiles =
-          !navigator.canShare ||
-          navigator.canShare(shareData);
-
-        if(canShareFiles){
-          try{
-            await navigator.share(shareData);
-            return;
-          }catch(fileShareError){
-            if(fileShareError && fileShareError.name === 'AbortError'){
-              return;
-            }
-
-            console.warn('File sharing unavailable:', fileShareError);
-          }
-        }
-      }
-
-    }catch(fetchError){
-      if(fetchError && fetchError.name === 'AbortError'){
-        return;
-      }
-
-      console.warn('Media file preparation failed:', fetchError);
-    }
-
-    /*
-      Fallback:
-      If direct file sharing is unavailable, share the original media URL
-      through the device's native share sheet.
-    */
-    try{
-      await navigator.share({
-        title: 'GoChat media',
-        text: 'Shared from GoChat',
-        url: url
-      });
-
-      return;
-
-    }catch(shareError){
-      if(shareError && shareError.name === 'AbortError'){
-        return;
-      }
-
-      console.warn('Media URL sharing failed:', shareError);
-    }
-  }
-
-  /*
-    Optional Android native bridge fallback.
-  */
-  if(
-    window.AndroidBridge &&
-    typeof window.AndroidBridge.shareFile === 'function'
-  ){
-    try{
-      window.AndroidBridge.shareFile(url, fallbackMime);
+      window.AndroidBridge.shareApp('Butterfly Media', 'Shared from Butterfly', url);
       return;
     }catch(e){
       console.warn('Android share bridge failed:', e);
     }
   }
 
-  /*
-    Last fallback for browsers without native sharing support.
-  */
+  /* ২. ব্রাউজারের ডিফল্ট শেয়ার (ক্রোমের জন্য) */
+  var isVideo = mediaCurrentKind === 'video';
+  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
+
+  if(typeof navigator.share === 'function'){
+    try{
+      var res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+      var blob = await res.blob();
+      if(blob && blob.size && typeof File !== 'undefined'){
+        var mime = blob.type || fallbackMime;
+        var ext = mediaFileExtension(url, mime, isVideo);
+        var fileName = 'Butterfly_' + (isVideo ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
+        var file = new File([blob], fileName, { type: mime });
+        var shareData = { files: [file], title: 'Butterfly media' };
+        
+        if(!navigator.canShare || navigator.canShare(shareData)){
+          await navigator.share(shareData);
+          return;
+        }
+      }
+    }catch(fetchError){}
+
+    try{
+      await navigator.share({ title: 'Butterfly media', text: 'Shared from Butterfly', url: url });
+      return;
+    }catch(shareError){}
+  }
+
   try{
     if(navigator.clipboard && navigator.clipboard.writeText){
       await navigator.clipboard.writeText(url);
       toast('Media link copied');
       return;
     }
-  }catch(e){
-    console.warn('Clipboard fallback failed:', e);
-  }
-
+  }catch(e){}
+  
   try{
     window.open(url, '_blank', 'noopener');
     toast('Media link opened');
@@ -1360,6 +1328,7 @@ async function shareMediaCurrent(){
     toast('Could not share media');
   }
 }
+
 
 
 function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
