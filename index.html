@@ -1079,60 +1079,284 @@ function closeMediaViewer(fromPop){
 }
 function openMediaMenu(){ var m=$('mediaMenu'); if(m){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); } }
 function closeMediaMenu(){ var m=$('mediaMenu'); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); } }
+function getMediaDownloadUrl(url){
+  try{
+    var target = new URL(url, location.href);
+    var host = target.hostname.toLowerCase();
+
+    var isCloudinary =
+      host === 'res.cloudinary.com' ||
+      host.endsWith('.res.cloudinary.com');
+
+    if(
+      isCloudinary &&
+      target.pathname.indexOf('/upload/') !== -1 &&
+      !/\/upload\/fl_attachment(?:\/|:)/.test(target.pathname)
+    ){
+      target.pathname = target.pathname.replace(
+        '/upload/',
+        '/upload/fl_attachment/'
+      );
+    }
+
+    return target.href;
+  }catch(e){
+    return url;
+  }
+}
+
+function mediaFileExtension(url, mime, isVideo){
+  var type = String(mime || '').toLowerCase().split(';')[0];
+
+  var knownTypes = {
+    'image/jpeg':'jpg',
+    'image/png':'png',
+    'image/webp':'webp',
+    'image/gif':'gif',
+    'image/avif':'avif',
+    'video/mp4':'mp4',
+    'video/webm':'webm',
+    'video/quicktime':'mov'
+  };
+
+  if(knownTypes[type]) return knownTypes[type];
+
+  try{
+    var pathname = new URL(url, location.href).pathname;
+    var match = pathname.match(/\.([a-z0-9]{2,5})$/i);
+    if(match) return match[1].toLowerCase();
+  }catch(e){}
+
+  return isVideo ? 'mp4' : 'jpg';
+}
+
 async function saveMediaCurrent(){
   closeMediaMenu();
+
   var url = mediaCurrentUrl;
-  if(!url) return;
+
+  if(!url){
+    toast('Media not available');
+    return;
+  }
+
+  var isVideo = mediaCurrentKind === 'video';
+  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
+
   try{
-    var res = await fetch(url);
+    var res = await fetch(url, {
+      mode: 'cors',
+      credentials: 'omit'
+    });
+
+    if(!res.ok){
+      throw new Error('Media download failed: ' + res.status);
+    }
+
     var blob = await res.blob();
+
+    if(!blob || !blob.size){
+      throw new Error('Empty media file');
+    }
+
+    var mime = blob.type || fallbackMime;
+    var ext = mediaFileExtension(url, mime, isVideo);
+
+    var fileName =
+      'GoChat_' +
+      (isVideo ? 'Video' : 'Photo') +
+      '_' + Date.now() + '.' + ext;
+
+    var downloadBlob = blob.type
+      ? blob
+      : new Blob([blob], {type:mime});
+
+    var objectUrl = URL.createObjectURL(downloadBlob);
+
     var a = document.createElement('a');
-    var obj = URL.createObjectURL(blob);
-    a.href = obj;
-    a.download = 'GoChat_' + (mediaCurrentKind === 'video' ? 'Video' : 'Image') + '_' + Date.now() + (mediaCurrentKind==='video'?'.mp4':'.jpg');
+    a.href = objectUrl;
+    a.download = fileName;
+    a.style.display = 'none';
+
     document.body.appendChild(a);
     a.click();
     a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(obj); }, 2000);
-    toast('Saved');
+
+    setTimeout(function(){
+      URL.revokeObjectURL(objectUrl);
+    }, 60000);
+
+    toast('Download started');
+    return;
+
   }catch(e){
-    // Fallback: open in new tab
-    try{ window.open(url, '_blank'); toast('Opened media'); }catch(err){ toast('Could not save media'); }
+    console.warn('saveMediaCurrent:', e);
+
+    /*
+      Cloudinary fallback:
+      Force the server to deliver the media as an attachment,
+      so the browser can download it even when fetch is blocked by CORS.
+    */
+    var downloadUrl = getMediaDownloadUrl(url);
+
+    try{
+      var a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'GoChat_' +
+        (isVideo ? 'Video' : 'Photo') +
+        '_' + Date.now() +
+        (isVideo ? '.mp4' : '.jpg');
+
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.style.display = 'none';
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      if(downloadUrl !== url){
+        toast('Download started');
+      }else{
+        toast('Opening media');
+      }
+
+    }catch(err){
+      console.warn('Media download fallback:', err);
+      toast('Could not download media');
+    }
   }
 }
+
 async function shareMediaCurrent(){
   closeMediaMenu();
+
   var url = mediaCurrentUrl;
-  if(!url) return;
+
+  if(!url){
+    toast('Media not available');
+    return;
+  }
+
+  var isVideo = mediaCurrentKind === 'video';
+  var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
+
+  /*
+    First attempt:
+    Share the actual image/video file through the device share sheet.
+  */
+  if(typeof navigator.share === 'function'){
+    try{
+      var res = await fetch(url, {
+        mode: 'cors',
+        credentials: 'omit'
+      });
+
+      if(!res.ok){
+        throw new Error('Media fetch failed: ' + res.status);
+      }
+
+      var blob = await res.blob();
+
+      if(blob && blob.size && typeof File !== 'undefined'){
+        var mime = blob.type || fallbackMime;
+        var ext = mediaFileExtension(url, mime, isVideo);
+
+        var fileName =
+          'GoChat_' +
+          (isVideo ? 'Video' : 'Photo') +
+          '_' + Date.now() + '.' + ext;
+
+        var file = new File([blob], fileName, {
+          type: mime
+        });
+
+        var shareData = {
+          files: [file],
+          title: 'GoChat media'
+        };
+
+        var canShareFiles =
+          !navigator.canShare ||
+          navigator.canShare(shareData);
+
+        if(canShareFiles){
+          try{
+            await navigator.share(shareData);
+            return;
+          }catch(fileShareError){
+            if(fileShareError && fileShareError.name === 'AbortError'){
+              return;
+            }
+
+            console.warn('File sharing unavailable:', fileShareError);
+          }
+        }
+      }
+
+    }catch(fetchError){
+      if(fetchError && fetchError.name === 'AbortError'){
+        return;
+      }
+
+      console.warn('Media file preparation failed:', fetchError);
+    }
+
+    /*
+      Fallback:
+      If direct file sharing is unavailable, share the original media URL
+      through the device's native share sheet.
+    */
+    try{
+      await navigator.share({
+        title: 'GoChat media',
+        text: 'Shared from GoChat',
+        url: url
+      });
+
+      return;
+
+    }catch(shareError){
+      if(shareError && shareError.name === 'AbortError'){
+        return;
+      }
+
+      console.warn('Media URL sharing failed:', shareError);
+    }
+  }
+
+  /*
+    Optional Android native bridge fallback.
+  */
+  if(
+    window.AndroidBridge &&
+    typeof window.AndroidBridge.shareFile === 'function'
+  ){
+    try{
+      window.AndroidBridge.shareFile(url, fallbackMime);
+      return;
+    }catch(e){
+      console.warn('Android share bridge failed:', e);
+    }
+  }
+
+  /*
+    Last fallback for browsers without native sharing support.
+  */
   try{
-    var res = await fetch(url, { mode: 'cors' });
-    var blob = await res.blob();
-    var isVid = (mediaCurrentKind === 'video') || (blob.type && blob.type.indexOf('video') === 0);
-    var ext = isVid ? 'mp4' : (blob.type && blob.type.indexOf('png')>=0 ? 'png' : 'jpg');
-    var mime = blob.type || (isVid ? 'video/mp4' : 'image/jpeg');
-    var fileName = 'GoChat_' + (isVid ? 'Video' : 'Photo') + '_' + Date.now() + '.' + ext;
-    var file = new File([blob], fileName, { type: mime });
-    if(navigator.canShare && navigator.canShare({ files: [file] })){
-      await navigator.share({ files: [file], title: 'GoChat media' });
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(url);
+      toast('Media link copied');
       return;
     }
-    if(navigator.share){
-      // Some Android WebViews accept files without canShare
-      try{
-        await navigator.share({ files: [file], title: 'GoChat media' });
-        return;
-      }catch(shareErr){
-        if(shareErr && shareErr.name === 'AbortError') return;
-      }
-    }
-    // Last resort: open system share via Android bridge if present
-    if(window.AndroidBridge && typeof window.AndroidBridge.shareFile === 'function'){
-      try{ window.AndroidBridge.shareFile(url, mime); return; }catch(e){}
-    }
-    toast('Sharing is not supported on this device');
   }catch(e){
-    if(e && e.name === 'AbortError') return;
-    console.warn('shareMediaCurrent', e);
+    console.warn('Clipboard fallback failed:', e);
+  }
+
+  try{
+    window.open(url, '_blank', 'noopener');
+    toast('Media link opened');
+  }catch(e){
     toast('Could not share media');
   }
 }
@@ -4309,17 +4533,22 @@ closeMediaViewer = hardCloseMediaViewer;
   function wireMediaChrome(){
     var closeBtn = document.getElementById('mediaCloseBtn');
     var menuBtn = document.getElementById('mediaMenuBtn');
+    var shareBtn = document.getElementById('mediaShareBtn');
+    var saveBtn = document.getElementById('mediaSaveBtn');
+
     if(closeBtn && !closeBtn._wired){
       closeBtn._wired = true;
       closeBtn.addEventListener('click', function(e){
         e.preventDefault(); e.stopPropagation();
         try{ hardCloseMediaViewer(false); }catch(err){ try{ closeMediaViewer(false); }catch(e2){} }
       }, true);
+
       closeBtn.addEventListener('touchend', function(e){
         e.preventDefault(); e.stopPropagation();
         try{ hardCloseMediaViewer(false); }catch(err){ try{ closeMediaViewer(false); }catch(e2){} }
       }, {passive:false, capture:true});
     }
+
     if(menuBtn && !menuBtn._wired){
       menuBtn._wired = true;
       menuBtn.addEventListener('click', function(e){
@@ -4327,9 +4556,29 @@ closeMediaViewer = hardCloseMediaViewer;
         try{ openMediaMenu(); }catch(err){}
       }, true);
     }
+
+    if(shareBtn && !shareBtn._wired){
+      shareBtn._wired = true;
+      shareBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        shareMediaCurrent();
+      }, true);
+    }
+
+    if(saveBtn && !saveBtn._wired){
+      saveBtn._wired = true;
+      saveBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        saveMediaCurrent();
+      }, true);
+    }
   }
+
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireMediaChrome);
   else wireMediaChrome();
+
   setTimeout(wireMediaChrome, 0);
 })();
 
@@ -4586,8 +4835,6 @@ document.addEventListener('click', function(e){
     closeMediaMenu();
     return;
   }
-  if(e.target.closest('#mediaShareBtn')){ shareMediaCurrent(); return; }
-  if(e.target.closest('#mediaSaveBtn')){ saveMediaCurrent(); return; }
   if(e.target.closest('#mvcPlay')){
     e.stopPropagation();
     var v = getViewerVideo && getViewerVideo();
