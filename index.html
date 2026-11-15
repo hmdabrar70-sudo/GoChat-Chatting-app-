@@ -371,14 +371,78 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .ms-sv-stage img.ms-fit-contain,.ms-sv-stage video.ms-fit-contain{object-fit:contain}
 .ms-sv-nav{position:absolute;inset:70px 0 80px;display:flex;pointer-events:none}
 .ms-sv-nav button{flex:1;border:none;background:transparent;pointer-events:auto}
-.ms-sv-bottom{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.65))}
-.ms-sv-like{border:none;background:transparent;color:#fff;cursor:pointer;line-height:0;padding:6px;display:grid;place-items:center;flex:none}
+.ms-sv-bottom{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  min-width:0;
+  padding:10px 12px;
+  padding-bottom:max(12px,env(safe-area-inset-bottom));
+  background:linear-gradient(transparent,rgba(0,0,0,.65));
+}
+
+.ms-sv-like{
+  border:none;
+  background:transparent;
+  color:#fff;
+  cursor:pointer;
+  line-height:0;
+  padding:6px;
+  display:grid;
+  place-items:center;
+  flex:none;
+}
+
 .ms-sv-like svg{width:26px;height:26px;display:block}
 .ms-sv-like.on{color:#ff4d6a}
-.ms-sv-like-count{color:#fff;font-size:13px;font-weight:700;min-width:1.2em}
-.ms-sv-reply{flex:1;height:40px;border-radius:20px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;padding:0 14px;font-size:14px;outline:none}
+
+.ms-sv-like-count{
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  min-width:1.2em;
+  flex:none;
+}
+
+.ms-sv-reply{
+  flex:1 1 0;
+  min-width:0;
+  width:0;
+  height:40px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.1);
+  color:#fff;
+  padding:0 12px;
+  font-size:14px;
+  outline:none;
+}
+
 .ms-sv-reply::placeholder{color:rgba(255,255,255,.55)}
-.ms-sv-send{border:none;background:var(--accent,#1a1a2e);color:#fff;height:40px;padding:0 14px;border-radius:20px;font-weight:800;font-size:13px;cursor:pointer}
+
+.ms-sv-send{
+  flex:0 0 78px;
+  width:78px;
+  min-width:78px;
+  height:40px;
+  padding:0 4px;
+  border:none;
+  border-radius:20px;
+  background:var(--accent,#1a1a2e);
+  color:#fff;
+  font-weight:800;
+  font-size:12px;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:opacity .15s ease;
+}
+
+.ms-sv-send:disabled{
+  opacity:.85;
+  cursor:wait;
+}
+
 .ms-sv-bottom.own-hide-reply .ms-sv-reply,
 .ms-sv-bottom.own-hide-reply .ms-sv-send{display:none}
 
@@ -2983,52 +3047,96 @@ function prevSegment(){
   }
 
   async function sendReply(){
-    if(!user || !activeGroup) return;
-    var s = activeGroup.items[activeIndex];
-    if(!s || s.uid===user.uid) return;
-    var inp = $('msSvReply');
-    var text = (inp && inp.value || '').trim();
-    if(!text){ toast('Write a reply first'); return; }
-    try{
-      paused = true;
-      var otherUid = s.uid;
-      var chatId = [user.uid, otherUid].sort().join('_');
-      var otherName = s.name || 'User';
-      var otherAvatar = s.avatar || '';
-      var thumb = s.mediaUrl || '';
-      var isVideo = !!s.isVideo;
-      await db.collection('chats').doc(chatId).collection('messages').add({
-        uid: user.uid,
-        senderName: (userData && userData.name) || 'User',
-        text: text,
-        sharedStoryId: s.id || '',
-        sharedStoryImg: isVideo ? '' : thumb,
-        sharedStoryVideo: isVideo ? thumb : '',
-        sharedStoryIsVideo: isVideo,
-        sharedStoryOwner: otherName,
-        sharedStoryOwnerUid: otherUid || s.uid || '',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      await db.collection('chats').doc(chatId).set({
-        lastMsg: '📎 Story reply: ' + text,
-        lastAt: firebase.firestore.FieldValue.serverTimestamp(),
-        names: (function(){ var o={}; o[user.uid]=(userData&&userData.name)||'User'; o[otherUid]=otherName; return o; })(),
-        avatars: (function(){ var o={}; o[user.uid]=(userData&&userData.avatar)||''; o[otherUid]=otherAvatar; return o; })(),
-        lastSender: user.uid,
-        isRead: false,
-        unreadCount: firebase.firestore.FieldValue.increment(1),
-        users: [user.uid, otherUid].sort()
-      }, {merge:true});
-      if(inp) inp.value='';
-      toast('Reply sent');
-      closeViewer();
-      if(typeof openChat==='function') openChat(chatId, otherUid, otherName, otherAvatar, false, 'storiesPage');
-    }catch(e){
-      console.error(e);
-      toast('Failed to send reply');
-      paused = false;
+  if(!user || !activeGroup) return;
+
+  var s = activeGroup.items[activeIndex];
+  if(!s || s.uid===user.uid) return;
+
+  var inp = $('msSvReply');
+  var text = (inp && inp.value || '').trim();
+
+  if(!text){
+    toast('Write a reply first');
+    return;
+  }
+
+  var sendBtn = $('msSvSend');
+
+  if(sendBtn && sendBtn.disabled) return;
+
+  try{
+    paused = true;
+
+    // Show text-only sending state.
+    if(sendBtn){
+      sendBtn.disabled = true;
+      sendBtn.classList.add('is-sending');
+      sendBtn.textContent = 'Sending…';
+    }
+
+    var otherUid = s.uid;
+    var chatId = [user.uid, otherUid].sort().join('_');
+    var otherName = s.name || 'User';
+    var otherAvatar = s.avatar || '';
+    var thumb = s.mediaUrl || '';
+    var isVideo = !!s.isVideo;
+
+    await db.collection('chats').doc(chatId).collection('messages').add({
+      uid: user.uid,
+      senderName: (userData && userData.name) || 'User',
+      text: text,
+      sharedStoryId: s.id || '',
+      sharedStoryImg: isVideo ? '' : thumb,
+      sharedStoryVideo: isVideo ? thumb : '',
+      sharedStoryIsVideo: isVideo,
+      sharedStoryOwner: otherName,
+      sharedStoryOwnerUid: otherUid || s.uid || '',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await db.collection('chats').doc(chatId).set({
+      lastMsg: '📎 Story reply: ' + text,
+      lastAt: firebase.firestore.FieldValue.serverTimestamp(),
+      names: (function(){
+        var o = {};
+        o[user.uid] = (userData && userData.name) || 'User';
+        o[otherUid] = otherName;
+        return o;
+      })(),
+      avatars: (function(){
+        var o = {};
+        o[user.uid] = (userData && userData.avatar) || '';
+        o[otherUid] = otherAvatar;
+        return o;
+      })(),
+      lastSender: user.uid,
+      isRead: false,
+      unreadCount: firebase.firestore.FieldValue.increment(1),
+      users: [user.uid, otherUid].sort()
+    }, {merge:true});
+
+    if(inp) inp.value = '';
+
+    toast('Reply sent');
+    closeViewer();
+
+    if(typeof openChat === 'function'){
+      openChat(chatId, otherUid, otherName, otherAvatar, false, 'storiesPage');
+    }
+
+  }catch(e){
+    console.error(e);
+    toast('Failed to send reply');
+    paused = false;
+
+  }finally{
+    if(sendBtn){
+      sendBtn.disabled = false;
+      sendBtn.classList.remove('is-sending');
+      sendBtn.textContent = 'Send';
     }
   }
+}
 
   function pickStoryFile(){
     var inp = $('msStoryFileInput');
