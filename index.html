@@ -652,6 +652,55 @@ article.msg.mine.gc-msg-new{animation:none}
   font-size:9px;
   font-weight:750;
 }
+
+.chat-messages-wrap{
+  position:relative;
+  display:flex;
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+}
+
+.chat-messages-wrap .messages{
+  flex:1;
+  min-height:0;
+}
+
+.gc-scroll-bottom{
+  position:absolute;
+  right:16px;
+  bottom:16px;
+  z-index:6;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--surface);
+  color:var(--accent);
+  box-shadow:var(--shadow);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(6px);
+  transition:opacity .18s ease,transform .18s ease,visibility .18s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.gc-scroll-bottom.is-visible{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translateY(0);
+}
+
+.gc-scroll-bottom svg{
+  width:21px;
+  height:21px;
+  display:block;
+}
 </style>
 </head>
 <body>
@@ -768,7 +817,17 @@ article.msg.mine.gc-msg-new{animation:none}
 <button class="nav-item" data-page="storiesPage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M10.0957 2.00445C6.62194 2.03072 4.71683 2.2121 3.46447 3.46447C2.6068 4.32213 2.25143 5.48593 2.10418 7.25002H6.59861L10.0957 2.00445Z"/><path fill="currentColor" d="M2.02644 8.75002C2 9.68875 2 10.7633 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 10.7633 22 9.68875 21.9736 8.75002H2.02644Z"/><path fill="currentColor" d="M21.8958 7.25002C21.7486 5.48593 21.3932 4.32213 20.5355 3.46447C19.9382 2.86714 19.1924 2.51345 18.1987 2.30403L14.9014 7.25002H21.8958Z"/><path fill="currentColor" d="M16.5401 2.08783C15.3293 2 13.8452 2 12 2C11.967 2 11.9342 2 11.9014 2L8.40139 7.25002H13.0986L16.5401 2.08783Z"/></svg><span>Stories</span></button>
 <button class="nav-item nav-item-profile" data-page="settingsPage" type="button"><img class="nav-user-avatar" id="navAvatar" alt="Profile"><span>Profile</span></button>
 </nav></div>
-<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header><div class="messages" id="messages"></div><div id="replyBar" class="reply-bar"><div class="reply-bar-accent" aria-hidden="true"></div><div class="reply-bar-body"><div class="reply-bar-name" id="replyName"></div><div class="reply-bar-text" id="replyText"></div></div><button type="button" class="reply-bar-close" id="cancelReply" aria-label="Cancel reply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div id="voiceRecBar" class="voice-rec-bar" hidden>
+<section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div></header>
+<div class="chat-messages-wrap">
+  <div class="messages" id="messages"></div>
+
+  <button type="button" id="gcScrollBottom" class="gc-scroll-bottom" aria-label="Jump to latest message" title="Jump to latest message">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4v16M5 13l7 7 7-7"/>
+    </svg>
+  </button>
+</div>
+<div id="replyBar" class="reply-bar"><div class="reply-bar-accent" aria-hidden="true"></div><div class="reply-bar-body"><div class="reply-bar-name" id="replyName"></div><div class="reply-bar-text" id="replyText"></div></div><button type="button" class="reply-bar-close" id="cancelReply" aria-label="Cancel reply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div id="voiceRecBar" class="voice-rec-bar" hidden>
   <button type="button" class="voice-rec-cancel" id="voiceRecCancel" aria-label="Cancel recording">Cancel</button>
   <div class="voice-rec-mid">
     <span class="voice-rec-dot" aria-hidden="true"></span>
@@ -1541,6 +1600,10 @@ function listenMessages(cid){
   seenMsgIds = new Set(); // reset so reopen doesn't re-flash old messages
   window.__gcMsgDataCache = {}; // scoped to this chat — double-tap opens instantly
   var box = $('messages');
+
+  var jumpBtn = $('gcScrollBottom');
+  if(jumpBtn) jumpBtn.classList.remove('is-visible');
+
   if(box) box.innerHTML = '<div class="sk-msg" aria-hidden="true"><div class="sk-bubble w80"></div><div class="sk-bubble me w60"></div><div class="sk-bubble w50"></div><div class="sk-bubble me w80"></div><div class="sk-bubble w40"></div></div>';
   var q = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','desc').limit(50);
   var painted = false;
@@ -1575,10 +1638,12 @@ function listenMessages(cid){
         return html;
       }).join('') || '<div class="empty">No messages yet. Say hello.</div>';
       if(!painted || nearBottom){
-        box.scrollTop = box.scrollHeight;
-      } else {
-        try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
-      }
+  box.scrollTop = box.scrollHeight;
+} else {
+  try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
+}
+
+gcUpdateScrollBottomButton();
       // Apply highlight after DOM insert
       if(newIds.length){
         newIds.forEach(function(nid){
@@ -1619,6 +1684,43 @@ function listenMessages(cid){
   });
 }
 
+
+function gcUpdateScrollBottomButton(){
+  var box = $('messages');
+  var btn = $('gcScrollBottom');
+
+  if(!box || !btn) return;
+
+  var distance = box.scrollHeight - box.scrollTop - box.clientHeight;
+
+  btn.classList.toggle('is-visible', distance >= 120);
+}
+
+(function(){
+  var box = $('messages');
+  var btn = $('gcScrollBottom');
+
+  if(!box || !btn || box._gcScrollBottomBound) return;
+
+  box._gcScrollBottomBound = true;
+
+  box.addEventListener('scroll', gcUpdateScrollBottomButton, {
+    passive:true
+  });
+
+  btn.addEventListener('click', function(){
+    try{
+      box.scrollTo({
+        top: box.scrollHeight,
+        behavior: 'smooth'
+      });
+    }catch(e){
+      box.scrollTop = box.scrollHeight;
+    }
+  });
+
+  window.addEventListener('resize', gcUpdateScrollBottomButton);
+})();
 
 
 function renderStoryReplyAttachment(m, mine){
