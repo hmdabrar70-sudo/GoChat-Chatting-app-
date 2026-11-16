@@ -979,7 +979,66 @@ db.settings({experimentalForceLongPolling:true});
 let user=null,userData={},authReady=false,typingUnsub=null,typingMap={},myTypingTimer=null,seenMsgIds=new Set(),mediaOpen=false,mediaCurrentUrl="",mediaCurrentKind="image",chatMap=new Map(),chatReturnPage='chatsPage',usersCache=new Map(),listUnsubs=[],msgUnsub=null,otherStatusUnsub=null,currentChat=null,currentOther=null,replyTarget=null,mediaRecorder=null,voiceChunks=[],voiceStream=null,voiceState='idle',presenceTimer=null;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
-function avatar(u){return u?.avatar||u?.photoURL||('https://ui-avatars.com/api/?name='+encodeURIComponent(u?.name||'User')+'&background=e7edf0&color=43515a')}
+function gcDefaultAvatarDataUri(){
+  // Unique gradient id per call avoids SVG id collisions when many avatars render
+  var gid = 'gradNinja' + Math.random().toString(36).slice(2, 9);
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">'
+    + '<defs><linearGradient id="'+gid+'" x1="0%" y1="0%" x2="100%" y2="100%">'
+    + '<stop offset="0%" stop-color="#ff7e67"/><stop offset="100%" stop-color="#ffb867"/>'
+    + '</linearGradient></defs>'
+    + '<circle cx="50" cy="50" r="50" fill="url(#'+gid+')"/>'
+    + '<circle cx="50" cy="50" r="28" fill="#1a1a2e"/>'
+    + '<path d="M 25 45 Q 50 55 75 45 Q 75 60 50 60 Q 25 60 25 45 Z" fill="#f1c40f"/>'
+    + '<circle cx="40" cy="52" r="4" fill="#1a1a2e"/>'
+    + '<circle cx="60" cy="52" r="4" fill="#1a1a2e"/>'
+    + '<path d="M 75 40 Q 85 35 90 45 Q 85 45 75 42 Z" fill="#e74c3c"/>'
+    + '<path d="M 75 40 Q 85 45 80 55 Q 78 50 75 42 Z" fill="#e74c3c"/>'
+    + '<path d="M 20 40 Q 50 35 80 40 Q 50 45 20 40 Z" fill="#e74c3c"/>'
+    + '</svg>';
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+}
+function gcIsValidAvatarUrl(url){
+  if(!url || typeof url !== 'string') return false;
+  var u = url.trim();
+  if(!u) return false;
+  if(u.indexOf('ui-avatars.com') !== -1) return false;
+  if(u.indexOf('data:image/svg') === 0 && u.indexOf('gradNinja') === -1 && u.indexOf('ff7e67') === -1){
+    // allow our default; reject other letter avatars if any
+  }
+  if(u.indexOf('http://') === 0 || u.indexOf('https://') === 0 || u.indexOf('data:') === 0 || u.indexOf('blob:') === 0) return true;
+  return false;
+}
+function avatar(u){
+  if(typeof u === 'string'){
+    return gcIsValidAvatarUrl(u) ? u : gcDefaultAvatarDataUri();
+  }
+  u = u || {};
+  var url = u.avatar || u.photoURL || u.photo || '';
+  return gcIsValidAvatarUrl(url) ? url : gcDefaultAvatarDataUri();
+}
+
+/* Universal default avatar: failed loads fall back to ninja SVG */
+(function(){
+  document.addEventListener('error', function(e){
+    var t = e.target;
+    if(!t || t.tagName !== 'IMG') return;
+    if(!t.classList.contains('avatar') && t.id !== 'chatAvatar' && t.id !== 'qpAvatar' && t.id !== 'settingsAvatar' && t.id !== 'navAvatar' && !t.classList.contains('qp-av') && !t.classList.contains('active-av') && !t.classList.contains('ms-story-av')) return;
+    if(t.dataset.gcAvFallback === '1') return;
+    t.dataset.gcAvFallback = '1';
+    try{ t.src = (typeof gcDefaultAvatarDataUri === 'function') ? gcDefaultAvatarDataUri() : ''; }catch(err){}
+  }, true);
+})();
+
+function gcBindAvatarFallback(img){
+  if(!img || img._gcAvBound) return;
+  img._gcAvBound = true;
+  img.addEventListener('error', function(){
+    try{
+      img.onerror = null;
+      img.src = gcDefaultAvatarDataUri();
+    }catch(e){}
+  });
+}
 function fmt(t){
   try{
     var d = t && t.toDate ? t.toDate() : new Date(t || Date.now());
@@ -1684,6 +1743,58 @@ function listenTyping(cid){
   }, function(){});
 }
 
+
+/* ═══ In-memory chat message cache (instant reopen, no skeleton) ═══ */
+if(!window.__gcChatMsgCache) window.__gcChatMsgCache = {}; // chatId -> { html, ids: [], at, docs: [{id,data}] }
+function gcSaveChatMsgCache(cid, docs, html){
+  if(!cid || !user) return;
+  try{
+    window.__gcChatMsgCache[cid] = {
+      uid: user.uid,
+      html: html || '',
+      docs: (docs || []).map(function(d){
+        return { id: d.id, data: (typeof d.data === 'function' ? d.data() : d.data) || {} };
+      }),
+      at: Date.now()
+    };
+  }catch(e){}
+}
+function gcGetChatMsgCache(cid){
+  try{
+    var c = window.__gcChatMsgCache && window.__gcChatMsgCache[cid];
+    if(!c || c.uid !== (user && user.uid)) return null;
+    // 45 min TTL
+    if(Date.now() - (c.at || 0) > 45 * 60 * 1000) return null;
+    return c;
+  }catch(e){ return null; }
+}
+function gcScrollMessagesToBottom(box, force){
+  if(!box) return;
+  function go(){
+    try{ box.scrollTop = box.scrollHeight; }catch(e){}
+  }
+  go();
+  requestAnimationFrame(function(){
+    go();
+    requestAnimationFrame(go);
+  });
+  // Media can expand height after decode
+  setTimeout(go, 50);
+  setTimeout(go, 180);
+  setTimeout(go, 400);
+  if(force){
+    try{
+      var imgs = box.querySelectorAll('img,video');
+      imgs.forEach(function(el){
+        if(el._gcScrollBound) return;
+        el._gcScrollBound = true;
+        el.addEventListener('load', go, { once:true });
+        el.addEventListener('loadeddata', go, { once:true });
+      });
+    }catch(e){}
+  }
+}
+
 function listenMessages(cid){
   if(msgUnsub){ try{ msgUnsub(); }catch(e){} msgUnsub=null; }
   seenMsgIds = new Set(); // reset so reopen doesn't re-flash old messages
@@ -1693,9 +1804,27 @@ function listenMessages(cid){
   var jumpBtn = $('gcScrollBottom');
   if(jumpBtn) jumpBtn.classList.remove('is-visible');
 
-  if(box) box.innerHTML = '<div class="sk-msg" aria-hidden="true"><div class="sk-bubble w80"></div><div class="sk-bubble me w60"></div><div class="sk-bubble w50"></div><div class="sk-bubble me w80"></div><div class="sk-bubble w40"></div></div>';
-  var q = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','desc').limit(50);
+  var cachedChat = gcGetChatMsgCache(cid);
   var painted = false;
+  if(box){
+    if(cachedChat && cachedChat.html){
+      box.innerHTML = cachedChat.html;
+      // Restore per-message data cache for reply/double-tap
+      window.__gcMsgDataCache = {};
+      (cachedChat.docs || []).forEach(function(entry){
+        if(entry && entry.id){
+          window.__gcMsgDataCache[entry.id] = entry.data || {};
+          seenMsgIds.add(entry.id);
+        }
+      });
+      painted = true; // treat as already painted so we don't flash skeleton
+      gcScrollMessagesToBottom(box, true);
+      try{ gcUpdateScrollBottomButton(); }catch(e){}
+    } else {
+      box.innerHTML = '<div class="sk-msg" aria-hidden="true"><div class="sk-bubble w80"></div><div class="sk-bubble me w60"></div><div class="sk-bubble w50"></div><div class="sk-bubble me w80"></div><div class="sk-bubble w40"></div></div>';
+    }
+  }
+  var q = db.collection('chats').doc(cid).collection('messages').orderBy('createdAt','desc').limit(50);
   function paint(snap){
     if(currentChat !== cid) return;
     var docs = snap.docs.slice().reverse();
@@ -1727,12 +1856,14 @@ function listenMessages(cid){
         return html;
       }).join('') || '<div class="empty">No messages yet. Say hello.</div>';
       if(!painted || nearBottom){
-  box.scrollTop = box.scrollHeight;
-} else {
-  try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
-}
+        gcScrollMessagesToBottom(box, !!isFirstPaint);
+      } else {
+        try{ box.scrollTop = Math.max(0, box.scrollHeight - prevHeight + prevTop); }catch(e){}
+      }
+      try{ gcUpdateScrollBottomButton(); }catch(e){}
+      // Persist for instant reopen
+      try{ gcSaveChatMsgCache(cid, docs.map(function(d){ return { id: d.id, data: d.data() }; }), box.innerHTML); }catch(e){}
 
-gcUpdateScrollBottomButton();
       // Apply highlight after DOM insert
       if(newIds.length){
         newIds.forEach(function(nid){
@@ -2686,7 +2817,7 @@ async function runFriendSearch(q){
     return;
   }
   box.classList.add('show');
-  box.innerHTML = '<div class="empty" style="padding:16px">Searching friends…</div>';
+  box.innerHTML = '<div class="empty" style="padding:16px">Searching…</div>';
 
   var mutualIds = getMutualFriendIds();
   var needFetch = mutualIds.filter(function(id){ return !usersCache.has(id); }).slice(0, 80);
@@ -2705,41 +2836,45 @@ async function runFriendSearch(q){
     qs2.docs.forEach(function(d){ if(d.id !== user.uid){ usersCache.set(d.id, Object.assign({ uid: d.id }, d.data()||{})); }});
   }catch(e){}
 
-  // Rebuild strict mutual list
-  mutualIds = getMutualFriendIds().filter(function(id){
-    var u = usersCache.get(id);
-    if(!u) return false;
-    var mine = userData || {};
-    var following = Array.isArray(mine.following) ? mine.following : [];
-    var friends = Array.isArray(mine.friends) ? mine.friends : [];
-    if(friends.indexOf(id) !== -1) return true;
-    if(following.indexOf(id) === -1) return false;
-    var theirFollowing = Array.isArray(u.following) ? u.following : [];
-    return theirFollowing.indexOf(user.uid) !== -1;
-  });
-
+  // Public user search (same eligibility as main GoChat messenger search):
+  // usernameLower / nameLower prefix matches from Firestore, not limited to mutual follows.
+  var blocked = {};
+  try{
+    (userData && userData.blockedUsers || []).forEach(function(id){ if(id) blocked[id] = true; });
+  }catch(e){}
   var hits = [];
-  mutualIds.forEach(function(id){
-    var u = usersCache.get(id) || {};
+  var seenHit = {};
+  usersCache.forEach(function(u, id){
+    if(!id || id === user.uid || seenHit[id] || blocked[id]) return;
+    if(u.isDeleted) return;
     var name = (u.name || u.displayName || '').toLowerCase();
     var uname = (u.username || u.usernameLower || '').toLowerCase();
-    if(name.indexOf(q) !== -1 || uname.indexOf(q) !== -1 || String(id).toLowerCase().indexOf(q) !== -1){
+    if(name.indexOf(q) !== -1 || uname.indexOf(q) === 0 || uname.indexOf(q) !== -1){
+      seenHit[id] = true;
       hits.push({
         uid: id,
         name: u.name || u.displayName || 'User',
         username: u.username || '',
-        avatar: u.avatar || u.photoURL || avatar({ name: u.name || 'User' })
+        avatar: avatar(u)
       });
     }
   });
-  hits.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  // Prefer username prefix matches, then name
+  hits.sort(function(a,b){
+    var au = (a.username || '').toLowerCase();
+    var bu = (b.username || '').toLowerCase();
+    var ap = au.indexOf(q) === 0 ? 0 : 1;
+    var bp = bu.indexOf(q) === 0 ? 0 : 1;
+    if(ap !== bp) return ap - bp;
+    return (a.name || '').localeCompare(b.name || '');
+  });
   hits = hits.slice(0, 30);
 
   if(!hits.length){
-    box.innerHTML = '<div class="empty" style="padding:18px 8px">No mutual friends match this search.<br><span style="font-size:12px;opacity:.75">Only people you follow each other with appear here.</span></div>';
+    box.innerHTML = '<div class="empty" style="padding:18px 8px">No users found.<br><span style="font-size:12px;opacity:.75">Try a different name or username.</span></div>';
     return;
   }
-  box.innerHTML = '<div class="search-section-label">Friends</div>' + hits.map(function(p){
+  box.innerHTML = '<div class="search-section-label">People</div>' + hits.map(function(p){
     var cid = chatIdFor(p.uid);
     var handle = p.username ? ('@'+p.username) : '';
     return '<button type="button" class="friend-row" data-chat="'+esc(cid)+'" data-uid="'+esc(p.uid)+'" data-name="'+esc(p.name)+'" data-avatar="'+esc(p.avatar)+'">'
@@ -3263,12 +3398,27 @@ function msStoryIsSeen(s, localSeen){
       var groups = [];
       if(user && byUid[user.uid]){ groups.push(byUid[user.uid]); delete byUid[user.uid]; }
       Object.keys(byUid).forEach(function(uid){ groups.push(byUid[uid]); });
-      // unseen first for others
+      // Merge durable local seen into each story item so rings stay correct
+      // even when Firestore views lag behind a just-viewed story.
+      try{
+        var _localSeen = msReadLocalSeenStoryMap();
+        Object.keys(byUid).forEach(function(uid){
+          (byUid[uid].items || []).forEach(function(item){
+            if(!item || !item.id) return;
+            if(_localSeen[item.id]){
+              if(!Array.isArray(item.views)) item.views = [];
+              if(item.views.indexOf(user.uid) === -1) item.views.push(user.uid);
+            }
+          });
+        });
+      }catch(e){}
+      // unseen first for others — use same seen rules as ring (local + server)
       groups.sort(function(a,b){
         if(user && a.uid===user.uid) return -1;
         if(user && b.uid===user.uid) return 1;
-        var au = a.items.some(function(s){ return !s.views || s.views.indexOf(user.uid)===-1; });
-        var bu = b.items.some(function(s){ return !s.views || s.views.indexOf(user.uid)===-1; });
+        var localSeenMap = msReadLocalSeenStoryMap();
+        var au = a.items.some(function(st){ return !msStoryIsSeen(st, localSeenMap); });
+        var bu = b.items.some(function(st){ return !msStoryIsSeen(st, localSeenMap); });
         if(au!==bu) return au?-1:1;
         return 0;
       });
