@@ -701,6 +701,66 @@ article.msg.mine.gc-msg-new{animation:none}
   height:21px;
   display:block;
 }
+
+/* ═══ Quick Profile + Gallery (fixed sheet) ═══ */
+.qp-overlay{position:fixed;inset:0;z-index:70;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.42);backdrop-filter:blur(2px)}
+.qp-overlay.open{display:flex}
+.qp-sheet{
+  width:min(520px,100%);
+  height:min(85dvh,720px);
+  max-height:min(85dvh,720px);
+  background:var(--bg);
+  border-radius:22px 22px 0 0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 -8px 40px rgba(0,0,0,.18);
+  animation:qpUp .22s ease;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+@keyframes qpUp{from{transform:translateY(28px);opacity:.6}to{transform:none;opacity:1}}
+.qp-head{padding:18px 18px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;border-bottom:1px solid var(--line);flex:none;position:relative}
+.qp-close{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;color:var(--text)}
+.qp-close svg{width:18px;height:18px}
+.qp-av{width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--surface2);border:3px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.qp-name{font-size:18px;font-weight:800;letter-spacing:-.3px;text-align:center;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qp-uname{font-size:13px;color:var(--muted);font-weight:600}
+.qp-body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.qp-gallery{min-height:100%}
+.qp-load-section{padding:22px 20px 10px;text-align:center}
+.qp-load-icon{width:50px;height:50px;margin:0 auto 12px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;color:var(--muted)}
+.qp-load-icon svg{width:26px;height:26px}
+.qp-load-title{font-size:15px;font-weight:750;margin:0 0 4px}
+.qp-load-sub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.qp-progress{height:5px;border-radius:99px;background:var(--surface2);overflow:hidden;max-width:220px;margin:0 auto}
+.qp-progress > i{display:block;height:100%;width:30%;border-radius:99px;background:var(--accent);transition:width .3s ease}
+.qp-progress.indeterminate > i{width:40%;animation:qpBar 1.4s ease-in-out infinite}
+@keyframes qpBar{0%{transform:translateX(-120%)}50%{transform:translateX(160%)}100%{transform:translateX(280%)}}
+.qp-status{font-size:11px;color:var(--muted);margin-top:8px}
+.qp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5px;padding:2px 3px 24px}
+.qp-cell{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;background:var(--surface2);border:0;padding:0;cursor:pointer}
+.qp-cell img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.qp-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;color:#fff;pointer-events:none}
+.qp-play svg{width:14px;height:14px;margin-left:1px}
+.qp-sk{background:var(--surface2);position:relative;overflow:hidden}
+.qp-sk::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%);animation:qpShimmer 1.45s ease-in-out infinite}
+html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
+@media(prefers-color-scheme:dark){html:not(.theme-light) .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}}
+@keyframes qpShimmer{100%{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.qp-sk::after,.qp-progress.indeterminate > i{animation:none!important}}
+.qp-empty{padding:48px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh}
+.qp-empty-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:var(--surface2);display:grid;place-items:center}
+.qp-empty-icon svg{width:28px;height:28px}
+.qp-empty h3{margin:0 0 6px;font-size:16px;font-weight:750;color:var(--text)}
+.qp-empty p{margin:0;font-size:13px;line-height:1.45;max-width:260px}
+.qp-error{padding:12px 16px;display:flex;align-items:center;gap:10px;justify-content:center;font-size:12px;color:var(--muted)}
+.qp-error button{padding:6px 12px;border-radius:99px;background:var(--surface2);font-weight:700;font-size:12px;color:var(--text)}
+#chatName{cursor:pointer}
+#chatName:active{opacity:.7}
+/* Gallery media opens above Quick Profile */
+.media-viewer{z-index:90 !important}
+
+
 </style>
 </head>
 <body>
@@ -847,6 +907,23 @@ article.msg.mine.gc-msg-new{animation:none}
   <div id="gcMediaPreviewGrid" class="gc-media-preview-grid"></div>
 </div>
 <form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section><div id="toast" class="toast"></div>
+
+
+<div id="qpOverlay" class="qp-overlay" aria-hidden="true">
+  <div class="qp-sheet" role="dialog" aria-modal="true" aria-labelledby="qpName" onclick="event.stopPropagation()">
+    <div class="qp-head">
+      <button type="button" class="qp-close" id="qpClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <img class="qp-av" id="qpAvatar" alt="">
+      <div class="qp-name" id="qpName">User</div>
+      <div class="qp-uname" id="qpUname"></div>
+    </div>
+    <div class="qp-body" id="qpBody">
+      <div class="qp-gallery" id="qpGalleryPane"></div>
+    </div>
+  </div>
+</div>
 
 <div id="mediaViewer" class="media-viewer" aria-hidden="true">
   <div class="zoom-actions-capsule" onclick="event.stopPropagation()">
@@ -1500,6 +1577,7 @@ function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
   }
 }
 function closeChat(){
+  try{ closeQuickProfile(true); }catch(e){}
   try{ closeMediaViewer(true); }catch(e){}
   if(msgUnsub){msgUnsub();msgUnsub=null}
   if(otherStatusUnsub){otherStatusUnsub();otherStatusUnsub=null}
@@ -4188,6 +4266,11 @@ window.addEventListener('pagehide',()=>{if(user)db.collection('users').doc(user.
 // Android / browser Back: close chat first, then return through tab history, stay in app on list
 try{ history.replaceState({page:'chatsPage'},'','#chats'); }catch(e){}
 window.addEventListener('popstate', function(e){
+  if(qpState && qpState.open){
+    try{ closeQuickProfile(true); }catch(err){}
+    return;
+  }
+
   if(typeof msIsStoryOpen==='function' && msIsStoryOpen()){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
@@ -4773,6 +4856,331 @@ function bindMsgHold(listEl){
 }
 if($('messages')) bindMsgHold($('messages'));
 
+
+/* ═══════════════════════════════════════════════════════════════
+   Quick Profile · Conversation Gallery (photos & videos only)
+═══════════════════════════════════════════════════════════════ */
+var qpState = {
+  open: false,
+  chatId: null,
+  otherUid: null,
+  otherName: '',
+  otherAvatar: '',
+  otherUsername: '',
+  media: [],
+  seenKeys: {},
+  cursor: null,
+  loading: false,
+  done: false,
+  err: null,
+  gen: 0
+};
+
+function qpCloudThumb(url, size){
+  size = size || 360;
+  if(!url || typeof url !== 'string') return url || '';
+  try{
+    if(url.indexOf('res.cloudinary.com') === -1 || url.indexOf('/upload/') === -1) return url;
+    if(/\/upload\/[^/]*w_\d+/.test(url)) return url;
+    return url.replace('/upload/', '/upload/c_fill,w_'+size+',h_'+size+',q_auto,f_auto/');
+  }catch(e){ return url; }
+}
+
+function qpMs(v){
+  if(v == null || v === '') return 0;
+  if(typeof v === 'number' && isFinite(v)) return v;
+  if(typeof v.toMillis === 'function') return v.toMillis();
+  if(typeof v.seconds === 'number') return v.seconds * 1000;
+  var n = Number(v);
+  return isFinite(n) ? n : 0;
+}
+
+function qpCacheKey(chatId){
+  return 'gc_qp_gal_v2_' + (user && user.uid || '') + '_' + (chatId || '');
+}
+
+function qpLoadCache(chatId){
+  try{
+    var raw = localStorage.getItem(qpCacheKey(chatId));
+    if(!raw) return null;
+    var o = JSON.parse(raw);
+    if(!o || o.uid !== (user && user.uid) || o.chatId !== chatId) return null;
+    return o;
+  }catch(e){ return null; }
+}
+
+function qpSaveCache(chatId){
+  try{
+    if(!user || !chatId) return;
+    localStorage.setItem(qpCacheKey(chatId), JSON.stringify({
+      uid: user.uid,
+      chatId: chatId,
+      at: Date.now(),
+      media: (qpState.media || []).slice(0, 400),
+      done: !!qpState.done
+    }));
+  }catch(e){}
+}
+
+function qpExtractMedia(msgId, m){
+  var out = [];
+  if(!m || m.deletedForEveryone || m.unsent) return out;
+  if(Array.isArray(m.deletedFor) && user && m.deletedFor.indexOf(user.uid) !== -1) return out;
+  var ts = qpMs(m.createdAt || m.timestamp || m.sentAt);
+  if(Array.isArray(m.images) && m.images.length){
+    m.images.forEach(function(u, i){
+      if(!u) return;
+      out.push({ key: msgId + '_img_' + i, url: u, thumb: qpCloudThumb(u), kind: 'image', ts: ts, msgId: msgId, idx: i });
+    });
+  } else if(m.imageUrl){
+    out.push({ key: msgId + '_img', url: m.imageUrl, thumb: qpCloudThumb(m.imageUrl), kind: 'image', ts: ts, msgId: msgId, idx: 0 });
+  }
+  if(m.videoUrl){
+    var th = m.videoThumb || m.poster || m.thumbnail || '';
+    out.push({
+      key: msgId + '_vid',
+      url: m.videoUrl,
+      thumb: th ? qpCloudThumb(th, 360) : '',
+      kind: 'video',
+      ts: ts,
+      msgId: msgId,
+      idx: 0
+    });
+  }
+  return out;
+}
+
+function qpSortMedia(arr){
+  arr.sort(function(a,b){
+    if(b.ts !== a.ts) return b.ts - a.ts;
+    if(a.msgId !== b.msgId) return String(b.msgId).localeCompare(String(a.msgId));
+    return (a.idx||0) - (b.idx||0);
+  });
+}
+
+function qpSkeletonHTML(n){
+  n = n || 9;
+  var cells = '';
+  for(var i=0;i<n;i++) cells += '<div class="qp-cell qp-sk" aria-hidden="true"></div>';
+  return '<div class="qp-load-section">'
+    + '<div class="qp-load-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>'
+    + '<div class="qp-load-title">Preparing your gallery</div>'
+    + '<div class="qp-load-sub">Collecting photos and videos…</div>'
+    + '<div class="qp-progress indeterminate" id="qpProgress"><i></i></div>'
+    + '<div class="qp-status" id="qpStatus">Preparing gallery…</div>'
+    + '</div>'
+    + '<div class="qp-grid">'+cells+'</div>';
+}
+
+function qpEmptyHTML(){
+  return '<div class="qp-empty"><div class="qp-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>'
+    + '<h3>No media yet</h3><p>Photos and videos shared in this conversation will appear here.</p></div>';
+}
+
+function qpRenderGallery(){
+  var pane = $('qpGalleryPane');
+  if(!pane) return;
+  if(qpState.loading && !qpState.media.length){
+    pane.innerHTML = qpSkeletonHTML(9);
+    return;
+  }
+  if(!qpState.media.length && qpState.done){
+    pane.innerHTML = qpEmptyHTML();
+    return;
+  }
+  var html = '';
+  if(qpState.err){
+    html += '<div class="qp-error"><span>'+esc(qpState.err)+'</span><button type="button" id="qpRetry">Retry</button></div>';
+  }
+  if(qpState.loading && qpState.media.length){
+    html += '<div class="qp-status" style="padding:8px 12px;text-align:center">Loading more media…</div>';
+  }
+  html += '<div class="qp-grid" id="qpGrid">';
+  qpState.media.forEach(function(it){
+    var play = it.kind === 'video'
+      ? '<span class="qp-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>'
+      : '';
+    var src = it.thumb || it.url || '';
+    html += '<button type="button" class="qp-cell" data-qp-media="1" data-url="'+esc(it.url)+'" data-kind="'+esc(it.kind)+'" data-thumb="'+esc(it.thumb||'')+'">'
+      + (src ? '<img src="'+esc(src)+'" alt="" loading="lazy" draggable="false">' : '')
+      + play
+      + '</button>';
+  });
+  html += '</div>';
+  pane.innerHTML = html;
+}
+
+async function qpFetchBatch(gen){
+  if(!qpState.chatId || !user) return;
+  if(qpState.loading || qpState.done) return;
+  qpState.loading = true;
+  qpState.err = null;
+  try{
+    var col = db.collection('chats').doc(qpState.chatId).collection('messages');
+    var q = col.orderBy('createdAt', 'desc').limit(45);
+    if(qpState.cursor) q = col.orderBy('createdAt', 'desc').startAfter(qpState.cursor).limit(40);
+    var snap = await q.get();
+    if(gen !== qpState.gen) return;
+    if(snap.empty){
+      qpState.done = true;
+    } else {
+      snap.docs.forEach(function(d){
+        qpExtractMedia(d.id, d.data() || {}).forEach(function(it){
+          if(qpState.seenKeys[it.key]) return;
+          qpState.seenKeys[it.key] = true;
+          qpState.media.push(it);
+        });
+      });
+      qpState.cursor = snap.docs[snap.docs.length - 1];
+      if(snap.docs.length < 40) qpState.done = true;
+      qpSortMedia(qpState.media);
+      qpSaveCache(qpState.chatId);
+    }
+  }catch(e){
+    console.warn('qp fetch', e);
+    if(gen === qpState.gen) qpState.err = (e && e.message) ? e.message : 'Could not load media';
+  }finally{
+    if(gen === qpState.gen){
+      qpState.loading = false;
+      qpRenderGallery();
+    }
+  }
+}
+
+function openQuickProfile(){
+  if(!currentChat || !currentOther || currentOther === 'group') return;
+  var u = usersCache.get(currentOther) || {};
+  qpState.open = true;
+  qpState.chatId = currentChat;
+  qpState.otherUid = currentOther;
+  qpState.otherName = ($('chatName') && $('chatName').textContent) || u.name || u.displayName || 'User';
+  qpState.otherAvatar = ($('chatAvatar') && $('chatAvatar').src) || u.avatar || u.photoURL || '';
+  qpState.otherUsername = u.username || u.usernameLower || '';
+  qpState.media = [];
+  qpState.seenKeys = {};
+  qpState.cursor = null;
+  qpState.loading = false;
+  qpState.done = false;
+  qpState.err = null;
+  qpState.gen += 1;
+  var gen = qpState.gen;
+
+  var cached = qpLoadCache(currentChat);
+  if(cached && Array.isArray(cached.media) && cached.media.length){
+    cached.media.forEach(function(it){
+      if(!it || !it.key || qpState.seenKeys[it.key]) return;
+      qpState.seenKeys[it.key] = true;
+      qpState.media.push(it);
+    });
+    qpSortMedia(qpState.media);
+  }
+
+  if($('qpAvatar')) $('qpAvatar').src = qpState.otherAvatar || avatar({ name: qpState.otherName });
+  if($('qpName')) $('qpName').textContent = qpState.otherName;
+  if($('qpUname')) $('qpUname').textContent = qpState.otherUsername ? ('@' + qpState.otherUsername) : '';
+
+  var ov = $('qpOverlay');
+  if(ov){ ov.classList.add('open'); ov.setAttribute('aria-hidden','false'); }
+  try{ history.pushState({ page: 'qp', chat: currentChat }, '', (location.hash || '#chat') + '/profile'); }catch(e){}
+
+  qpState.loading = !qpState.media.length;
+  qpRenderGallery();
+  qpState.loading = false;
+  qpState.done = false;
+  qpState.cursor = null;
+  qpFetchBatch(gen).then(function(){
+    function more(){
+      if(qpState.gen !== gen || qpState.done || !qpState.open) return;
+      if(qpState.media.length >= 120) return;
+      qpFetchBatch(gen).then(more);
+    }
+    more();
+  });
+}
+
+function closeQuickProfile(fromPop){
+  if(!qpState.open) return;
+  qpState.open = false;
+  qpState.gen += 1;
+  var ov = $('qpOverlay');
+  if(ov){ ov.classList.remove('open'); ov.setAttribute('aria-hidden','true'); }
+  if(!fromPop){
+    try{
+      if(currentChat){
+        history.replaceState({ page: 'chat', chat: currentChat, returnPage: chatReturnPage || 'chatsPage' }, '', '#chat/' + currentChat);
+      }
+    }catch(e){}
+  }
+}
+
+(function wireQP(){
+  function bind(){
+    var nameEl = $('chatName');
+    if(nameEl && !nameEl._qpBound){
+      nameEl._qpBound = true;
+      nameEl.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(!currentChat || !currentOther || currentOther === 'group') return;
+        openQuickProfile();
+      });
+    }
+    var closeBtn = $('qpClose');
+    if(closeBtn && !closeBtn._qpBound){
+      closeBtn._qpBound = true;
+      closeBtn.addEventListener('click', function(e){ e.preventDefault(); closeQuickProfile(false); });
+    }
+    var ov = $('qpOverlay');
+    if(ov && !ov._qpBound){
+      ov._qpBound = true;
+      ov.addEventListener('click', function(e){
+        if(e.target === ov) closeQuickProfile(false);
+      });
+    }
+    if(!document._qpClickBound){
+      document._qpClickBound = true;
+      document.addEventListener('click', function(e){
+        var cell = e.target.closest('[data-qp-media]');
+        if(cell){
+          e.preventDefault();
+          e.stopPropagation();
+          var url = cell.getAttribute('data-url');
+          var kind = cell.getAttribute('data-kind') || 'image';
+          var thumb = cell.getAttribute('data-thumb') || '';
+          if(url && typeof openMediaViewer === 'function'){
+            openMediaViewer(url, kind, thumb || undefined);
+          }
+          return;
+        }
+        if(e.target.closest('#qpRetry')){
+          e.preventDefault();
+          qpState.err = null;
+          qpState.done = false;
+          qpFetchBatch(qpState.gen);
+        }
+      }, true);
+    }
+    var body = $('qpBody');
+    if(body && !body._qpScroll){
+      body._qpScroll = true;
+      body.addEventListener('scroll', function(){
+        if(!qpState.open || qpState.loading || qpState.done) return;
+        if(body.scrollTop + body.clientHeight > body.scrollHeight - 140){
+          qpFetchBatch(qpState.gen);
+        }
+      }, {passive:true});
+    }
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+  setTimeout(bind, 0);
+})();
+
+window.openQuickProfile = openQuickProfile;
+window.closeQuickProfile = closeQuickProfile;
+
+
+
 document.addEventListener('click', function(e){
   var ref = e.target.closest('.msg-reply-ref');
   if(!ref) return;
@@ -4842,8 +5250,16 @@ document.addEventListener('click', function(e){
     if(dx >= THRESH){
       var id = art.getAttribute('data-id');
       if(!id || !currentChat) return;
+      var cached = (window.__gcMsgDataCache && window.__gcMsgDataCache[id]) || null;
+      if(cached){
+        startReplyToMessage(id, cached);
+        return;
+      }
       db.collection('chats').doc(currentChat).collection('messages').doc(id).get().then(function(snap){
-        if(snap.exists) startReplyToMessage(id, snap.data());
+        if(snap.exists){
+          if(window.__gcMsgDataCache) window.__gcMsgDataCache[id] = snap.data();
+          startReplyToMessage(id, snap.data());
+        }
       }).catch(function(){});
     }
   }
