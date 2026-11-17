@@ -1346,14 +1346,6 @@ async function saveMediaCurrent(){
     return;
   }
 
-  // --- নতুন আপডেট: অ্যান্ড্রয়েড অ্যাপ থেকে ডাউনলোড করলে সরাসরি গ্যালারিতে সেভ হবে ---
-  if (window.AndroidInterface && typeof window.AndroidInterface.downloadMedia === 'function') {
-      window.AndroidInterface.downloadMedia(url, "GoChat_Media_" + Date.now());
-      return; 
-  }
-  // -----------------------------------------------------------------------------
-
-  // --- ক্রোম ব্রাউজারের নরমাল ডাউনলোড কোড (আগের মতোই থাকবে) ---
   var isVideo = mediaCurrentKind === 'video';
   var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
 
@@ -1408,6 +1400,8 @@ async function saveMediaCurrent(){
 
     /*
       Cloudinary fallback:
+      Force the server to deliver the media as an attachment,
+      so the browser can download it even when fetch is blocked by CORS.
     */
     var downloadUrl = getMediaDownloadUrl(url);
 
@@ -1440,8 +1434,6 @@ async function saveMediaCurrent(){
   }
 }
 
-
-
 async function shareMediaCurrent(){
   closeMediaMenu();
 
@@ -1451,14 +1443,6 @@ async function shareMediaCurrent(){
     toast('Media not available');
     return;
   }
-
-  // --- নতুন আপডেট: অ্যান্ড্রয়েড অ্যাপ থেকে শেয়ার করলে নেটিভ শেয়ারিং ওপেন হবে ---
-  if (window.AndroidInterface && typeof window.AndroidInterface.shareApp === 'function') {
-      // এটি সরাসরি ফোনের WhatsApp, Messenger সহ সব অ্যাপের লিস্ট নিয়ে আসবে
-      window.AndroidInterface.shareApp("GoChat Media", "Shared from GoChat", url);
-      return; 
-  }
-  // -------------------------------------------------------------------------
 
   var isVideo = mediaCurrentKind === 'video';
   var fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
@@ -1582,7 +1566,6 @@ async function shareMediaCurrent(){
     toast('Could not share media');
   }
 }
-
 
 
 function openChat(chatId,otherUid,otherName,otherAvatar,isGroup,returnPage){
