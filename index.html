@@ -21,9 +21,9 @@
 .chat-head-more{width:40px;height:40px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;flex:none;border:0;color:var(--text);margin-left:auto}
 .chat-head-more svg{width:20px;height:20px}
 .chat-head-more:active{opacity:.75}
-.ms-opt-backdrop{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center}
+.ms-opt-backdrop{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;padding:0;box-sizing:border-box}
 .ms-opt-backdrop.open{display:flex}
-.ms-opt-sheet{width:min(520px,100%);background:var(--surface);border-radius:22px 22px 0 0;padding:10px 8px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 36px rgba(0,0,0,.22);animation:msOptUp .26s ease}
+.ms-opt-sheet{width:min(520px,100%);max-height:min(88dvh,640px);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border-radius:22px 22px 0 0;padding:10px 8px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 36px rgba(0,0,0,.22);animation:msOptUp .26s ease;box-sizing:border-box}
 @keyframes msOptUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .ms-opt-handle{width:40px;height:4px;border-radius:99px;background:var(--line);margin:4px auto 12px}
 .ms-opt-item{width:100%;display:flex;align-items:center;gap:14px;padding:16px 18px;border:0;background:transparent;border-radius:14px;text-align:left;color:var(--text);font-size:15px;font-weight:700;cursor:pointer}
@@ -37,6 +37,10 @@
 .ms-opt-cancel{width:calc(100% - 20px);margin:8px 10px 0;padding:14px;border:0;border-radius:14px;background:var(--surface2);color:var(--text);font-weight:800;font-size:14px}
 .ms-block-opt{width:100%;display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);margin:0 10px 10px;text-align:left;color:var(--text);cursor:pointer}
 .ms-block-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.ms-block-actions{display:flex;gap:10px;padding:8px 10px 4px;position:sticky;bottom:0;background:var(--surface);z-index:2}
+.ms-block-actions .ms-block-cancel,.ms-block-actions .ms-block-go{flex:1;min-width:0}
+.ms-block-opt{box-sizing:border-box;max-width:calc(100% - 20px)}
+
 .ms-block-opt strong{display:block;font-size:14px;font-weight:800}
 .ms-block-opt span{display:block;margin-top:4px;font-size:12px;color:var(--muted);line-height:1.4;font-weight:600}
 .ms-block-actions{display:flex;gap:10px;padding:6px 10px 4px}
@@ -757,8 +761,8 @@ article.msg.mine.gc-msg-new{animation:none}
 .qp-overlay.open{display:flex}
 .qp-sheet{
   width:min(520px,100%);
-  height:min(85dvh,720px);
-  max-height:min(85dvh,720px);
+  height:min(92dvh,820px);
+  max-height:min(92dvh,820px);
   background:var(--bg);
   border-radius:22px 22px 0 0;
   display:flex;
@@ -769,6 +773,19 @@ article.msg.mine.gc-msg-new{animation:none}
   padding-bottom:env(safe-area-inset-bottom,0);
 }
 @keyframes qpUp{from{transform:translateY(28px);opacity:.6}to{transform:none;opacity:1}}
+
+.qp-view-profile{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin:4px 0 2px;padding:10px 22px;min-width:148px;
+  border:0;border-radius:999px;cursor:pointer;
+  font-size:14px;font-weight:800;letter-spacing:-.1px;
+  background:var(--accent);color:#fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+  transition:transform .15s, opacity .15s, filter .15s;
+}
+.qp-view-profile:active{transform:scale(.97);opacity:.92}
+body.light-mode .qp-view-profile,html:not(.dark) .qp-view-profile{color:#fff}
+
 .qp-head{padding:18px 18px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;border-bottom:1px solid var(--line);flex:none;position:relative}
 .qp-close{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;color:var(--text)}
 .qp-close svg{width:18px;height:18px}
@@ -977,6 +994,7 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
       <img class="qp-av" id="qpAvatar" alt="">
       <div class="qp-name" id="qpName">User</div>
       <div class="qp-uname" id="qpUname"></div>
+      <button type="button" class="qp-view-profile" id="qpViewProfile">View Profile</button>
     </div>
     <div class="qp-body" id="qpBody">
       <div class="qp-gallery" id="qpGalleryPane"></div>
@@ -2508,6 +2526,12 @@ async function gcSendSelectedMedia(){
 }
 (function(){
   var voiceRecTimer = null, voiceRecStarted = 0, voiceDiscard = false;
+  var voiceSessionId = 0;
+  var voiceStopRequested = false;
+  var voiceUploadInFlight = false;
+  var voiceActiveStream = null;
+  var sessionChunksRef = null;
+
   function fmtRec(ms){
     var s = Math.floor(ms/1000);
     var m = Math.floor(s/60); s = s % 60;
@@ -2517,6 +2541,11 @@ async function gcSendSelectedMedia(){
     var bar = $('voiceRecBar'), comp = $('composer');
     if(bar) bar.hidden = !on;
     if(comp) comp.classList.toggle('voice-hidden', !!on);
+    // Re-enable send after previous upload cycle
+    try{
+      var vs = $('voiceRecSend');
+      if(vs && on){ vs.disabled = false; vs.style.opacity = ''; }
+    }catch(e){}
   }
   function stopRecTimer(){
     if(voiceRecTimer){ clearInterval(voiceRecTimer); voiceRecTimer = null; }
@@ -2526,26 +2555,38 @@ async function gcSendSelectedMedia(){
     showRecBar(false);
     voiceState = 'idle';
     voiceDiscard = false;
+    voiceStopRequested = false;
     var tEl = $('voiceRecTime'); if(tEl) tEl.textContent = '0:00';
   }
-  async function uploadVoiceBlob(blob){
-    if(!blob || blob.size < 200){ toast('Recording too short'); return; }
+  async function uploadVoiceBlob(blob, session){
+    if(session !== voiceSessionId) return; // stale session
+    if(voiceUploadInFlight) return;
+    if(!blob || blob.size < 500){ toast('Recording too short'); return; }
     if(blob.size > 10*1024*1024){ toast('Voice message exceeds 10 MB'); return; }
+    voiceUploadInFlight = true;
     voiceState = 'uploading';
     toast('Sending voice…');
     try{
+      // Unique filename per take — avoids any CDN/browser cache collision
+      var stamp = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+      var ext = (blob.type && blob.type.indexOf('mp4') !== -1) ? 'm4a' : 'webm';
       var fd = new FormData();
-      fd.append('file', blob, 'voice.webm');
+      fd.append('file', blob, 'voice-' + stamp + '.' + ext);
       fd.append('upload_preset', 'gochat');
       var r = await fetch('https://api.cloudinary.com/v1_1/pfbi9lmx/video/upload', { method:'POST', body: fd });
       var j = await r.json();
       if(!r.ok || !j.secure_url) throw Error(j.error && j.error.message || 'Upload failed');
+      if(session !== voiceSessionId) return; // abandoned
       await sendPayload({ audioUrl: j.secure_url, voiceUrl: j.secure_url });
       toast('Voice message sent');
     }catch(err){
-      toast('Voice upload failed: ' + (err.message || err));
+      if(session === voiceSessionId) toast('Voice upload failed: ' + (err.message || err));
     }finally{
+      voiceUploadInFlight = false;
       voiceState = 'idle';
+      // Clear global chunk buffer so next take cannot reuse this data
+      voiceChunks = [];
+      sessionChunksRef = null;
     }
   }
   function pickRecorderMime(){
@@ -2568,40 +2609,63 @@ async function gcSendSelectedMedia(){
       if(typeof msAssertCanMessage === 'function') msAssertCanMessage(currentOther);
       return;
     }
-
     if(voiceState !== 'idle' || !currentChat) return;
+    if(voiceUploadInFlight){ toast('Still sending previous voice…'); return; }
     if(!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost'){
       toast('Microphone needs HTTPS. Open the app over a secure connection.');
       return;
     }
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      toast('Microphone API not available in this WebView');
+      toast('Microphone not supported in this browser');
       return;
     }
     if(!window.MediaRecorder){
-      toast('Voice recording is not supported on this device');
+      toast('Voice recording not supported on this device');
       return;
     }
     voiceState = 'requesting';
+    voiceDiscard = false;
+    voiceStopRequested = false;
+    // New session id — any late events from older recorders are ignored
+    voiceSessionId += 1;
+    var session = voiceSessionId;
+    voiceChunks = [];
+    var sessionChunks = [];
+    sessionChunksRef = sessionChunks;
+
     var constraintsList = [
-      { audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 } },
-      { audio: true }
+      { audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 }, video: false },
+      { audio: true, video: false }
     ];
     function tryGet(i){
+      if(session !== voiceSessionId) return;
       if(i >= constraintsList.length){
         toast('Microphone unavailable. Allow mic permission in app settings and try again.');
         resetVoiceUi();
         return;
       }
       navigator.mediaDevices.getUserMedia(constraintsList[i]).then(function(stream){
+        if(session !== voiceSessionId){
+          try{ stream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
+          return;
+        }
+        // Stop any prior stream
+        try{
+          if(voiceActiveStream){
+            voiceActiveStream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} });
+          }
+        }catch(e){}
+        voiceActiveStream = stream;
         voiceStream = stream;
-        voiceChunks = [];
+        sessionChunks.length = 0;
+        voiceChunks = sessionChunks;
         voiceDiscard = false;
         var mime = pickRecorderMime();
+        var rec;
         try{
-          mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+          rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
         }catch(e1){
-          try{ mediaRecorder = new MediaRecorder(stream); }
+          try{ rec = new MediaRecorder(stream); }
           catch(e2){
             stream.getTracks().forEach(function(tr){ tr.stop(); });
             toast('Recorder unavailable on this device');
@@ -2609,29 +2673,70 @@ async function gcSendSelectedMedia(){
             return;
           }
         }
-        mediaRecorder.ondataavailable = function(e){ if(e.data && e.data.size) voiceChunks.push(e.data); };
-        mediaRecorder.onerror = function(){
+        mediaRecorder = rec;
+
+        rec.ondataavailable = function(e){
+          if(session !== voiceSessionId) return;
+          if(voiceDiscard) return;
+          if(e.data && e.data.size > 0) sessionChunks.push(e.data);
+        };
+        rec.onerror = function(){
+          if(session !== voiceSessionId) return;
           toast('Recording error');
-          try{ mediaRecorder.stop(); }catch(e){}
+          try{ if(rec.state !== 'inactive') rec.stop(); }catch(e){}
         };
-        mediaRecorder.onstop = function(){
-          try{ if(voiceStream) voiceStream.getTracks().forEach(function(tr){ tr.stop(); }); }catch(e){}
-          voiceStream = null;
-          var type = (mediaRecorder && mediaRecorder.mimeType) || mime || 'audio/webm';
-          var blob = new Blob(voiceChunks, { type: type });
-          mediaRecorder = null;
-          if(voiceDiscard){ voiceChunks = []; resetVoiceUi(); return; }
+        rec.onstop = function(){
+          // Detach so a second stop cannot re-enter with old data
+          try{ rec.onstop = null; rec.ondataavailable = null; }catch(e){}
+          try{ if(stream) stream.getTracks().forEach(function(tr){ try{ tr.stop(); }catch(e){} }); }catch(e){}
+          if(voiceActiveStream === stream) voiceActiveStream = null;
+          if(voiceStream === stream) voiceStream = null;
+
+          // Snapshot THIS session only, then wipe
+          var chunks = sessionChunks.slice();
+          sessionChunks.length = 0;
+          voiceChunks = [];
+          sessionChunksRef = null;
+          if(mediaRecorder === rec) mediaRecorder = null;
+
+          if(session !== voiceSessionId) return;
+          if(voiceDiscard){ resetVoiceUi(); return; }
+          if(voiceUploadInFlight){ resetVoiceUi(); return; }
+          if(!chunks.length){
+            resetVoiceUi();
+            toast('No audio captured. Try again.');
+            return;
+          }
+          var elapsed = Date.now() - (voiceRecStarted || Date.now());
+          if(elapsed < 700){
+            resetVoiceUi();
+            toast('Hold a bit longer to record.');
+            return;
+          }
+          var type = (rec.mimeType || mime || 'audio/webm');
+          var blob = new Blob(chunks, { type: type });
+          chunks = null;
+          if(!blob || blob.size < 500){
+            resetVoiceUi();
+            toast('Recording failed. Try again.');
+            return;
+          }
           resetVoiceUi();
-          uploadVoiceBlob(blob);
+          uploadVoiceBlob(blob, session);
         };
+
         try{
-          mediaRecorder.start(250);
+          // timeslice forces periodic dataavailable so stop always has fresh data
+          rec.start(200);
         }catch(e){
-          stream.getTracks().forEach(function(tr){ tr.stop(); });
-          toast('Could not start recorder');
-          resetVoiceUi();
-          return;
+          try{ rec.start(); }catch(e2){
+            stream.getTracks().forEach(function(tr){ tr.stop(); });
+            toast('Could not start recorder');
+            resetVoiceUi();
+            return;
+          }
         }
+        if(session !== voiceSessionId) return;
         voiceState = 'recording';
         voiceRecStarted = Date.now();
         showRecBar(true);
@@ -2641,6 +2746,7 @@ async function gcSendSelectedMedia(){
           if(tEl) tEl.textContent = fmtRec(Date.now() - voiceRecStarted);
         }, 250);
       }).catch(function(err){
+        if(session !== voiceSessionId) return;
         var name = (err && err.name) || '';
         if(name === 'NotAllowedError' || name === 'PermissionDeniedError'){
           toast('Microphone permission denied. Enable it in system settings.');
@@ -2652,7 +2758,6 @@ async function gcSendSelectedMedia(){
           resetVoiceUi();
           return;
         }
-        // Retry with looser constraints
         tryGet(i+1);
       });
     }
@@ -2661,12 +2766,33 @@ async function gcSendSelectedMedia(){
   function cancelVoiceRecording(){
     if(voiceState !== 'recording' || !mediaRecorder){ resetVoiceUi(); return; }
     voiceDiscard = true;
-    try{ mediaRecorder.stop(); }catch(e){ resetVoiceUi(); }
+    voiceStopRequested = true;
+    voiceChunks = [];
+    if(sessionChunksRef) sessionChunksRef.length = 0;
+    try{
+      if(mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    }catch(e){ resetVoiceUi(); }
   }
   function sendVoiceRecording(){
+    if(voiceStopRequested || voiceUploadInFlight) return;
     if(voiceState !== 'recording' || !mediaRecorder) return;
+    if(mediaRecorder.state === 'inactive') return;
+    voiceStopRequested = true;
     voiceDiscard = false;
-    try{ mediaRecorder.stop(); }catch(e){ resetVoiceUi(); toast('Could not finish recording'); }
+    try{
+      var vs = $('voiceRecSend');
+      if(vs){ vs.disabled = true; vs.style.opacity = '0.5'; }
+    }catch(e){}
+    try{
+      if(mediaRecorder.state === 'recording'){
+        // Flush buffered audio before stop (important on Android WebViews)
+        try{ if(typeof mediaRecorder.requestData === 'function') mediaRecorder.requestData(); }catch(e){}
+        mediaRecorder.stop();
+      }
+    }catch(e){
+      resetVoiceUi();
+      toast('Could not finish recording');
+    }
   }
   var vb = $('voiceButton');
   if(vb) vb.onclick = function(){ startVoiceRecording(); };
@@ -4616,6 +4742,24 @@ window.addEventListener('pagehide',()=>{if(user)db.collection('users').doc(user.
 // Android / browser Back: close chat first, then return through tab history, stay in app on list
 try{ history.replaceState({page:'chatsPage'},'','#chats'); }catch(e){}
 window.addEventListener('popstate', function(e){
+  // Priority 1: Chat option sheets (Block / Delete / ⋮ menu) — never leave chat
+  try{
+    var optOpen = document.querySelector('.ms-opt-backdrop.open');
+    if(optOpen){
+      if(typeof window.closeAllChatOptSheets === 'function') window.closeAllChatOptSheets();
+      else {
+        ['msChatOptSheet','msBlockTypeSheet','msDelConvSheet'].forEach(function(id){
+          var el = document.getElementById(id);
+          if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+        });
+        try{
+          if(currentChat) history.replaceState({ page:'chat', chat: currentChat, returnPage: chatReturnPage||'chatsPage' }, '', '#chat/'+currentChat);
+        }catch(_e){}
+      }
+      return;
+    }
+  }catch(err){}
+
   if(qpState && qpState.open){
     try{ closeQuickProfile(true); }catch(err){}
     return;
@@ -5397,6 +5541,88 @@ async function qpFetchBatch(gen){
   }
 }
 
+
+function msBuildMainProfileUrl(param){
+  // Main App deep-link format: ?user=<uid|username> (see gochat_main gcOpenDeepLinkProfile)
+  var q = '?user=' + encodeURIComponent(param);
+  if(window.GC_MAIN_APP_URL){
+    return String(window.GC_MAIN_APP_URL).replace(/\/$/, '') + '/' + q;
+  }
+  try{
+    var origin = location.origin || '';
+    var path = location.pathname || '/';
+    // Messenger often lives under /messenger, /messages, /msg — main is parent path
+    var mainPath = path.replace(/\/(messenger|messages|gochatmessages|msg|chat)(\/.*)?$/i, '/');
+    if(mainPath === path){
+      // same folder: try sibling index / root
+      mainPath = path.replace(/\/[^\/]*\.html?$/i, '/') || '/';
+    }
+    if(!mainPath.endsWith('/')) mainPath += '/';
+    return origin + mainPath + q;
+  }catch(e){
+    return (location.origin || '') + '/' + q;
+  }
+}
+function msOpenGoChatProfile(uid){
+  if(!uid || uid === 'group'){ toast('Profile unavailable'); return; }
+  // Prefer username for nicer Main App resolve (gcResolveUserParam accepts both)
+  var param = uid;
+  try{
+    var u = (typeof usersCache !== 'undefined' && usersCache.get) ? usersCache.get(uid) : null;
+    if(u && (u.username || u.usernameLower)) param = u.username || u.usernameLower;
+    else if(qpState && qpState.otherUid === uid && qpState.otherUsername) param = qpState.otherUsername;
+  }catch(e){}
+
+  // 1) Android WebView bridge (native Main Activity)
+  try{
+    if(window.AndroidBridge){
+      var b = window.AndroidBridge;
+      if(typeof b.openUserProfile === 'function'){ b.openUserProfile(uid); return; }
+      if(typeof b.viewProfile === 'function'){ b.viewProfile(uid); return; }
+      if(typeof b.openProfile === 'function'){ b.openProfile(uid); return; }
+      if(typeof b.navigateToProfile === 'function'){ b.navigateToProfile(uid); return; }
+      if(typeof b.openMainProfile === 'function'){ b.openMainProfile(uid); return; }
+    }
+  }catch(e){}
+
+  // 2) Embedded in Main App shell (iframe / same window has viewUserProfile)
+  try{
+    if(window.parent && window.parent !== window && typeof window.parent.viewUserProfile === 'function'){
+      window.parent.viewUserProfile(uid); return;
+    }
+  }catch(e){}
+  try{
+    if(typeof viewUserProfile === 'function'){ viewUserProfile(uid); return; }
+  }catch(e){}
+
+  // 3) Main App real deep link: ?user= (never touch Messenger hash — that was sending users to Message tab)
+  var url = msBuildMainProfileUrl(param);
+  try{ localStorage.setItem('gc_open_profile_uid', uid); localStorage.setItem('gc_open_profile_at', String(Date.now())); }catch(e){}
+
+  // Prefer opening Main App package via Android intent when available
+  try{
+    var host = (location.hostname || '');
+    var intentUrl = 'intent://' + host + '/?user=' + encodeURIComponent(param)
+      + '#Intent;scheme=https;package=com.example.gochatweb;S.browser_fallback_url='
+      + encodeURIComponent(url) + ';end';
+    // Only use intent on Android WebView / mobile
+    var ua = navigator.userAgent || '';
+    if(/Android/i.test(ua) && !window.AndroidBridge){
+      location.href = intentUrl;
+      return;
+    }
+  }catch(e){}
+
+  // Same-origin or configured main URL — navigate without breaking Messenger history
+  try{
+    // New tab/window keeps Messenger chat state intact
+    var w = window.open(url, '_blank');
+    if(w){ try{ w.focus(); }catch(e){} return; }
+  }catch(e){}
+  // Last resort: top-level navigate to Main profile deep link
+  try{ location.href = url; }catch(e){ toast('Open GoChat to view full profile'); }
+}
+
 function openQuickProfile(){
   if(!currentChat || !currentOther || currentOther === 'group') return;
   var u = usersCache.get(currentOther) || {};
@@ -5473,6 +5699,17 @@ function closeQuickProfile(fromPop){
         e.stopPropagation();
         if(!currentChat || !currentOther || currentOther === 'group') return;
         openQuickProfile();
+      });
+    }
+    var vpBtn = $('qpViewProfile');
+    if(vpBtn && !vpBtn._qpBound){
+      vpBtn._qpBound = true;
+      vpBtn.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        var uid = (qpState && qpState.otherUid) || currentOther;
+        if(!uid || uid === 'group'){ toast('Profile unavailable'); return; }
+        try{ closeQuickProfile(true); }catch(err){}
+        msOpenGoChatProfile(uid);
       });
     }
     var closeBtn = $('qpClose');
@@ -6162,13 +6399,11 @@ window.msWatchPeerBlock = msWatchPeerBlock;
     // Patch inside by wrapping after - we filter in a post-hook via chatMap when blocking
   }
 
-  // popstate: close option sheets on Android back
+  // popstate handled in main handler (priority overlay). Keep flag in sync only.
   window.addEventListener('popstate', function(){
     var any = document.querySelector('.ms-opt-backdrop.open');
     if(any){
-      closeSheet('msChatOptSheet');
-      closeSheet('msBlockTypeSheet');
-      closeSheet('msDelConvSheet');
+      // Main popstate closes sheets; ensure flag is cleared if we still see open nodes mid-cycle
       optNavPushed = false;
     }
   });
