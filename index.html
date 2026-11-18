@@ -5542,38 +5542,31 @@ async function qpFetchBatch(gen){
 }
 
 
+/* Main GoChat web app — profile deep links use ?user= (see gochat_main.html) */
+var GC_MAIN_APP_ORIGIN = 'https://go-chat-zyp2.vercel.app';
 function msBuildMainProfileUrl(param){
-  // Main App deep-link format: ?user=<uid|username> (see gochat_main gcOpenDeepLinkProfile)
   var q = '?user=' + encodeURIComponent(param);
-  if(window.GC_MAIN_APP_URL){
-    return String(window.GC_MAIN_APP_URL).replace(/\/$/, '') + '/' + q;
-  }
+  var base = '';
   try{
-    var origin = location.origin || '';
-    var path = location.pathname || '/';
-    // Messenger often lives under /messenger, /messages, /msg — main is parent path
-    var mainPath = path.replace(/\/(messenger|messages|gochatmessages|msg|chat)(\/.*)?$/i, '/');
-    if(mainPath === path){
-      // same folder: try sibling index / root
-      mainPath = path.replace(/\/[^\/]*\.html?$/i, '/') || '/';
-    }
-    if(!mainPath.endsWith('/')) mainPath += '/';
-    return origin + mainPath + q;
-  }catch(e){
-    return (location.origin || '') + '/' + q;
-  }
+    if(window.GC_MAIN_APP_URL) base = String(window.GC_MAIN_APP_URL).replace(/\/$/, '');
+    else if(typeof GC_MAIN_APP_ORIGIN === 'string' && GC_MAIN_APP_ORIGIN) base = GC_MAIN_APP_ORIGIN.replace(/\/$/, '');
+  }catch(e){}
+  if(!base) base = 'https://go-chat-zyp2.vercel.app';
+  return base + '/' + q;
 }
 function msOpenGoChatProfile(uid){
   if(!uid || uid === 'group'){ toast('Profile unavailable'); return; }
-  // Prefer username for nicer Main App resolve (gcResolveUserParam accepts both)
+
+  // Prefer username when available (Main App gcResolveUserParam accepts uid OR username)
   var param = uid;
   try{
     var u = (typeof usersCache !== 'undefined' && usersCache.get) ? usersCache.get(uid) : null;
-    if(u && (u.username || u.usernameLower)) param = u.username || u.usernameLower;
-    else if(qpState && qpState.otherUid === uid && qpState.otherUsername) param = qpState.otherUsername;
+    if(u && (u.username || u.usernameLower)) param = String(u.username || u.usernameLower).replace(/^@/, '');
+    else if(qpState && qpState.otherUid === uid && qpState.otherUsername)
+      param = String(qpState.otherUsername).replace(/^@/, '');
   }catch(e){}
 
-  // 1) Android WebView bridge (native Main Activity)
+  // 1) Native Android bridge (WebView Main Activity)
   try{
     if(window.AndroidBridge){
       var b = window.AndroidBridge;
@@ -5585,7 +5578,7 @@ function msOpenGoChatProfile(uid){
     }
   }catch(e){}
 
-  // 2) Embedded in Main App shell (iframe / same window has viewUserProfile)
+  // 2) Embedded shell already has Main App viewUserProfile
   try{
     if(window.parent && window.parent !== window && typeof window.parent.viewUserProfile === 'function'){
       window.parent.viewUserProfile(uid); return;
@@ -5595,32 +5588,28 @@ function msOpenGoChatProfile(uid){
     if(typeof viewUserProfile === 'function'){ viewUserProfile(uid); return; }
   }catch(e){}
 
-  // 3) Main App real deep link: ?user= (never touch Messenger hash — that was sending users to Message tab)
+  // 3) Open REAL Main GoChat profile URL — never reload Messenger
   var url = msBuildMainProfileUrl(param);
-  try{ localStorage.setItem('gc_open_profile_uid', uid); localStorage.setItem('gc_open_profile_at', String(Date.now())); }catch(e){}
-
-  // Prefer opening Main App package via Android intent when available
   try{
-    var host = (location.hostname || '');
-    var intentUrl = 'intent://' + host + '/?user=' + encodeURIComponent(param)
-      + '#Intent;scheme=https;package=com.example.gochatweb;S.browser_fallback_url='
-      + encodeURIComponent(url) + ';end';
-    // Only use intent on Android WebView / mobile
-    var ua = navigator.userAgent || '';
-    if(/Android/i.test(ua) && !window.AndroidBridge){
-      location.href = intentUrl;
-      return;
-    }
+    localStorage.setItem('gc_open_profile_uid', uid);
+    localStorage.setItem('gc_open_profile_at', String(Date.now()));
   }catch(e){}
 
-  // Same-origin or configured main URL — navigate without breaking Messenger history
+  // Keep Quick Profile closed before leaving
+  try{ if(typeof closeQuickProfile === 'function') closeQuickProfile(true); }catch(e){}
+
+  // Always open Main App origin (different host from hatmessenger.vercel.app)
   try{
-    // New tab/window keeps Messenger chat state intact
-    var w = window.open(url, '_blank');
+    var w = window.open(url, '_blank', 'noopener,noreferrer');
     if(w){ try{ w.focus(); }catch(e){} return; }
   }catch(e){}
-  // Last resort: top-level navigate to Main profile deep link
-  try{ location.href = url; }catch(e){ toast('Open GoChat to view full profile'); }
+
+  // Popup blocked → top-level navigate to Main App (not Messenger)
+  try{
+    location.assign(url);
+  }catch(e){
+    try{ location.href = url; }catch(e2){ toast('Open GoChat to view full profile'); }
+  }
 }
 
 function openQuickProfile(){
