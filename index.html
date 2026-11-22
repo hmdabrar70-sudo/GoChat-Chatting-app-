@@ -191,6 +191,156 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .chat-messages-wrap .messages{background:transparent}
 .chat-messages-wrap[data-ms-bg]{/* solid set via inline style */}
 
+
+/* ═══ Incoming Message Popup (in-app) ═══ */
+#msInAppHost{
+  position:fixed; left:0; right:0; top:0; z-index:12000;
+  pointer-events:none;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 0;
+  display:flex; justify-content:center;
+}
+.ms-inapp-card{
+  pointer-events:auto;
+  width:min(420px, 100%);
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow), 0 12px 40px rgba(0,0,0,.12);
+  padding:12px 12px 12px 12px;
+  position:relative;
+  transform:translateY(-120%);
+  opacity:0;
+  transition:transform .28s cubic-bezier(.22,1,.36,1), opacity .22s ease;
+  touch-action:pan-y;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.ms-inapp-card.show{
+  transform:translateY(0);
+  opacity:1;
+}
+.ms-inapp-card.dismiss-left{ transform:translateX(-120%); opacity:0; }
+.ms-inapp-card.dismiss-right{ transform:translateX(120%); opacity:0; }
+.ms-inapp-card.dismiss-up{ transform:translateY(-120%); opacity:0; }
+.ms-inapp-top{
+  display:flex; align-items:flex-start; gap:10px;
+}
+.ms-inapp-av-wrap{
+  position:relative; flex:0 0 auto; width:48px; height:48px;
+}
+.ms-inapp-av{
+  width:48px; height:48px; border-radius:50%;
+  object-fit:cover; background:var(--surface2);
+  display:block;
+}
+.ms-inapp-badge{
+  position:absolute; right:-2px; bottom:-2px;
+  width:20px; height:20px; border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  display:grid; place-items:center;
+  border:2px solid var(--surface);
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+.ms-inapp-badge svg{ width:12px; height:12px; display:block; }
+.ms-inapp-body{ flex:1 1 auto; min-width:0; padding-right:4px; }
+.ms-inapp-row1{
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:2px;
+}
+.ms-inapp-name{
+  font-weight:700; font-size:14.5px; line-height:1.25;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  flex:1 1 auto; min-width:0;
+}
+.ms-inapp-time{
+  flex:0 0 auto;
+  font-size:11.5px; color:var(--muted); font-weight:600;
+  white-space:nowrap;
+}
+.ms-inapp-preview{
+  font-size:13px; color:var(--muted); line-height:1.35;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden; word-break:break-word;
+}
+.ms-inapp-close{
+  position:absolute; top:8px; right:8px;
+  width:32px; height:32px; border-radius:50%;
+  background:transparent; color:var(--muted);
+  display:grid; place-items:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.ms-inapp-close:active{ background:var(--surface2); }
+.ms-inapp-close svg{ width:18px; height:18px; display:block; }
+.ms-inapp-actions{
+  display:flex; justify-content:flex-end; margin-top:10px; gap:8px;
+}
+.ms-inapp-reply-btn{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 14px; border-radius:999px;
+  background:var(--accent); color:#fff;
+  font-weight:700; font-size:13px;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.ms-inapp-reply-btn:active{ transform:scale(.97); }
+.ms-inapp-reply-btn svg{ width:16px; height:16px; display:block; }
+.ms-inapp-card.replying .ms-inapp-actions{ display:none; }
+.ms-inapp-card.replying .ms-inapp-preview{ display:none; }
+.ms-inapp-qr{
+  display:none; margin-top:10px;
+  align-items:center; gap:8px;
+}
+.ms-inapp-card.replying .ms-inapp-qr{ display:flex; }
+.ms-inapp-qr input{
+  flex:1 1 auto; min-width:0;
+  border:1px solid var(--line); background:var(--surface2);
+  color:var(--text); border-radius:999px;
+  padding:10px 14px; outline:none; font-size:14px;
+}
+.ms-inapp-qr input:focus{ border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.ms-inapp-qr-send{
+  flex:0 0 auto; width:40px; height:40px; border-radius:50%;
+  background:var(--accent); color:#fff;
+  display:grid; place-items:center;
+}
+.ms-inapp-qr-send:disabled{ opacity:.5; }
+.ms-inapp-qr-send svg{ width:18px; height:18px; }
+
+.ms-inapp-count-row{
+  display:flex; align-items:center; gap:6px;
+  margin-top:6px;
+}
+.ms-inapp-count-badge{
+  min-width:18px; height:18px; padding:0 6px;
+  border-radius:999px;
+  background:var(--accent); color:#fff;
+  font-size:11px; font-weight:800;
+  display:inline-flex; align-items:center; justify-content:center;
+  line-height:1;
+}
+.ms-inapp-count-label{
+  font-size:12px; font-weight:600; color:var(--muted);
+}
+.ms-inapp-react-row{
+  display:flex; align-items:center; gap:8px;
+  margin-top:6px;
+  padding:6px 8px;
+  border-radius:10px;
+  background:var(--surface2);
+}
+.ms-inapp-react-emoji{
+  font-size:18px; line-height:1; flex:0 0 auto;
+}
+.ms-inapp-react-msg{
+  font-size:12.5px; color:var(--muted);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  min-width:0;
+}
+.ms-inapp-close{ display:none !important; }
+
+
 /* ═══ Message Reactions (WhatsApp-style, GoChat emoji set) ═══ */
 .msg{ position:relative; }
 .msg-reacts{
@@ -1142,7 +1292,9 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
   </div>
   <div id="gcMediaPreviewGrid" class="gc-media-preview-grid"></div>
 </div>
-<div id="msBlockBanner" class="ms-block-banner" aria-live="polite"></div><form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section><div id="toast" class="toast"></div>
+<div id="msBlockBanner" class="ms-block-banner" aria-live="polite"></div><form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section>
+<div id="msInAppHost" aria-live="polite"></div>
+<div id="toast" class="toast"></div>
 
 
 <div id="qpOverlay" class="qp-overlay" aria-hidden="true">
@@ -3006,6 +3158,7 @@ async function loadChatLists(){
     if(!id) return;
     data = data || {};
     chatMap.set(id, { id: id, data: data });
+    try{ if(typeof msInAppOnChatUpdate === 'function') msInAppOnChatUpdate(id, data); }catch(_n){}
     var people = (data.users || data.members) || [];
     people.forEach(function(uid){ prefetchUser(uid); });
     if(!data.isGroup && String(id).indexOf('group_') !== 0){
@@ -4933,6 +5086,10 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
+  if(document.getElementById('msInAppHost') && document.querySelector('.ms-inapp-card.show')){
+    try{ msInAppDismiss(); }catch(err){}
+    return;
+  }
   if(document.getElementById('msReactPop') || document.getElementById('msReactMask')){
     try{ closeReactPicker(true); }catch(err){}
     return;
@@ -6291,6 +6448,549 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 
 
 
+
+/* ═══ Incoming Message Popup + Quick Reply ═══ */
+(function(){
+  var MS_INAPP_MSG_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22ZM8 13.25C7.58579 13.25 7.25 13.5858 7.25 14C7.25 14.4142 7.58579 14.75 8 14.75H13.5C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25H8ZM7.25 10.5C7.25 10.0858 7.58579 9.75 8 9.75H16C16.4142 9.75 16.75 10.0858 16.75 10.5C16.75 10.9142 16.4142 11.25 16 11.25H8C7.58579 11.25 7.25 10.9142 7.25 10.5Z" clip-rule="evenodd"/></svg>';
+  var MS_INAPP_REPLY_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M7.65332 4.00475C7.96597 4.0011 8.12276 4.00001 8.24609 4.07604C8.36932 4.15209 8.44044 4.29683 8.58203 4.58678C9.24602 5.94647 11.0199 9.32678 13 11.0008C14.7521 12.4821 17.8633 13.6407 19.2715 14.1161C19.6337 14.2383 19.8155 14.2989 19.9102 14.4422C20.0047 14.5855 19.9906 14.7626 19.9629 15.1161C19.9178 15.692 19.8326 16.132 19.6709 16.5223C19.2139 17.625 18.3368 18.5011 17.2334 18.9579C16.6387 19.204 15.9295 19.2734 14.7988 19.2928C14.033 19.306 13.6498 19.3124 13.3457 19.4891C13.0416 19.6659 12.8523 19.9865 12.4736 20.6258L11.9854 21.4501C11.5502 22.1844 10.4636 22.1842 10.0283 21.4501L9.54004 20.6258C9.16133 19.9865 8.97114 19.6659 8.66699 19.4891C8.36297 19.3127 7.98005 19.306 7.21484 19.2928C6.0843 19.2734 5.37495 19.204 4.78027 18.9579C3.67683 18.5011 2.79983 17.625 2.34277 16.5223C2.00009 15.6954 2 14.6471 2 12.5506V11.6503C2 8.704 2.00045 7.23048 2.66406 6.1483C3.03536 5.54297 3.5446 5.03393 4.15039 4.66295C5.01701 4.13225 5.84576 4.02589 7.65332 4.00475Z"/><path fill="currentColor" d="M12.5908 1.2108C12.8996 0.927003 13.3973 0.930226 13.7021 1.21764C14.0067 1.50504 14.0038 1.96799 13.6953 2.25182L12.6934 3.17272C13.5649 3.18092 14.4036 3.20122 15.1602 3.24889C15.8107 3.28989 16.4203 3.3527 16.9512 3.45104C17.4711 3.54737 17.9722 3.68775 18.3701 3.91198C19.1098 4.32883 19.7331 4.90097 20.1875 5.58287C20.6247 6.23891 20.8167 6.9807 20.9092 7.87487C20.9996 8.7498 21 9.84391 21 11.2303V11.2684C21 11.6724 20.6478 11.9999 20.2139 11.9999C19.7802 11.9997 19.4288 11.6723 19.4287 11.2684C19.4287 9.83518 19.4281 8.8121 19.3457 8.01549C19.2645 7.23013 19.109 6.7407 18.8516 6.35436C18.5287 5.86996 18.0853 5.46189 17.5566 5.16393C17.3879 5.06882 17.0941 4.96891 16.6445 4.88561C16.2057 4.80432 15.6699 4.74768 15.0537 4.70885C14.3419 4.664 13.548 4.64472 12.7061 4.63659L13.6953 5.54576C14.004 5.82967 14.007 6.2935 13.7021 6.58092C13.3972 6.86829 12.8995 6.87065 12.5908 6.58678L10.2334 4.41979C10.084 4.28244 10.0001 4.09473 10 3.89928C10 3.70381 10.0841 3.51619 10.2334 3.37877L12.5908 1.2108Z"/></svg>';
+  var MS_INAPP_CLOSE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M18.4765 4.46967C18.7694 4.17683 19.2442 4.1768 19.5371 4.46967C19.8299 4.76255 19.8299 5.23734 19.5371 5.53022L13.0634 12.0029L19.5302 18.4697C19.823 18.7626 19.8231 19.2374 19.5302 19.5302C19.2374 19.8231 18.7626 19.823 18.4697 19.5302L12.0029 13.0634L5.53705 19.5302C5.24417 19.823 4.76938 19.823 4.47651 19.5302C4.18363 19.2373 4.18367 18.7626 4.47651 18.4697L10.9423 12.0029L4.46967 5.53022C4.17678 5.23732 4.17678 4.76256 4.46967 4.46967C4.76256 4.17678 5.23732 4.17678 5.53022 4.46967L12.0029 10.9423L18.4765 4.46967Z"/></svg>';
+  var MS_INAPP_SEND_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
+
+  var state = {
+    queue: [],
+    batch: null, // { primary, senders: {uid: entry}, startedAt }
+    groupTimer: null,
+    dismissTimer: null,
+    seenMsg: {},
+    seenReact: {},
+    seeded: false,
+    interacting: false,
+    replyMode: false,
+    navPushed: false,
+    cardEl: null,
+    swipe: { x:0, y:0, tracking:false }
+  };
+
+  function host(){ return document.getElementById('msInAppHost'); }
+
+  function msTimeAgo(ms){
+    if(!ms) return 'Just now';
+    var d = Date.now() - ms;
+    if(d < 45000) return 'Just now';
+    if(d < 3600000) return Math.max(1, Math.round(d/60000)) + 'm ago';
+    if(d < 86400000) return Math.max(1, Math.round(d/3600000)) + 'h ago';
+    return Math.max(1, Math.round(d/86400000)) + 'd ago';
+  }
+
+  function msResolveUser(uid, chatData){
+    var name = 'User', avatar = '';
+    try{
+      if(chatData && chatData.names && chatData.names[uid]) name = chatData.names[uid];
+    }catch(e){}
+    try{
+      if(typeof usersCache !== 'undefined' && usersCache && usersCache.has(uid)){
+        var u = usersCache.get(uid) || {};
+        name = u.name || u.displayName || name;
+        avatar = u.avatar || u.photoURL || '';
+      }
+    }catch(e){}
+    if(!avatar && typeof gcDefaultAvatarDataUri === 'function'){
+      try{ avatar = gcDefaultAvatarDataUri(); }catch(e){}
+    }
+    return { uid: uid, name: name, avatar: avatar };
+  }
+
+  function msPreviewText(data, type, emoji){
+    if(type === 'react'){
+      return 'Reacted ' + (emoji || '❤️') + ' to your message';
+    }
+    var t = (data && (data.lastMsg || data.lastMessage || '')) || '';
+    t = String(t).trim();
+    if(!t) return 'Sent a message';
+    var low = t.toLowerCase();
+    if(low.indexOf('photo') !== -1 || low.indexOf('image') !== -1) return 'Sent you a photo';
+    if(low.indexOf('video') !== -1) return 'Sent a video';
+    if(low.indexOf('voice') !== -1 || low.indexOf('audio') !== -1) return 'Sent a voice message';
+    if(t.length > 90) t = t.slice(0, 87) + '…';
+    return t;
+  }
+
+  function msIsAuthScreen(){
+    try{
+      var auth = document.getElementById('authScreen') || document.getElementById('auth');
+      if(auth && auth.style && auth.style.display === 'none') return false;
+      if(auth && auth.classList && auth.classList.contains('hidden')) return false;
+      var app = document.querySelector('.app');
+      if(app && app.classList.contains('hidden')) return true;
+    }catch(e){}
+    return false;
+  }
+
+  function msIsViewingChat(chatId){
+    try{
+      if(!chatId || !currentChat) return false;
+      if(String(currentChat) !== String(chatId)) return false;
+      var cv = document.getElementById('chatView');
+      return !!(cv && cv.classList.contains('open'));
+    }catch(e){ return false; }
+  }
+
+  function msOtherUidFromChat(chatId, data){
+    if(!user) return null;
+    if(data && data.isGroup) return null;
+    var parts = String(chatId).split('_');
+    if(parts.length >= 2 && String(chatId).indexOf('group_') !== 0){
+      if(parts[0] === user.uid) return parts.slice(1).join('_');
+      if(parts[parts.length-1] === user.uid || parts.slice(1).join('_') === user.uid) return parts[0];
+      if(parts[0] === user.uid) return parts[1];
+      return parts[0] === user.uid ? parts[1] : parts[0];
+    }
+    var people = (data && (data.users || data.members)) || [];
+    for(var i=0;i<people.length;i++){ if(people[i] !== user.uid) return people[i]; }
+    return null;
+  }
+
+  function clearDismissTimer(){
+    if(state.dismissTimer){ clearTimeout(state.dismissTimer); state.dismissTimer = null; }
+  }
+  function armDismissTimer(){
+    clearDismissTimer();
+    if(state.interacting || state.replyMode) return;
+    state.dismissTimer = setTimeout(function(){ dismissCard(null); }, 5000);
+  }
+
+  function dismissCard(dir){
+    clearDismissTimer();
+    if(state.groupTimer){ clearTimeout(state.groupTimer); state.groupTimer = null; }
+    var card = state.cardEl;
+    state.batch = null;
+    state.replyMode = false;
+    state.interacting = false;
+    if(state.navPushed){
+      state.navPushed = false;
+      try{
+        if(currentChat) history.replaceState({ page:'chat', chat: currentChat }, '', '#chat/'+currentChat);
+        else history.replaceState({ page:'chatsPage' }, '', location.hash || '#chats');
+      }catch(e){}
+    }
+    if(card){
+      card.classList.remove('show');
+      if(dir === 'left') card.classList.add('dismiss-left');
+      else if(dir === 'right') card.classList.add('dismiss-right');
+      else card.classList.add('dismiss-up');
+      setTimeout(function(){
+        try{ card.remove(); }catch(e){}
+        if(state.cardEl === card) state.cardEl = null;
+        pumpQueue();
+      }, 220);
+    } else {
+      pumpQueue();
+    }
+  }
+  window.msInAppDismiss = function(){ dismissCard(null); };
+
+  function buildPreviewLine(batch){
+    var primary = batch.primary;
+    var others = Object.keys(batch.senders).length - 1;
+    if(primary.type === 'react'){
+      var line = 'Reacted to your message';
+      if(others > 0) line += ' and ' + others + ' other' + (others === 1 ? '' : 's');
+      return line;
+    }
+    var base = primary.preview || 'Sent a message';
+    if(others > 0) return base + ' and ' + others + ' other' + (others === 1 ? '' : 's');
+    return base;
+  }
+
+  function buildCountLine(batch){
+    var primary = batch.primary;
+    if(primary.type === 'react') return '';
+    var n = primary.msgCount || 1;
+    if(n < 1) n = 1;
+    return n + (n === 1 ? ' message' : ' messages');
+  }
+
+  function renderCard(){
+    var batch = state.batch;
+    if(!batch || !batch.primary) return;
+    var p = batch.primary;
+    var hostEl = host();
+    if(!hostEl) return;
+
+    var card = state.cardEl;
+    if(!card){
+      card = document.createElement('div');
+      card.className = 'ms-inapp-card';
+      card.setAttribute('role', 'dialog');
+      hostEl.innerHTML = '';
+      hostEl.appendChild(card);
+      state.cardEl = card;
+      bindCardGestures(card);
+      requestAnimationFrame(function(){ card.classList.add('show'); });
+      if(!state.navPushed){
+        state.navPushed = true;
+        try{ history.pushState({ page: 'msinapp' }, '', location.hash || '#'); }catch(e){}
+      }
+    }
+
+    var av = p.avatar || '';
+    var countLine = buildCountLine(batch);
+    var isReact = p.type === 'react';
+    var reactBlock = '';
+    if(isReact){
+      reactBlock =
+        '<div class="ms-inapp-react-row">'
+        +  '<span class="ms-inapp-react-emoji">'+(p.emoji || '❤️')+'</span>'
+        +  '<span class="ms-inapp-react-msg">'+esc(p.msgPreview || 'Message')+'</span>'
+        + '</div>';
+    }
+    var countBlock = (!isReact && countLine)
+      ? ('<div class="ms-inapp-count-row">'
+         + '<span class="ms-inapp-count-badge">'+(p.msgCount > 99 ? '99+' : String(p.msgCount || 1))+'</span>'
+         + '<span class="ms-inapp-count-label">'+esc(countLine)+'</span>'
+         + '</div>')
+      : '';
+
+    card.innerHTML =
+      '<div class="ms-inapp-top">'
+      + '<div class="ms-inapp-av-wrap">'
+      +   '<img class="ms-inapp-av" alt="" src="'+esc(av)+'" onerror="this.style.opacity=.3">'
+      +   '<span class="ms-inapp-badge">'+MS_INAPP_MSG_SVG+'</span>'
+      + '</div>'
+      + '<div class="ms-inapp-body">'
+      +   '<div class="ms-inapp-row1">'
+      +     '<div class="ms-inapp-name">'+esc(p.name || 'User')+'</div>'
+      +     '<div class="ms-inapp-time">'+esc(msTimeAgo(p.at))+'</div>'
+      +   '</div>'
+      +   '<div class="ms-inapp-preview">'+esc(buildPreviewLine(batch))+'</div>'
+      +   reactBlock
+      +   countBlock
+      +   '<div class="ms-inapp-qr">'
+      +     '<input type="text" enterkeyhint="send" placeholder="Type a message…" autocomplete="off" />'
+      +     '<button type="button" class="ms-inapp-qr-send" aria-label="Send">'+MS_INAPP_SEND_SVG+'</button>'
+      +   '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="ms-inapp-actions">'
+      +   '<button type="button" class="ms-inapp-reply-btn">'+MS_INAPP_REPLY_SVG+'<span>Reply</span></button>'
+      + '</div>';
+
+    if(state.replyMode) card.classList.add('replying');
+    else card.classList.remove('replying');
+
+    card.querySelector('.ms-inapp-reply-btn').onclick = function(e){
+      e.stopPropagation();
+      enterReplyMode();
+    };
+    card.addEventListener('click', function(e){
+      if(e.target.closest('.ms-inapp-reply-btn, .ms-inapp-qr, .ms-inapp-qr-send, input')) return;
+      openPrimaryChat();
+    });
+    var input = card.querySelector('.ms-inapp-qr input');
+    var sendBtn = card.querySelector('.ms-inapp-qr-send');
+    function doSend(){
+      if(!input) return;
+      var text = String(input.value || '').trim();
+      if(!text) return;
+      sendBtn.disabled = true;
+      msQuickReply(p, text).then(function(){
+        dismissCard(null);
+      }).catch(function(err){
+        sendBtn.disabled = false;
+        if(typeof toast === 'function') toast((err && err.message) || 'Send failed');
+      });
+    }
+    if(sendBtn) sendBtn.onclick = function(e){ e.stopPropagation(); doSend(); };
+    if(input){
+      input.addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){ e.preventDefault(); doSend(); }
+      });
+      input.addEventListener('focus', function(){
+        state.interacting = true;
+        clearDismissTimer();
+      });
+    }
+  }
+
+  function enterReplyMode(){
+    state.replyMode = true;
+    state.interacting = true;
+    clearDismissTimer();
+    renderCard();
+    setTimeout(function(){
+      var input = state.cardEl && state.cardEl.querySelector('.ms-inapp-qr input');
+      if(input) try{ input.focus(); }catch(e){}
+    }, 50);
+  }
+
+  function openPrimaryChat(){
+    var batch = state.batch;
+    if(!batch || !batch.primary) return;
+    var p = batch.primary;
+    dismissCard(null);
+    try{
+      if(typeof openChat === 'function'){
+        openChat(p.chatId, p.uid, p.name, p.avatar, !!p.isGroup);
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  async function msQuickReply(primary, text){
+    if(!user || !primary) throw new Error('Unavailable');
+    var prevChat = currentChat;
+    var prevOther = currentOther;
+    currentChat = primary.chatId;
+    currentOther = primary.uid;
+    try{
+      if(typeof sendPayload !== 'function') throw new Error('Send unavailable');
+      await sendPayload({ text: text });
+    }finally{
+      // Restore previous conversation context only if user was in a chat
+      try{
+        var cv = document.getElementById('chatView');
+        var open = cv && cv.classList.contains('open');
+        if(open && prevChat){
+          currentChat = prevChat;
+          currentOther = prevOther;
+        }
+      }catch(e){}
+    }
+  }
+
+  function bindCardGestures(card){
+    var startX=0, startY=0, tracking=false, moved=false;
+    card.addEventListener('touchstart', function(e){
+      if(!e.touches || !e.touches[0]) return;
+      if(e.target.closest('input, .ms-inapp-qr')) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      tracking = true; moved = false;
+      state.interacting = true;
+      clearDismissTimer();
+    }, {passive:true});
+    card.addEventListener('touchmove', function(e){
+      if(!tracking || !e.touches || !e.touches[0]) return;
+      var dx = e.touches[0].clientX - startX;
+      var dy = e.touches[0].clientY - startY;
+      if(Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+      if(Math.abs(dx) > Math.abs(dy)){
+        card.style.transition = 'none';
+        card.style.transform = 'translateX('+dx+'px)';
+        card.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx)/180));
+      } else if(dy < 0){
+        card.style.transition = 'none';
+        card.style.transform = 'translateY('+dy+'px)';
+        card.style.opacity = String(Math.max(0.35, 1 - Math.abs(dy)/160));
+      }
+    }, {passive:true});
+    card.addEventListener('touchend', function(e){
+      if(!tracking) return;
+      tracking = false;
+      var t = (e.changedTouches && e.changedTouches[0]) || null;
+      var dx = t ? t.clientX - startX : 0;
+      var dy = t ? t.clientY - startY : 0;
+      card.style.transition = '';
+      card.style.transform = '';
+      card.style.opacity = '';
+      if(dx < -72){ dismissCard('left'); return; }
+      if(dx > 72){ dismissCard('right'); return; }
+      if(dy < -64){ dismissCard('up'); return; }
+      if(!state.replyMode){
+        state.interacting = false;
+        armDismissTimer();
+      }
+    }, {passive:true});
+  }
+
+  function pumpQueue(){
+    if(state.batch || state.cardEl) return;
+    if(!state.queue.length) return;
+    var next = state.queue.shift();
+    state.batch = {
+      primary: next,
+      senders: {},
+      startedAt: Date.now()
+    };
+    state.batch.senders[next.uid] = next;
+    state.replyMode = false;
+    state.interacting = false;
+    renderCard();
+    armDismissTimer();
+    // 2s grouping window for this batch
+    if(state.groupTimer) clearTimeout(state.groupTimer);
+    state.groupTimer = setTimeout(function(){ state.groupTimer = null; }, 2000);
+  }
+
+  function enqueueNotif(entry){
+    if(!entry || !entry.uid || !entry.chatId) return;
+    if(msIsViewingChat(entry.chatId)) return;
+    if(!user) return;
+
+    // If active batch still in 2s window, merge
+    if(state.batch && state.groupTimer){
+      if(state.batch.senders[entry.uid]){
+        // update same sender preview + unread count
+        var prev = state.batch.senders[entry.uid];
+        prev.preview = entry.preview;
+        prev.at = entry.at;
+        prev.msgCount = Math.max(prev.msgCount || 1, entry.msgCount || 1);
+        if(entry.emoji) prev.emoji = entry.emoji;
+        if(entry.msgPreview) prev.msgPreview = entry.msgPreview;
+        prev.type = entry.type || prev.type;
+        if(state.batch.primary.uid === entry.uid) state.batch.primary = prev;
+      } else {
+        state.batch.senders[entry.uid] = entry;
+      }
+      if(!state.replyMode) renderCard();
+      return;
+    }
+
+    // If a card is showing but window closed, queue
+    if(state.batch || state.cardEl){
+      // coalesce into queue by uid+chat
+      for(var i=0;i<state.queue.length;i++){
+        if(state.queue[i].chatId === entry.chatId && state.queue[i].uid === entry.uid){
+          state.queue[i] = entry;
+          return;
+        }
+      }
+      state.queue.push(entry);
+      return;
+    }
+
+    // Start new batch
+    state.queue.push(entry);
+    pumpQueue();
+  }
+
+  function msUnreadForChat(chatId, data){
+    try{
+      if(!data) return 1;
+      if(data.lastSender && data.lastSender === user.uid) return 0;
+      var raw = data.unreadCount;
+      var n = 0;
+      if(typeof raw === 'number' && raw > 0) n = Math.floor(raw);
+      else if(typeof raw === 'string' && Number(raw) > 0) n = Math.floor(Number(raw));
+      try{
+        var cached = window.__gcUnreadCache && window.__gcUnreadCache[chatId];
+        if(typeof cached === 'number' && cached > n) n = cached;
+      }catch(_c){}
+      if(n < 1 && data.lastSender && data.lastSender !== user.uid && data.isRead === false) n = 1;
+      return Math.min(99, n);
+    }catch(e){ return 1; }
+  }
+
+  function msEmitReactNotif(chatId, data, rb, ra){
+    if(!rb || rb === user.uid) return;
+    if(msIsViewingChat(chatId)) return;
+    if(data.lastReactAction === 'remove') return;
+    var info2 = msResolveUser(rb, data);
+    var emoji = data.lastReactEmoji || '❤️';
+    var msgPrev = String(data.lastReactPreview || '').trim();
+    if(!msgPrev) msgPrev = 'Message';
+    enqueueNotif({
+      type: 'react',
+      chatId: chatId,
+      uid: rb,
+      name: info2.name,
+      avatar: info2.avatar,
+      preview: 'Reacted to your message',
+      emoji: emoji,
+      msgPreview: msgPrev,
+      at: ra,
+      msgCount: 1,
+      isGroup: !!(data.isGroup || String(chatId).indexOf('group_') === 0)
+    });
+  }
+
+  function msInAppOnChatUpdate(chatId, data){
+    try{
+      if(!user || !chatId || !data) return;
+      if(msIsAuthScreen()) return;
+
+      // --- message path ---
+      var lastSender = data.lastSender || null;
+      var lastAt = (typeof toMs === 'function') ? toMs(data.lastAt) : 0;
+      if(lastSender && lastAt){
+        var firstMsg = (state.seenMsg[chatId] == null);
+        if(firstMsg){
+          state.seenMsg[chatId] = lastAt;
+          // Fresh message while app is open (within 20s) still notifies
+          if(Date.now() - lastAt > 20000){
+            /* seed only — ignore historical */
+          } else if(lastSender !== user.uid && !msIsViewingChat(chatId)){
+            var info0 = msResolveUser(lastSender, data);
+            enqueueNotif({
+              type: 'msg',
+              chatId: chatId,
+              uid: lastSender,
+              name: info0.name,
+              avatar: info0.avatar,
+              preview: msPreviewText(data, 'msg'),
+              at: lastAt,
+              msgCount: msUnreadForChat(chatId, data) || 1,
+              isGroup: !!(data.isGroup || String(chatId).indexOf('group_') === 0)
+            });
+          }
+        } else if(lastAt > state.seenMsg[chatId]){
+          state.seenMsg[chatId] = lastAt;
+          if(lastSender !== user.uid && !msIsViewingChat(chatId)){
+            var info = msResolveUser(lastSender, data);
+            enqueueNotif({
+              type: 'msg',
+              chatId: chatId,
+              uid: lastSender,
+              name: info.name,
+              avatar: info.avatar,
+              preview: msPreviewText(data, 'msg'),
+              at: lastAt,
+              msgCount: msUnreadForChat(chatId, data) || 1,
+              isGroup: !!(data.isGroup || String(chatId).indexOf('group_') === 0)
+            });
+          }
+        }
+      }
+
+      // --- reaction path ---
+      var rb = data.lastReactBy || null;
+      var ra = (typeof toMs === 'function') ? toMs(data.lastReactAt) : 0;
+      if(rb && ra){
+        var firstReact = (state.seenReact[chatId] == null);
+        if(firstReact){
+          state.seenReact[chatId] = ra;
+          // Critical fix: first observation of a FRESH reaction must still notify
+          // (previously we only seeded and skipped — so reaction popups never appeared)
+          if(Date.now() - ra < 30000){
+            msEmitReactNotif(chatId, data, rb, ra);
+          }
+        } else if(ra > state.seenReact[chatId]){
+          state.seenReact[chatId] = ra;
+          msEmitReactNotif(chatId, data, rb, ra);
+        }
+      }
+    }catch(e){ console.warn('msInAppOnChatUpdate', e); }
+  }
+  window.msInAppOnChatUpdate = msInAppOnChatUpdate;
+
+  // Outside tap
+  document.addEventListener('click', function(e){
+    if(!state.cardEl || !state.cardEl.classList.contains('show')) return;
+    if(state.replyMode) return;
+    if(e.target.closest('.ms-inapp-card, #msInAppHost')) return;
+    dismissCard(null);
+  }, true);
+
+  // Back button
+  window.addEventListener('popstate', function(){
+    if(state.cardEl && state.cardEl.classList.contains('show')){
+      state.navPushed = false;
+      dismissCard(null);
+    }
+  }, true);
+
+  // Also in main popstate chain marker
+})();
+
 /* ═══ Message Reactions · GoChat emoji set · WhatsApp-style UX ═══ */
 (function(){
   var MS_REACT_EMOJIS = [
@@ -6441,6 +7141,29 @@ window.msWatchPeerBlock = msWatchPeerBlock;
       }
 
       msPaintMsgReactions(msgId, reactions);
+      // Notify peer only when a reaction was ADDED (not removed)
+      if(!already){
+        try{
+          var preview = '';
+          try{
+            var md = (window.__gcMsgDataCache && window.__gcMsgDataCache[msgId]) || {};
+            preview = String(md.text || '').trim().slice(0, 80);
+            if(!preview){
+              if(md.imageUrl) preview = 'Photo';
+              else if(md.videoUrl) preview = 'Video';
+              else if(md.audioUrl || md.voiceUrl) preview = 'Voice message';
+              else preview = 'Message';
+            }
+          }catch(_p){}
+          db.collection('chats').doc(chatId).set({
+            lastReactAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastReactBy: user.uid,
+            lastReactEmoji: emoji,
+            lastReactPreview: preview,
+            lastReactAction: 'add'
+          }, { merge: true });
+        }catch(_nr){}
+      }
     }catch(e){
       console.error('toggleMessageReaction', e && e.code, e);
       // Revert optimistic UI
