@@ -156,6 +156,41 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .theme-opt.selected .theme-opt-check{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
 
 /* Boot loader — prevent login flash while Firebase restores session */
+
+/* ═══ Chat Background Customization ═══ */
+.ms-bg-page{position:fixed;inset:0;z-index:57;background:var(--bg);display:flex;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;transform:translateX(100%);pointer-events:none;transition:transform .28s ease;overflow:hidden}
+.ms-bg-page.open{transform:translateX(0);pointer-events:auto}
+.ms-bg-top{height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;padding-top:max(0px,env(safe-area-inset-top));border-bottom:1px solid var(--line);flex:none;background:var(--bg)}
+.ms-bg-back{width:40px;height:40px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0}
+.ms-bg-back svg{width:22px;height:22px}
+.ms-bg-title{flex:1;text-align:center;font-weight:800;font-size:17px;color:var(--text)}
+.ms-bg-spacer{width:40px}
+.ms-bg-body{flex:1;overflow:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+.ms-bg-preview{border-radius:18px;border:1px solid var(--line);overflow:hidden;margin-bottom:18px;background:var(--surface);box-shadow:var(--shadow)}
+.ms-bg-preview-label{font-size:12px;font-weight:700;color:var(--muted);padding:10px 14px 0;letter-spacing:.02em;text-transform:uppercase}
+.ms-bg-preview-stage{height:168px;margin:10px 12px 12px;border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;transition:background-color .25s ease;box-sizing:border-box;border:1px solid color-mix(in srgb, var(--line) 80%, transparent)}
+.ms-bg-pv-bubble{max-width:72%;padding:8px 12px;border-radius:14px;font-size:12.5px;font-weight:600;line-height:1.35;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ms-bg-pv-bubble.theirs{align-self:flex-start;background:var(--surface);color:var(--text);border:1px solid var(--line);border-bottom-left-radius:4px}
+.ms-bg-pv-bubble.mine{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.ms-bg-section-title{font-size:14px;font-weight:800;color:var(--text);margin:4px 0 12px}
+.ms-bg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ms-bg-card{position:relative;aspect-ratio:1;border-radius:16px;border:2px solid var(--line);cursor:pointer;padding:0;overflow:hidden;background:var(--surface2);transition:border-color .15s ease, transform .12s ease, box-shadow .15s ease}
+.ms-bg-card:active{transform:scale(.97)}
+.ms-bg-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent)}
+.ms-bg-card-swatch{position:absolute;inset:0;border-radius:14px}
+.ms-bg-card-check{position:absolute;right:8px;bottom:8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.ms-bg-card.selected .ms-bg-card-check{display:grid}
+.ms-bg-card-check svg{width:14px;height:14px}
+.ms-bg-actions{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.ms-bg-apply{width:100%;height:50px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+.ms-bg-apply:active{opacity:.9}
+.ms-bg-reset{width:100%;height:44px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);font-weight:700;font-size:14px;cursor:pointer}
+.ms-bg-hint{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.45;font-weight:600;text-align:center}
+/* Applied chat background on real message list */
+.chat-messages-wrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;background:var(--bg);transition:background-color .25s ease}
+.chat-messages-wrap .messages{background:transparent}
+.chat-messages-wrap[data-ms-bg]{/* solid set via inline style */}
+
 #bootLoader{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:14px;font-weight:650}
 #bootLoader.hidden{display:none!important}
 #authScreen.hidden{display:none!important}
@@ -953,6 +988,32 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 <button class="nav-item" data-page="storiesPage" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" d="M10.0957 2.00445C6.62194 2.03072 4.71683 2.2121 3.46447 3.46447C2.6068 4.32213 2.25143 5.48593 2.10418 7.25002H6.59861L10.0957 2.00445Z"/><path fill="currentColor" d="M2.02644 8.75002C2 9.68875 2 10.7633 2 12C2 16.714 2 19.0711 3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12C22 10.7633 22 9.68875 21.9736 8.75002H2.02644Z"/><path fill="currentColor" d="M21.8958 7.25002C21.7486 5.48593 21.3932 4.32213 20.5355 3.46447C19.9382 2.86714 19.1924 2.51345 18.1987 2.30403L14.9014 7.25002H21.8958Z"/><path fill="currentColor" d="M16.5401 2.08783C15.3293 2 13.8452 2 12 2C11.967 2 11.9342 2 11.9014 2L8.40139 7.25002H13.0986L16.5401 2.08783Z"/></svg><span>Stories</span></button>
 <button class="nav-item nav-item-profile" data-page="settingsPage" type="button"><img class="nav-user-avatar" id="navAvatar" alt="Profile"><span>Profile</span></button>
 </nav></div>
+
+<div id="msChatBgPage" class="ms-bg-page" aria-hidden="true">
+  <header class="ms-bg-top">
+    <button type="button" class="ms-bg-back" id="msChatBgBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.5119C14.7001 4.19741 15.1736 4.16099 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
+    <div class="ms-bg-title">Chat Background</div>
+    <span class="ms-bg-spacer"></span>
+  </header>
+  <div class="ms-bg-body">
+    <div class="ms-bg-preview">
+      <div class="ms-bg-preview-label">Live Preview</div>
+      <div class="ms-bg-preview-stage" id="msBgPreviewStage">
+        <div class="ms-bg-pv-bubble theirs">Hey! How are you?</div>
+        <div class="ms-bg-pv-bubble mine">Doing great — check this background</div>
+        <div class="ms-bg-pv-bubble theirs">Looks clean ✨</div>
+      </div>
+    </div>
+    <div class="ms-bg-section-title">Solid colors</div>
+    <div class="ms-bg-grid" id="msBgGrid" role="listbox" aria-label="Background colors"></div>
+    <div class="ms-bg-actions">
+      <button type="button" class="ms-bg-apply" id="msBgApply">Apply Background</button>
+      <button type="button" class="ms-bg-reset" id="msBgReset">Use Default</button>
+    </div>
+    <p class="ms-bg-hint">Background is saved for this chat only. Change it anytime from chat options.</p>
+  </div>
+</div>
+
 <section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div><button type="button" class="chat-head-more" id="chatMoreBtn" aria-label="Chat options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button></header>
 <div class="chat-messages-wrap">
   <div class="messages" id="messages"></div>
@@ -4769,6 +4830,10 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
+  if($('msChatBgPage') && $('msChatBgPage').classList.contains('open')){
+    try{ closeChatBgPage(true); }catch(err){}
+    return;
+  }
   if($('msThemePage') && $('msThemePage').classList.contains('open')){
     try{ closeThemePage(true); }catch(err){}
     return;
@@ -6117,6 +6182,225 @@ window.msCanMessageUser = msCanMessageUser;
 window.msAssertCanMessage = msAssertCanMessage;
 window.msWatchPeerBlock = msWatchPeerBlock;
 
+
+/* ═══ Chat Background Customization (per-chat, local) ═══ */
+(function(){
+  var PRESETS = [
+    { id: 'soft-sky',    color: '#E8EEF5', label: 'Soft Sky' },
+    { id: 'mint-leaf',   color: '#E3F3EA', label: 'Mint Leaf' },
+    { id: 'warm-sand',   color: '#F3EBE3', label: 'Warm Sand' },
+    { id: 'lilac-mist',  color: '#EBE8F5', label: 'Lilac Mist' },
+    { id: 'aqua-haze',   color: '#E2F1F0', label: 'Aqua Haze' },
+    { id: 'stone-beige', color: '#EFECE7', label: 'Stone Beige' }
+  ];
+  var STORE_KEY = 'ms_chat_bg_v1';
+  var pendingId = null;
+  var activeChatId = null;
+
+  function $(id){ return document.getElementById(id); }
+
+  function loadMap(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return {};
+      var o = JSON.parse(raw);
+      return (o && typeof o === 'object') ? o : {};
+    }catch(e){ return {}; }
+  }
+  function saveMap(map){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(map || {})); }catch(e){}
+  }
+  function getPreset(id){
+    for(var i=0;i<PRESETS.length;i++) if(PRESETS[i].id === id) return PRESETS[i];
+    return null;
+  }
+  function getChatBgId(chatId){
+    if(!chatId) return null;
+    var map = loadMap();
+    return map[chatId] || null;
+  }
+  function setChatBgId(chatId, id){
+    if(!chatId) return;
+    var map = loadMap();
+    if(!id) delete map[chatId];
+    else map[chatId] = id;
+    saveMap(map);
+  }
+
+  function applyColorToMessages(color){
+    var wrap = document.querySelector('#chatView .chat-messages-wrap') || document.querySelector('.chat-messages-wrap');
+    var msgs = $('messages');
+    if(wrap){
+      if(color){
+        wrap.style.backgroundColor = color;
+        wrap.setAttribute('data-ms-bg', color);
+      } else {
+        wrap.style.backgroundColor = '';
+        wrap.removeAttribute('data-ms-bg');
+      }
+    }
+    if(msgs){
+      // keep transparent so wrap color shows through
+      if(color) msgs.style.backgroundColor = 'transparent';
+      else msgs.style.backgroundColor = '';
+    }
+  }
+
+  function applyChatBackground(chatId){
+    var id = getChatBgId(chatId);
+    var p = getPreset(id);
+    applyColorToMessages(p ? p.color : '');
+  }
+
+  function setPreview(color){
+    var stage = $('msBgPreviewStage');
+    if(!stage) return;
+    stage.style.backgroundColor = color || 'var(--bg)';
+  }
+
+  function renderGrid(selectedId){
+    var grid = $('msBgGrid');
+    if(!grid) return;
+    grid.innerHTML = PRESETS.map(function(p){
+      var sel = p.id === selectedId ? ' selected' : '';
+      return '<button type="button" class="ms-bg-card'+sel+'" role="option" aria-selected="'+(sel?'true':'false')+'" data-bg-id="'+p.id+'" title="'+p.label+'">'
+        + '<span class="ms-bg-card-swatch" style="background:'+p.color+'"></span>'
+        + '<span class="ms-bg-card-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg></span>'
+        + '</button>';
+    }).join('');
+    grid.querySelectorAll('.ms-bg-card').forEach(function(btn){
+      btn.onclick = function(){
+        pendingId = btn.getAttribute('data-bg-id');
+        var p = getPreset(pendingId);
+        setPreview(p ? p.color : '');
+        grid.querySelectorAll('.ms-bg-card').forEach(function(b){
+          var on = b.getAttribute('data-bg-id') === pendingId;
+          b.classList.toggle('selected', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      };
+    });
+  }
+
+  function openChatBgPage(){
+    if(!currentChat){
+      if(typeof toast === 'function') toast('Open a chat first');
+      return;
+    }
+    activeChatId = currentChat;
+    pendingId = getChatBgId(activeChatId);
+    var p = getPreset(pendingId);
+    setPreview(p ? p.color : (getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f8'));
+    renderGrid(pendingId);
+    var el = $('msChatBgPage');
+    if(!el) return;
+    el.classList.add('open');
+    el.setAttribute('aria-hidden','false');
+    try{ history.pushState({ page: 'chatBg', chat: activeChatId }, '', (location.hash || '#chat') + '/background'); }catch(e){}
+  }
+
+  function closeChatBgPage(fromPop){
+    var el = $('msChatBgPage');
+    if(!el || !el.classList.contains('open')) return;
+    if(!fromPop){
+      try{
+        if(history.state && history.state.page === 'chatBg'){
+          history.back();
+          return;
+        }
+      }catch(e){}
+    }
+    el.classList.remove('open');
+    el.setAttribute('aria-hidden','true');
+    // restore chat history state if still in chat
+    try{
+      if(currentChat){
+        history.replaceState({ page:'chat', chat: currentChat, returnPage: (typeof chatReturnPage!=='undefined'?chatReturnPage:'chatsPage') }, '', '#chat/'+currentChat);
+      }
+    }catch(e){}
+  }
+
+  function applyPending(){
+    if(!activeChatId && currentChat) activeChatId = currentChat;
+    if(!activeChatId){ if(typeof toast==='function') toast('No chat'); return; }
+    setChatBgId(activeChatId, pendingId || null);
+    applyChatBackground(activeChatId);
+    if(typeof toast==='function') toast(pendingId ? 'Background applied' : 'Default background');
+    closeChatBgPage(false);
+  }
+
+  function resetPending(){
+    pendingId = null;
+    setPreview(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f4f6f8');
+    renderGrid(null);
+  }
+
+  // Wire UI
+  function wire(){
+    var back = $('msChatBgBack');
+    if(back && !back._bgWired){
+      back._bgWired = true;
+      back.onclick = function(){ closeChatBgPage(false); };
+    }
+    var apply = $('msBgApply');
+    if(apply && !apply._bgWired){
+      apply._bgWired = true;
+      apply.onclick = function(){ applyPending(); };
+    }
+    var reset = $('msBgReset');
+    if(reset && !reset._bgWired){
+      reset._bgWired = true;
+      reset.onclick = function(){ resetPending(); };
+    }
+    var opt = $('msOptChatBg');
+    if(opt && !opt._bgWired){
+      opt._bgWired = true;
+      opt.onclick = function(){
+        try{ if(typeof closeAllChatOptSheets === 'function') closeAllChatOptSheets(); }catch(e){}
+        // small delay so sheet closes first
+        setTimeout(function(){ openChatBgPage(); }, 120);
+      };
+    }
+  }
+
+  // Hook openChat
+  if(typeof window.openChat === 'function' && !window.__msChatBgOpenHooked){
+    window.__msChatBgOpenHooked = true;
+    var _open = window.openChat;
+    window.openChat = function(){
+      var ret = _open.apply(this, arguments);
+      try{ applyChatBackground(currentChat); }catch(e){}
+      return ret;
+    };
+  }
+  if(typeof window.closeChat === 'function' && !window.__msChatBgCloseHooked){
+    window.__msChatBgCloseHooked = true;
+    var _close = window.closeChat;
+    window.closeChat = function(){
+      try{ applyColorToMessages(''); }catch(e){}
+      try{ closeChatBgPage(true); }catch(e){}
+      return _close.apply(this, arguments);
+    };
+  }
+
+  // popstate priority — patch existing listener via capture
+  window.addEventListener('popstate', function(){
+    var el = $('msChatBgPage');
+    if(el && el.classList.contains('open')){
+      closeChatBgPage(true);
+    }
+  }, true);
+
+  window.openChatBgPage = openChatBgPage;
+  window.closeChatBgPage = closeChatBgPage;
+  window.msApplyChatBackground = applyChatBackground;
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+  setTimeout(wire, 0);
+  setTimeout(wire, 400);
+})();
+
 /* ═══ Chat options: Block User + Delete Conversation (Main App parity) ═══ */
 (function(){
   var blockTypeSelected = 'message_only';
@@ -6419,6 +6703,10 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 <div id="msChatOptSheet" class="ms-opt-backdrop" aria-hidden="true">
   <div class="ms-opt-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="ms-opt-handle" aria-hidden="true"></div>
+    <button type="button" class="ms-opt-item" id="msOptChatBg">
+      <span class="ms-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 16-5-5-4 4-2-2-5 5"/></svg></span>
+      <span class="ms-opt-copy">Chat Background<small>Choose a solid color for this chat</small></span>
+    </button>
     <button type="button" class="ms-opt-item" id="msOptBlock">
       <span class="ms-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5.5 5.5l13 13"/></svg></span>
       <span class="ms-opt-copy">Block User<small>Restrict messages or fully block on GoChat</small></span>
