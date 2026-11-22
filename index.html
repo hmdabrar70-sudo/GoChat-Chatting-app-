@@ -191,6 +191,105 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .chat-messages-wrap .messages{background:transparent}
 .chat-messages-wrap[data-ms-bg]{/* solid set via inline style */}
 
+/* ═══ Message Reactions (WhatsApp-style, GoChat emoji set) ═══ */
+.msg{ position:relative; }
+.msg-reacts{
+  display:flex; flex-wrap:wrap; gap:3px;
+  margin-top:4px; max-width:100%;
+}
+.msg.mine .msg-reacts{ justify-content:flex-end; }
+.msg:not(.mine) .msg-reacts{ justify-content:flex-start; }
+.msg-react-chip{
+  display:inline-flex; align-items:center; gap:3px;
+  min-height:22px; padding:1px 7px 1px 5px;
+  border-radius:999px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  font-size:13px; line-height:1;
+  cursor:pointer; user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.msg-react-chip .msg-react-emoji{ font-size:14px; line-height:1; }
+.msg-react-chip .msg-react-count{
+  font-size:11px; font-weight:800; color:var(--muted);
+  min-width:0.8em;
+}
+.msg-react-chip.is-mine{
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 80%, var(--surface));
+}
+.msg-react-chip.is-mine .msg-react-count{ color:var(--accent); }
+.msg.mine .msg-react-chip{
+  background:var(--surface);
+}
+/* Anchored reaction picker */
+.ms-react-mask{
+  position:fixed; inset:0; z-index:90;
+  background:transparent;
+  pointer-events:auto;
+}
+.ms-react-pop{
+  position:fixed; z-index:91;
+  display:flex; align-items:center; gap:2px;
+  padding:8px 10px;
+  border-radius:999px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 10px 32px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.06);
+  max-width:min(94vw, 420px);
+  overflow-x:auto; overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  animation:msReactIn .16s ease;
+  box-sizing:border-box;
+  touch-action:pan-x;
+  overscroll-behavior-x:contain;
+}
+.ms-react-pop::-webkit-scrollbar{ display:none; height:0; }
+@keyframes msReactIn{
+  from{ opacity:0; transform:scale(.92); }
+  to{ opacity:1; transform:scale(1); }
+}
+.ms-react-pop .ms-react-arrow{
+  position:absolute;
+  width:12px; height:12px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  transform:rotate(45deg);
+  z-index:0;
+  pointer-events:none;
+}
+.ms-react-pop[data-place="above"] .ms-react-arrow{
+  bottom:-7px;
+  border-top:none; border-left:none;
+}
+.ms-react-pop[data-place="below"] .ms-react-arrow{
+  top:-7px;
+  border-bottom:none; border-right:none;
+}
+.ms-react-btn{
+  position:relative; z-index:1;
+  width:40px; height:40px; flex:0 0 40px;
+  border:0; border-radius:50%;
+  background:transparent;
+  display:grid; place-items:center;
+  font-size:22px; line-height:1;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease, background .12s ease;
+}
+.ms-react-btn:active{ transform:scale(1.25); }
+.ms-react-btn.is-selected{
+  background:var(--accent-soft);
+  box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.msg.ms-react-target{
+  outline:2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset:2px;
+}
+
+
 #bootLoader{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-size:14px;font-weight:650}
 #bootLoader.hidden{display:none!important}
 #authScreen.hidden{display:none!important}
@@ -2162,7 +2261,11 @@ function renderMessage(id,m){
       + '</div>';
   }
   var timeLabel = (m.createdAt ? fmt(m.createdAt) : (mine ? 'Sending…' : ''));
-  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+timeLabel+((m.edited||m.isEdited)?' · Edited':'')+(mine && m.createdAt ?(m.read?' · Seen':' · Sent'):'')+'</time></article>';
+  var reactsHtml = '';
+  try{
+    if(typeof msBuildMsgReactsHtml === 'function') reactsHtml = msBuildMsgReactsHtml(id, m) || '';
+  }catch(_r){}
+  return '<article class="msg '+(mine?'mine':'')+'" data-id="'+esc(id)+'" data-mine="'+(mine?'1':'0')+'">'+reply+body+'<time>'+timeLabel+((m.edited||m.isEdited)?' · Edited':'')+(mine && m.createdAt ?(m.read?' · Seen':' · Sent'):'')+'</time>'+reactsHtml+'</article>';
 }
 
 async function sendPayload(payload){
@@ -4830,6 +4933,10 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
+  if(document.getElementById('msReactPop') || document.getElementById('msReactMask')){
+    try{ closeReactPicker(true); }catch(err){}
+    return;
+  }
   if($('msChatBgPage') && $('msChatBgPage').classList.contains('open')){
     try{ closeChatBgPage(true); }catch(err){}
     return;
@@ -6182,6 +6289,429 @@ window.msCanMessageUser = msCanMessageUser;
 window.msAssertCanMessage = msAssertCanMessage;
 window.msWatchPeerBlock = msWatchPeerBlock;
 
+
+
+/* ═══ Message Reactions · GoChat emoji set · WhatsApp-style UX ═══ */
+(function(){
+  var MS_REACT_EMOJIS = [
+    {k:'❤️', label:'Love'},
+    {k:'😂', label:'Haha'},
+    {k:'😮', label:'Wow'},
+    {k:'😥', label:'Sad'},
+    {k:'😡', label:'Angry'},
+    {k:'❤️‍🔥', label:'Fire'},
+    {k:'👽', label:'Alien'},
+    {k:'🤒', label:'Sick'},
+    {k:'☁️', label:'Cloud'},
+    {k:'📊', label:'Stats'}
+  ];
+  var holdTimer = null;
+  var holdMsgId = null;
+  var holdMoved = false;
+  var holdStartX = 0, holdStartY = 0;
+  var openMsgId = null;
+  var reactNavPushed = false;
+  var busy = {};
+
+  function $(id){ return document.getElementById(id); }
+
+  function summarizeReactions(reactions){
+    var map = reactions && typeof reactions === 'object' ? reactions : {};
+    var items = [];
+    Object.keys(map).forEach(function(emoji){
+      var arr = Array.isArray(map[emoji]) ? map[emoji] : [];
+      if(!arr.length) return;
+      var mine = !!(user && arr.indexOf(user.uid) !== -1);
+      items.push({ emoji: emoji, count: arr.length, mine: mine });
+    });
+    // Stable order: follow MS_REACT_EMOJIS order, then extras
+    var order = {};
+    MS_REACT_EMOJIS.forEach(function(r, i){ order[r.k] = i; });
+    items.sort(function(a,b){
+      var ia = order.hasOwnProperty(a.emoji) ? order[a.emoji] : 999;
+      var ib = order.hasOwnProperty(b.emoji) ? order[b.emoji] : 999;
+      if(ia !== ib) return ia - ib;
+      return b.count - a.count;
+    });
+    return items;
+  }
+
+  function msBuildMsgReactsHtml(msgId, m){
+    if(!m || m.deletedForEveryone || m.unsent) return '';
+    var items = summarizeReactions(m.reactions);
+    if(!items.length) return '';
+    var chips = items.map(function(it){
+      var safeE = String(it.emoji).replace(/"/g,'&quot;');
+      return '<button type="button" class="msg-react-chip'+(it.mine?' is-mine':'')+'" data-react-emoji="'+safeE+'" data-msg-id="'+String(msgId).replace(/"/g,'&quot;')+'" aria-label="'+it.count+' '+safeE+'">'
+        + '<span class="msg-react-emoji">'+it.emoji+'</span>'
+        + (it.count > 1 ? '<span class="msg-react-count">'+it.count+'</span>' : '')
+        + '</button>';
+    }).join('');
+    return '<div class="msg-reacts" data-msg-id="'+String(msgId).replace(/"/g,'&quot;')+'">'+chips+'</div>';
+  }
+  window.msBuildMsgReactsHtml = msBuildMsgReactsHtml;
+
+  function msCanonicalChatId(){
+    try{
+      if(!currentChat || !user) return currentChat;
+      var cid = String(currentChat);
+      if(cid.indexOf('group_') === 0) return cid;
+      if(currentOther && currentOther !== 'group'){
+        return [user.uid, currentOther].filter(Boolean).sort().join('_');
+      }
+      var parts = cid.split('_');
+      if(parts.length >= 2) return [parts[0], parts.slice(1).join('_')].sort().join('_');
+      return cid;
+    }catch(e){ return currentChat; }
+  }
+
+  function msPaintMsgReactions(msgId, reactions){
+    try{
+      var art = document.querySelector('article.msg[data-id="'+msgId+'"]');
+      if(!art) return;
+      var existing = art.querySelector('.msg-reacts');
+      var html = msBuildMsgReactsHtml(msgId, { reactions: reactions || {} });
+      if(existing){
+        if(html) existing.outerHTML = html;
+        else existing.remove();
+      } else if(html){
+        art.insertAdjacentHTML('beforeend', html);
+      }
+      if(window.__gcMsgDataCache && window.__gcMsgDataCache[msgId]){
+        window.__gcMsgDataCache[msgId].reactions = reactions || {};
+      }
+    }catch(e){}
+  }
+
+  async function toggleMessageReaction(msgId, emoji){
+    if(!user || !user.uid){
+      if(typeof toast === 'function') toast('Sign in to react');
+      return;
+    }
+    // currentChat is already normalized in openChat to sorted uid pair
+    var chatId = currentChat || msCanonicalChatId();
+    if(!chatId || !msgId || !emoji) return;
+    // Debounce double-taps on same message
+    var lockKey = chatId + '::' + msgId;
+    if(busy[lockKey]) return;
+    busy[lockKey] = true;
+    var prevReactions = null;
+    try{
+      var ref = db.collection('chats').doc(chatId).collection('messages').doc(msgId);
+
+      // Prefer live cache, fall back to fetch
+      var data = (window.__gcMsgDataCache && window.__gcMsgDataCache[msgId])
+        ? Object.assign({}, window.__gcMsgDataCache[msgId])
+        : null;
+      if(!data){
+        var snap = await ref.get();
+        if(!snap.exists){
+          if(typeof toast === 'function') toast('Message not found');
+          return;
+        }
+        data = snap.data() || {};
+      }
+      if(data.deletedForEveryone || data.unsent) return;
+
+      prevReactions = data.reactions ? JSON.parse(JSON.stringify(data.reactions)) : {};
+      var reactions = {};
+      // Clone arrays cleanly
+      Object.keys(prevReactions || {}).forEach(function(type){
+        if(Array.isArray(prevReactions[type])) reactions[type] = prevReactions[type].slice();
+      });
+
+      var already = Array.isArray(reactions[emoji]) && reactions[emoji].indexOf(user.uid) !== -1;
+
+      // One reaction per user per message
+      Object.keys(reactions).forEach(function(type){
+        reactions[type] = (reactions[type] || []).filter(function(uid){ return uid !== user.uid; });
+        if(reactions[type].length === 0) delete reactions[type];
+      });
+      if(!already){
+        if(!Array.isArray(reactions[emoji])) reactions[emoji] = [];
+        reactions[emoji].push(user.uid);
+      }
+
+      // Write first — only paint after success (no jump / disappear on permission errors)
+      try{
+        await ref.update({ reactions: reactions });
+      }catch(err1){
+        console.warn('reaction update failed, trying set merge', err1 && err1.code);
+        await ref.set({ reactions: reactions }, { merge: true });
+      }
+
+      msPaintMsgReactions(msgId, reactions);
+    }catch(e){
+      console.error('toggleMessageReaction', e && e.code, e);
+      // Revert optimistic UI
+      if(prevReactions) msPaintMsgReactions(msgId, prevReactions);
+      else msPaintMsgReactions(msgId, {});
+      var code = (e && e.code) ? String(e.code) : '';
+      var msg = 'Could not update reaction';
+      if(code.indexOf('permission') !== -1) msg = 'No permission to react';
+      else if(code.indexOf('unavailable') !== -1 || code.indexOf('network') !== -1) msg = 'Network error — try again';
+      else if(String(e && e.message || '').indexOf('missing') !== -1) msg = 'Message not found';
+      if(typeof toast === 'function') toast(msg);
+    }finally{
+      setTimeout(function(){ busy[lockKey] = false; }, 350);
+    }
+  }
+  window.toggleMessageReaction = toggleMessageReaction;
+
+  function closeReactPicker(fromPop){
+    var mask = $('msReactMask');
+    var pop = $('msReactPop');
+    if(mask) mask.remove();
+    if(pop) pop.remove();
+    document.querySelectorAll('article.msg.ms-react-target').forEach(function(el){
+      el.classList.remove('ms-react-target');
+    });
+    openMsgId = null;
+    if(!fromPop && reactNavPushed){
+      reactNavPushed = false;
+      try{
+        if(currentChat) history.replaceState({ page:'chat', chat: currentChat }, '', '#chat/'+currentChat);
+        else history.replaceState({ page:'chatsPage' }, '', '#chats');
+      }catch(e){}
+    } else {
+      reactNavPushed = false;
+    }
+  }
+  window.closeReactPicker = closeReactPicker;
+
+  function openReactPicker(msgId, anchorEl){
+    if(!msgId || !anchorEl || !currentChat) return;
+    closeReactPicker(true);
+
+    var data = (window.__gcMsgDataCache && window.__gcMsgDataCache[msgId]) || {};
+    if(data.deletedForEveryone || data.unsent) return;
+
+    openMsgId = msgId;
+    anchorEl.classList.add('ms-react-target');
+
+    var myEmoji = null;
+    var reactions = data.reactions || {};
+    Object.keys(reactions).forEach(function(em){
+      if(Array.isArray(reactions[em]) && user && reactions[em].indexOf(user.uid) !== -1) myEmoji = em;
+    });
+
+    var mask = document.createElement('div');
+    mask.id = 'msReactMask';
+    mask.className = 'ms-react-mask';
+    mask.addEventListener('click', function(){ closeReactPicker(false); });
+    mask.addEventListener('touchstart', function(e){
+      if(e.target === mask) closeReactPicker(false);
+    }, {passive:true});
+
+    var pop = document.createElement('div');
+    pop.id = 'msReactPop';
+    pop.className = 'ms-react-pop';
+    pop.setAttribute('role', 'dialog');
+    pop.setAttribute('aria-label', 'React to message');
+    pop.innerHTML = '<span class="ms-react-arrow" aria-hidden="true"></span>' + MS_REACT_EMOJIS.map(function(r){
+      var sel = (myEmoji === r.k) ? ' is-selected' : '';
+      return '<button type="button" class="ms-react-btn'+sel+'" data-emoji="'+r.k+'" aria-label="'+(r.label||'React')+'">'+r.k+'</button>';
+    }).join('');
+
+    document.body.appendChild(mask);
+    document.body.appendChild(pop);
+
+    // Position relative to message
+    var rect = anchorEl.getBoundingClientRect();
+    var popW = Math.min(window.innerWidth * 0.94, 420);
+    // measure after paint
+    requestAnimationFrame(function(){
+      var pw = pop.offsetWidth || popW;
+      var ph = pop.offsetHeight || 56;
+      var gap = 10;
+      var place = 'above';
+      var top = rect.top - ph - gap;
+      if(top < 8){
+        place = 'below';
+        top = rect.bottom + gap;
+      }
+      if(top + ph > window.innerHeight - 8){
+        top = Math.max(8, window.innerHeight - ph - 8);
+      }
+      var left = rect.left + rect.width/2 - pw/2;
+      if(anchorEl.classList.contains('mine')){
+        left = rect.right - pw;
+      } else {
+        left = rect.left;
+      }
+      left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+      pop.style.top = top + 'px';
+      pop.style.left = left + 'px';
+      pop.setAttribute('data-place', place);
+
+      // Arrow toward message center
+      var arrow = pop.querySelector('.ms-react-arrow');
+      if(arrow){
+        var msgCenterX = rect.left + rect.width/2;
+        var arrowLeft = msgCenterX - left - 6;
+        arrowLeft = Math.max(16, Math.min(arrowLeft, pw - 28));
+        arrow.style.left = arrowLeft + 'px';
+      }
+    });
+
+    // Swipe vs tap: only commit reaction when finger barely moved
+    var track = { x: 0, y: 0, moved: false, active: false };
+    pop.addEventListener('touchstart', function(e){
+      if(!e.touches || !e.touches[0]) return;
+      track.x = e.touches[0].clientX;
+      track.y = e.touches[0].clientY;
+      track.moved = false;
+      track.active = true;
+    }, {passive:true});
+    pop.addEventListener('touchmove', function(e){
+      if(!track.active || !e.touches || !e.touches[0]) return;
+      var dx = Math.abs(e.touches[0].clientX - track.x);
+      var dy = Math.abs(e.touches[0].clientY - track.y);
+      if(dx > 10 || dy > 10) track.moved = true;
+    }, {passive:true});
+    pop.addEventListener('touchend', function(){ track.active = false; }, {passive:true});
+    pop.addEventListener('touchcancel', function(){ track.active = false; track.moved = true; }, {passive:true});
+
+    var reactFired = false;
+    Array.prototype.forEach.call(pop.querySelectorAll('.ms-react-btn'), function(btn){
+      btn.addEventListener('click', function(ev){
+        try{ ev.preventDefault(); ev.stopPropagation(); }catch(err){}
+        // Ignore click synthesized after a horizontal swipe on the picker
+        if(track.moved) return;
+        if(reactFired) return;
+        reactFired = true;
+        var em = btn.getAttribute('data-emoji') || '';
+        MS_REACT_EMOJIS.forEach(function(r){
+          if(r.k === em || em.indexOf(r.k) === 0 || r.k.indexOf(em) === 0) em = r.k;
+        });
+        closeReactPicker(false);
+        toggleMessageReaction(msgId, em);
+        setTimeout(function(){ reactFired = false; }, 600);
+      }, true);
+      // Do NOT bind touchend — that fires on swipe release over a button
+    });
+
+    if(!reactNavPushed){
+      reactNavPushed = true;
+      try{ history.pushState({ page: 'msgreact' }, '', location.hash || '#chat'); }catch(e){}
+    }
+  }
+
+  function bindReactionHold(listEl){
+    if(!listEl || listEl._reactHoldBound) return;
+    listEl._reactHoldBound = true;
+
+    function clearHold(){
+      if(holdTimer){ clearTimeout(holdTimer); holdTimer = null; }
+      holdMsgId = null;
+    }
+
+    listEl.addEventListener('touchstart', function(e){
+      if(!e.touches || e.touches.length !== 1) return;
+      var art = e.target.closest('article.msg');
+      if(!art || e.target.closest('a,button,.gc-vp-play,input,textarea,.msg-react-chip')) return;
+      var id = art.getAttribute('data-id');
+      if(!id) return;
+      holdMoved = false;
+      holdStartX = e.touches[0].clientX;
+      holdStartY = e.touches[0].clientY;
+      holdMsgId = id;
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(function(){
+        if(holdMoved || holdMsgId !== id) return;
+        try{ if(navigator.vibrate) navigator.vibrate(12); }catch(err){}
+        openReactPicker(id, art);
+      }, 1000);
+    }, {passive:true});
+
+    listEl.addEventListener('touchmove', function(e){
+      if(!holdTimer || !e.touches || !e.touches.length) return;
+      var dx = Math.abs(e.touches[0].clientX - holdStartX);
+      var dy = Math.abs(e.touches[0].clientY - holdStartY);
+      if(dx > 12 || dy > 12){
+        holdMoved = true;
+        clearHold();
+      }
+    }, {passive:true});
+
+    listEl.addEventListener('touchend', clearHold, {passive:true});
+    listEl.addEventListener('touchcancel', clearHold, {passive:true});
+
+    // Desktop: long-press via mousedown
+    var mouseTimer = null;
+    listEl.addEventListener('mousedown', function(e){
+      if(e.button !== 0) return;
+      var art = e.target.closest('article.msg');
+      if(!art || e.target.closest('a,button,.gc-vp-play,input,textarea,.msg-react-chip')) return;
+      var id = art.getAttribute('data-id');
+      if(!id) return;
+      clearTimeout(mouseTimer);
+      mouseTimer = setTimeout(function(){
+        openReactPicker(id, art);
+      }, 1000);
+    });
+    listEl.addEventListener('mouseup', function(){ clearTimeout(mouseTimer); });
+    listEl.addEventListener('mouseleave', function(){ clearTimeout(mouseTimer); });
+
+    // Tap own reaction chip to toggle-remove / open picker for change
+    listEl.addEventListener('click', function(e){
+      var chip = e.target.closest('.msg-react-chip');
+      if(!chip) return;
+      e.preventDefault(); e.stopPropagation();
+      var msgId = chip.getAttribute('data-msg-id');
+      var emoji = chip.getAttribute('data-react-emoji') || '';
+      if(!msgId || !emoji) return;
+      MS_REACT_EMOJIS.forEach(function(r){ if(r.k === emoji || emoji.indexOf(r.k) === 0 || r.k.indexOf(emoji) === 0) emoji = r.k; });
+      var data = (window.__gcMsgDataCache && window.__gcMsgDataCache[msgId]) || {};
+      var reactions = data.reactions || {};
+      var arr = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
+      var isMine = user && arr.indexOf(user.uid) !== -1;
+      if(isMine){
+        // Remove own reaction (WhatsApp-style retap)
+        toggleMessageReaction(msgId, emoji);
+      } else {
+        // Open picker to add/change
+        var art = chip.closest('article.msg');
+        if(art) openReactPicker(msgId, art);
+      }
+    });
+  }
+
+  // Bind on messages list
+  function tryBind(){
+    var list = $('messages');
+    if(list) bindReactionHold(list);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryBind);
+  else tryBind();
+  setTimeout(tryBind, 0);
+  setTimeout(tryBind, 500);
+
+  // Also re-bind when listenMessages paints (list element is stable, but flag-safe)
+  if(typeof window.listenMessages === 'function' && !window.__msReactListenHooked){
+    window.__msReactListenHooked = true;
+    var _lm = window.listenMessages;
+    window.listenMessages = function(cid){
+      var ret = _lm.apply(this, arguments);
+      setTimeout(tryBind, 0);
+      return ret;
+    };
+  }
+
+  // Back button: close picker first
+  window.addEventListener('popstate', function(){
+    if($('msReactPop') || $('msReactMask')){
+      closeReactPicker(true);
+    }
+  }, true);
+
+  // Prevent text selection during long-press
+  try{
+    var style = document.createElement('style');
+    style.textContent = 'article.msg{-webkit-user-select:none;user-select:none;} article.msg a{-webkit-user-select:auto;user-select:auto;}';
+    document.head.appendChild(style);
+  }catch(e){}
+})();
 
 /* ═══ Chat Background Customization (per-chat, local) ═══ */
 (function(){
