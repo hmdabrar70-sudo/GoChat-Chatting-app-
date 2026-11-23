@@ -192,6 +192,38 @@ html.theme-dark .media-viewer{background:rgba(0,0,0,.96)}
 .chat-messages-wrap[data-ms-bg]{/* solid set via inline style */}
 
 
+
+/* ═══ Export Chat Page ═══ */
+.ms-export-page{position:fixed;inset:0;z-index:58;background:var(--bg);display:flex;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;transform:translateX(100%);pointer-events:none;transition:transform .28s ease;overflow:hidden}
+.ms-export-page.open{transform:translateX(0);pointer-events:auto}
+.ms-export-top{height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;padding-top:max(0px,env(safe-area-inset-top));border-bottom:1px solid var(--line);flex:none;background:var(--bg);z-index:2}
+.ms-export-back{width:40px;height:40px;border-radius:50%;border:none;background:var(--surface2);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
+.ms-export-back svg{width:22px;height:22px}
+.ms-export-title{flex:1 1 auto;text-align:center;font-weight:800;font-size:16px;color:var(--text)}
+.ms-export-copy-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:999px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;flex:0 0 auto}
+.ms-export-copy-btn:disabled{opacity:.55}
+.ms-export-copy-btn svg{width:16px;height:16px}
+.ms-export-info{flex:none;margin:12px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.ms-export-info-text{flex:1 1 auto;min-width:0;font-size:13px;color:var(--muted);line-height:1.4}
+.ms-export-info-text strong{display:block;color:var(--text);font-size:13.5px;margin-bottom:2px}
+.ms-export-dl-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;flex:0 0 auto;white-space:nowrap}
+.ms-export-dl-btn:disabled{opacity:.55}
+.ms-export-dl-btn svg{width:16px;height:16px}
+.ms-export-body{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 12px 20px;background:var(--bg)}
+.ms-export-body .ms-export-day{text-align:center;font-size:11.5px;font-weight:700;color:var(--muted);margin:14px 0 10px;letter-spacing:.02em}
+.ms-export-msg{display:flex;gap:8px;margin:6px 0;max-width:100%;align-items:flex-end}
+.ms-export-msg.mine{flex-direction:row-reverse}
+.ms-export-msg .av{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:0 0 auto;background:var(--surface2)}
+.ms-export-msg.mine .av{display:none}
+.ms-export-bubble{max-width:78%;padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word;background:var(--surface);border:1px solid var(--line);color:var(--text)}
+.ms-export-msg.mine .ms-export-bubble{background:var(--accent);color:#fff;border-color:transparent}
+.ms-export-bubble time{display:block;font-size:10.5px;opacity:.75;margin-top:4px}
+.ms-export-reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.ms-export-react-chip{font-size:12px;padding:1px 6px;border-radius:999px;background:var(--surface2);border:1px solid var(--line)}
+.ms-export-msg.mine .ms-export-react-chip{background:rgba(255,255,255,.18);border-color:transparent;color:#fff}
+.ms-export-empty,.ms-export-loading{text-align:center;padding:40px 16px;color:var(--muted);font-size:14px}
+.ms-export-foot{flex:none;text-align:center;padding:10px 16px calc(12px + env(safe-area-inset-bottom));font-size:12px;color:var(--muted);border-top:1px solid var(--line);background:var(--bg)}
+
 /* ═══ Incoming Message Popup (in-app) ═══ */
 #msInAppHost{
   position:fixed; left:0; right:0; top:0; z-index:12000;
@@ -1293,7 +1325,35 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
   <div id="gcMediaPreviewGrid" class="gc-media-preview-grid"></div>
 </div>
 <div id="msBlockBanner" class="ms-block-banner" aria-live="polite"></div><form class="composer" id="composer"><input id="messageInput" type="text" placeholder="Message…" autocomplete="off"><input id="mediaInput" class="file-input" type="file" accept="image/*,video/*" multiple><button type="button" class="tool-btn" id="mediaButton" aria-label="Attach photo or video"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg></button><button type="button" class="tool-btn" id="voiceButton" aria-label="Record voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg></button><button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></form></section>
-<div id="msInAppHost" aria-live="polite"></div>
+<div 
+<div id="msExportPage" class="ms-export-page" aria-hidden="true">
+  <header class="ms-export-top">
+    <button type="button" class="ms-export-back" id="msExportBack" aria-label="Back">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.51191C14.7001 4.19745 15.1736 4.16101 15.4881 4.43056Z" clip-rule="evenodd"/></svg>
+    </button>
+    <div class="ms-export-title">Export Chat</div>
+    <button type="button" class="ms-export-copy-btn" id="msExportCopy">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+      <span>Copy</span>
+    </button>
+  </header>
+  <div class="ms-export-info">
+    <div class="ms-export-info-text">
+      <strong>This chat will be exported as text only.</strong>
+      Photos and videos are not included.
+    </div>
+    <button type="button" class="ms-export-dl-btn" id="msExportDownload">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 19h14"/></svg>
+      <span>Download</span>
+    </button>
+  </div>
+  <div class="ms-export-body" id="msExportBody">
+    <div class="ms-export-loading">Loading conversation…</div>
+  </div>
+  <div class="ms-export-foot">Chat export is safe and secure.</div>
+</div>
+
+id="msInAppHost" aria-live="polite"></div>
 <div id="toast" class="toast"></div>
 
 
@@ -5086,6 +5146,10 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
+  if(document.getElementById('msExportPage') && document.getElementById('msExportPage').classList.contains('open')){
+    try{ closeExportChatPage(true); }catch(err){}
+    return;
+  }
   if(document.getElementById('msInAppHost') && document.querySelector('.ms-inapp-card.show')){
     try{ msInAppDismiss(); }catch(err){}
     return;
@@ -6448,6 +6512,422 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 
 
 
+
+
+/* ═══ Export Chat ═══ */
+(function(){
+  var exportNavPushed = false;
+  var exportState = {
+    open: false,
+    chatId: null,
+    otherUid: null,
+    otherName: '',
+    otherAvatar: '',
+    messages: [],
+    busy: false,
+    textCache: ''
+  };
+
+  function $(id){ return document.getElementById(id); }
+
+  function msExportCloseSheets(){
+    try{
+      ['msChatOptSheet','msBlockTypeSheet','msDelConvSheet'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+      });
+    }catch(e){}
+  }
+
+  function msExportFmtTime(ts){
+    try{
+      var ms = (typeof toMs === 'function') ? toMs(ts) : 0;
+      if(!ms) return '';
+      var d = new Date(ms);
+      var h = d.getHours();
+      var m = d.getMinutes();
+      var am = h < 12;
+      var h12 = h % 12;
+      if(h12 === 0) h12 = 12;
+      return h12 + ':' + String(m).padStart(2,'0') + (am ? ' AM' : ' PM');
+    }catch(e){ return ''; }
+  }
+
+  function msExportFmtDate(ts){
+    try{
+      var ms = (typeof toMs === 'function') ? toMs(ts) : 0;
+      if(!ms) return '';
+      var d = new Date(ms);
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }catch(e){ return ''; }
+  }
+
+  function msExportDayKey(ts){
+    var ms = (typeof toMs === 'function') ? toMs(ts) : 0;
+    if(!ms) return '';
+    var d = new Date(ms);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  function msExportBodyText(m){
+    if(!m) return '';
+    if(m.deletedForEveryone || m.unsent) return 'This message was unsent';
+    if(m.imageUrl) return '[Photo sent — Media not included]';
+    if(m.videoUrl) return '[Video sent — Media not included]';
+    if(m.audioUrl || m.voiceUrl) return '[Voice message sent — Media not included]';
+    if(m.sharedPostId || m.sharedPostImg) return '[Attachment sent — Media not included]';
+    if(m.sharedStoryId || m.sharedStoryImg || m.sharedStoryVideo) return '[Story shared — Media not included]';
+    var t = String(m.text || '').trim();
+    if(t) return t;
+    return '[Message]';
+  }
+
+  function msExportSenderLabel(m){
+    if(!m || !user) return 'User';
+    if(m.uid === user.uid) return 'আমি';
+    return exportState.otherName || m.senderName || 'User';
+  }
+
+  async function msExportResolveNames(uids){
+    var map = {};
+    var pending = [];
+    uids.forEach(function(uid){
+      if(!uid) return;
+      if(user && uid === user.uid){ map[uid] = 'আমি'; return; }
+      try{
+        if(typeof usersCache !== 'undefined' && usersCache && usersCache.has(uid)){
+          var u = usersCache.get(uid) || {};
+          map[uid] = u.name || u.displayName || exportState.otherName || 'User';
+          return;
+        }
+      }catch(e){}
+      pending.push(uid);
+    });
+    await Promise.all(pending.map(function(uid){
+      return db.collection('users').doc(uid).get().then(function(s){
+        if(s.exists){
+          var d = s.data() || {};
+          map[uid] = d.name || d.displayName || 'User';
+          try{ if(typeof usersCache !== 'undefined' && usersCache) usersCache.set(uid, Object.assign({uid:uid}, d)); }catch(e){}
+        } else {
+          map[uid] = (uid === exportState.otherUid) ? (exportState.otherName || 'User') : 'User';
+        }
+      }).catch(function(){ map[uid] = 'User'; });
+    }));
+    return map;
+  }
+
+  function msExportReactionLines(m, nameMap){
+    var reactions = (m && m.reactions && typeof m.reactions === 'object') ? m.reactions : null;
+    if(!reactions) return [];
+    var lines = [];
+    Object.keys(reactions).forEach(function(emoji){
+      var arr = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
+      arr.forEach(function(uid){
+        var nm = (nameMap && nameMap[uid]) || (uid === (user && user.uid) ? 'আমি' : (exportState.otherName || 'User'));
+        lines.push(nm + ' reacted ' + emoji);
+      });
+    });
+    return lines;
+  }
+
+  async function msExportFetchAllMessages(chatId){
+    var all = [];
+    var lastDoc = null;
+    var guard = 0;
+    while(guard < 80){
+      guard++;
+      var q = db.collection('chats').doc(chatId).collection('messages').orderBy('createdAt','asc').limit(100);
+      if(lastDoc) q = q.startAfter(lastDoc);
+      var snap = await q.get();
+      if(!snap || snap.empty) break;
+      snap.docs.forEach(function(doc){
+        var data = doc.data() || {};
+        // Skip messages deleted only for me if needed — still include for export history of "visible" thread
+        if((data.deletedFor || []).indexOf(user.uid) !== -1) return;
+        all.push(Object.assign({ id: doc.id }, data));
+      });
+      lastDoc = snap.docs[snap.docs.length - 1];
+      if(snap.size < 100) break;
+    }
+    return all;
+  }
+
+  function msExportBuildPlainText(messages, nameMap){
+    var otherName = exportState.otherName || 'User';
+    var exportDate = msExportFmtDate(Date.now());
+    var lines = [];
+    lines.push('---');
+    lines.push('BUTTERFLY MESSENGER');
+    lines.push('CHAT EXPORT');
+    lines.push('---');
+    lines.push('');
+    lines.push('Conversation With: ' + otherName);
+    lines.push('Participants: আমি, ' + otherName);
+    lines.push('Export Date: ' + exportDate);
+    lines.push('Total Messages: ' + messages.length);
+    lines.push('');
+    lines.push('---');
+    lines.push('CONVERSATION');
+    lines.push('---');
+    lines.push('');
+
+    var serial = 0;
+    var lastDay = '';
+    messages.forEach(function(m){
+      var day = msExportDayKey(m.createdAt);
+      if(day && day !== lastDay){
+        lastDay = day;
+        lines.push(msExportFmtDate(m.createdAt));
+        lines.push('');
+      }
+      serial++;
+      var who = msExportSenderLabel(m);
+      var time = msExportFmtTime(m.createdAt);
+      var body = msExportBodyText(m);
+      lines.push(serial + '. [' + time + '] ' + who);
+      lines.push(body);
+      var reacts = msExportReactionLines(m, nameMap);
+      if(reacts.length){
+        lines.push('Reactions:');
+        reacts.forEach(function(r){ lines.push(r); });
+      }
+      lines.push('');
+    });
+
+    lines.push('---');
+    lines.push('EXPORTED FROM BUTTERFLY MESSENGER');
+    lines.push('---');
+    return lines.join('\n');
+  }
+
+  function msExportRenderMessages(messages){
+    var body = $('msExportBody');
+    if(!body) return;
+    if(!messages.length){
+      body.innerHTML = '<div class="ms-export-empty">No messages to export.</div>';
+      return;
+    }
+    var html = '';
+    var lastDay = '';
+    var myAv = '';
+    try{ myAv = (userData && (userData.avatar || userData.photoURL)) || ''; }catch(e){}
+    messages.forEach(function(m){
+      var day = msExportDayKey(m.createdAt);
+      if(day && day !== lastDay){
+        lastDay = day;
+        html += '<div class="ms-export-day">'+esc(msExportFmtDate(m.createdAt))+'</div>';
+      }
+      var mine = user && m.uid === user.uid;
+      var text = msExportBodyText(m);
+      var time = msExportFmtTime(m.createdAt);
+      var av = mine ? myAv : (exportState.otherAvatar || '');
+      var reacts = (m.reactions && typeof m.reactions === 'object') ? m.reactions : null;
+      var rHtml = '';
+      if(reacts){
+        var chips = [];
+        Object.keys(reacts).forEach(function(emoji){
+          var arr = Array.isArray(reacts[emoji]) ? reacts[emoji] : [];
+          if(arr.length) chips.push('<span class="ms-export-react-chip">'+emoji+(arr.length>1?' '+arr.length:'')+'</span>');
+        });
+        if(chips.length) rHtml = '<div class="ms-export-reacts">'+chips.join('')+'</div>';
+      }
+      html += '<div class="ms-export-msg'+(mine?' mine':'')+'">'
+        + (mine ? '' : '<img class="av" alt="" src="'+esc(av)+'" onerror="this.style.opacity=.25">')
+        + '<div class="ms-export-bubble">'+esc(text)+rHtml+'<time>'+esc(time)+'</time></div>'
+        + '</div>';
+    });
+    body.innerHTML = html;
+  }
+
+  async function msExportLoad(){
+    var body = $('msExportBody');
+    if(body) body.innerHTML = '<div class="ms-export-loading">Loading conversation…</div>';
+    var copyBtn = $('msExportCopy');
+    var dlBtn = $('msExportDownload');
+    if(copyBtn) copyBtn.disabled = true;
+    if(dlBtn) dlBtn.disabled = true;
+    try{
+      var msgs = await msExportFetchAllMessages(exportState.chatId);
+      exportState.messages = msgs;
+      // collect reaction uids for names
+      var uids = {};
+      msgs.forEach(function(m){
+        if(m.uid) uids[m.uid] = true;
+        var r = m.reactions || {};
+        Object.keys(r).forEach(function(em){
+          (Array.isArray(r[em]) ? r[em] : []).forEach(function(uid){ uids[uid] = true; });
+        });
+      });
+      var nameMap = await msExportResolveNames(Object.keys(uids));
+      exportState.textCache = msExportBuildPlainText(msgs, nameMap);
+      msExportRenderMessages(msgs);
+      if(copyBtn) copyBtn.disabled = false;
+      if(dlBtn) dlBtn.disabled = false;
+    }catch(e){
+      console.error('export load', e);
+      if(body) body.innerHTML = '<div class="ms-export-empty">Could not load messages.</div>';
+      if(typeof toast === 'function') toast('Failed to load chat');
+    }
+  }
+
+  function openExportChatPage(){
+    if(!user || !currentChat){
+      if(typeof toast === 'function') toast('Open a chat first');
+      return;
+    }
+    msExportCloseSheets();
+    exportState.open = true;
+    exportState.chatId = currentChat;
+    exportState.otherUid = currentOther;
+    exportState.messages = [];
+    exportState.textCache = '';
+    try{
+      var nameEl = $('chatName');
+      exportState.otherName = (nameEl && nameEl.textContent) ? nameEl.textContent.trim() : 'User';
+    }catch(e){ exportState.otherName = 'User'; }
+    try{
+      var avEl = $('chatAvatar');
+      exportState.otherAvatar = (avEl && avEl.src) ? avEl.src : '';
+    }catch(e){ exportState.otherAvatar = ''; }
+
+    var page = $('msExportPage');
+    if(page){
+      page.classList.add('open');
+      page.setAttribute('aria-hidden','false');
+    }
+    if(!exportNavPushed){
+      exportNavPushed = true;
+      try{ history.pushState({ page:'exportchat', chat: currentChat }, '', (location.hash||'#chat')+'/export'); }catch(e){}
+    }
+    msExportLoad();
+  }
+
+  function closeExportChatPage(fromPop){
+    var page = $('msExportPage');
+    if(page){
+      page.classList.remove('open');
+      page.setAttribute('aria-hidden','true');
+    }
+    exportState.open = false;
+    if(!fromPop && exportNavPushed){
+      exportNavPushed = false;
+      try{
+        if(currentChat) history.replaceState({ page:'chat', chat: currentChat }, '', '#chat/'+currentChat);
+        else history.replaceState({ page:'chatsPage' }, '', '#chats');
+      }catch(e){}
+    } else {
+      exportNavPushed = false;
+    }
+  }
+  window.closeExportChatPage = closeExportChatPage;
+  window.openExportChatPage = openExportChatPage;
+
+  async function msExportCopy(){
+    if(exportState.busy) return;
+    var text = exportState.textCache;
+    if(!text){
+      if(typeof toast === 'function') toast('Nothing to copy yet');
+      return;
+    }
+    exportState.busy = true;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      if(typeof toast === 'function') toast('Conversation copied');
+    }catch(e){
+      if(typeof toast === 'function') toast('Copy failed');
+    }finally{
+      exportState.busy = false;
+    }
+  }
+
+  function msExportSafeName(name){
+    return String(name || 'Chat').replace(/[^\w\u0980-\u09FF\- ]+/g, '').replace(/\s+/g, '_').slice(0, 40) || 'Chat';
+  }
+
+  function msExportDownload(){
+    if(exportState.busy) return;
+    var text = exportState.textCache;
+    if(!text){
+      if(typeof toast === 'function') toast('Nothing to download yet');
+      return;
+    }
+    exportState.busy = true;
+    var btn = $('msExportDownload');
+    if(btn) btn.disabled = true;
+    try{
+      var d = new Date();
+      var dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      var fname = 'Butterfly_Chat_' + msExportSafeName(exportState.otherName) + '_' + dateStr + '.txt';
+      var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = fname;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){
+        try{ document.body.removeChild(a); URL.revokeObjectURL(url); }catch(e){}
+      }, 500);
+      if(typeof toast === 'function') toast('Chat exported successfully.');
+    }catch(e){
+      console.error(e);
+      if(typeof toast === 'function') toast('Download failed');
+    }finally{
+      exportState.busy = false;
+      if(btn) btn.disabled = false;
+    }
+  }
+
+  function wireExport(){
+    var opt = $('msOptExportChat');
+    if(opt && !opt._expWired){
+      opt._expWired = true;
+      opt.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        openExportChatPage();
+      });
+    }
+    var back = $('msExportBack');
+    if(back && !back._expWired){
+      back._expWired = true;
+      back.addEventListener('click', function(){ closeExportChatPage(false); });
+    }
+    var copy = $('msExportCopy');
+    if(copy && !copy._expWired){
+      copy._expWired = true;
+      copy.addEventListener('click', function(){ msExportCopy(); });
+    }
+    var dl = $('msExportDownload');
+    if(dl && !dl._expWired){
+      dl._expWired = true;
+      dl.addEventListener('click', function(){ msExportDownload(); });
+    }
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireExport);
+  else wireExport();
+  setTimeout(wireExport, 300);
+
+  window.addEventListener('popstate', function(){
+    if(exportState.open || ($('msExportPage') && $('msExportPage').classList.contains('open'))){
+      closeExportChatPage(true);
+    }
+  }, true);
+})();
 
 /* ═══ Incoming Message Popup + Quick Reply ═══ */
 (function(){
@@ -7956,6 +8436,10 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 <div id="msChatOptSheet" class="ms-opt-backdrop" aria-hidden="true">
   <div class="ms-opt-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="ms-opt-handle" aria-hidden="true"></div>
+    <button type="button" class="ms-opt-item" id="msOptExportChat">
+      <span class="ms-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 19h14"/></svg></span>
+      <span class="ms-opt-copy">Export Chat<small>View, copy or download this conversation</small></span>
+    </button>
     <button type="button" class="ms-opt-item" id="msOptChatBg">
       <span class="ms-opt-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 16-5-5-4 4-2-2-5 5"/></svg></span>
       <span class="ms-opt-copy">Chat Background<small>Choose a solid color for this chat</small></span>
