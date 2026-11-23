@@ -1144,6 +1144,43 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 .media-viewer{z-index:90 !important}
 
 
+
+/* ═══ Shared Message Pinning ═══ */
+.ms-pin-bar{display:none;flex:none;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);cursor:pointer;min-height:44px;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+.ms-pin-bar.show{display:flex}
+.ms-pin-bar:active{background:var(--surface2)}
+.ms-pin-label{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:850;letter-spacing:.04em}
+.ms-pin-label svg{width:12px;height:12px}
+.ms-pin-preview{flex:1 1 auto;min-width:0;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-pin-count{flex:0 0 auto;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.msg.ms-pin-highlight{outline:2px solid var(--accent);box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);transition:outline .2s ease,box-shadow .2s ease}
+.ms-pin-backdrop{display:none;position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.4);align-items:flex-end;justify-content:center}
+.ms-pin-backdrop.open{display:flex}
+.ms-pin-sheet{width:min(520px,100%);max-height:min(72dvh,560px);background:var(--surface);border-radius:20px 20px 0 0;padding:10px 0 calc(12px + env(safe-area-inset-bottom));box-shadow:var(--shadow);display:flex;flex-direction:column;animation:msPinUp .22s ease}
+@keyframes msPinUp{from{transform:translateY(16px);opacity:.6}to{transform:none;opacity:1}}
+.ms-pin-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 10px;border-bottom:1px solid var(--line);flex:none}
+.ms-pin-sheet-head h3{margin:0;font-size:16px;font-weight:850}
+.ms-pin-sheet-head span{font-size:12px;color:var(--muted);font-weight:700}
+.ms-pin-sheet-body{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 8px}
+.ms-pin-row{width:100%;display:flex;align-items:flex-start;gap:10px;padding:12px;border:0;border-radius:12px;background:transparent;text-align:left;color:var(--text);cursor:pointer}
+.ms-pin-row:active{background:var(--surface2)}
+.ms-pin-row .ms-pin-row-main{flex:1 1 auto;min-width:0}
+.ms-pin-row .ms-pin-row-name{font-size:13px;font-weight:800}
+.ms-pin-row .ms-pin-row-text{font-size:13px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-pin-row .ms-pin-row-time{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
+.ms-pin-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);flex:0 0 auto;margin-top:2px;display:grid;place-items:center}
+.ms-pin-row.selected .ms-pin-check{background:var(--accent);border-color:var(--accent);color:#fff}
+.ms-pin-sheet-foot{flex:none;padding:10px 14px 0;border-top:1px solid var(--line);display:flex;gap:10px}
+.ms-pin-sheet-foot button{flex:1;padding:13px;border-radius:14px;font-weight:800;font-size:14px;border:0}
+.ms-pin-cancel{background:var(--surface2);color:var(--text)}
+.ms-pin-go{background:var(--accent);color:#fff}
+.ms-pin-go:disabled{opacity:.5}
+.ms-pin-ctx{position:fixed;z-index:86;min-width:140px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none}
+.ms-pin-ctx.open{display:block}
+.ms-pin-ctx button{width:100%;display:flex;align-items:center;gap:10px;padding:11px 12px;border:0;border-radius:10px;background:transparent;color:var(--text);font-weight:700;font-size:14px;text-align:left;cursor:pointer}
+.ms-pin-ctx button:active{background:var(--surface2)}
+.ms-pin-ctx button svg{width:18px;height:18px;color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -1297,7 +1334,12 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 
 <section id="chatView" class="chat-view"><header class="chat-head"><button class="back-btn" id="chatBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><img id="chatAvatar" class="avatar" alt=""><div class="chat-head-info"><strong id="chatName">Chat</strong><small id="chatStatus"> </small></div><button type="button" class="chat-head-more" id="chatMoreBtn" aria-label="Chat options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button></header>
 <div class="chat-messages-wrap">
-  <div class="messages" id="messages"></div>
+  <div id="msPinBar" class="ms-pin-bar" aria-hidden="true">
+  <span class="ms-pin-label"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>PIN</span>
+  <span class="ms-pin-preview" id="msPinPreview"></span>
+  <span class="ms-pin-count" id="msPinCount" hidden>0</span>
+</div>
+<div class="messages" id="messages"></div>
 
   <button type="button" id="gcScrollBottom" class="gc-scroll-bottom" aria-label="Jump to latest message" title="Jump to latest message">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -5146,6 +5188,22 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
+  if(document.getElementById('msPinUnpin') && document.getElementById('msPinUnpin').classList.contains('open')){
+    try{ msPinCloseAll(true); }catch(err){}
+    // close only topmost - helper closes unpin first via dedicated calls
+    try{
+      var u=$('msPinUnpin'); if(u&&u.classList.contains('open')){ u.classList.remove('open'); }
+    }catch(e){}
+    return;
+  }
+  if(document.getElementById('msPinList') && document.getElementById('msPinList').classList.contains('open')){
+    try{ var l=$('msPinList'); if(l) l.classList.remove('open'); }catch(err){}
+    return;
+  }
+  if(document.getElementById('msPinCtx') && document.getElementById('msPinCtx').classList.contains('open')){
+    try{ var c=$('msPinCtx'); if(c) c.classList.remove('open'); }catch(err){}
+    return;
+  }
   if(document.getElementById('msExportPage') && document.getElementById('msExportPage').classList.contains('open')){
     try{ closeExportChatPage(true); }catch(err){}
     return;
@@ -5221,6 +5279,7 @@ var gcFwdMsgId = null, gcFwdSelected = {}, gcFwdBusy = false;
 var mediaNavPushed = false, msgCtxNavPushed = false, fwdNavPushed = false;
 
 var CTX_ICO = {
+  pin: '<svg class="ctx-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>',
   reply: '<svg class="ctx-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>',
   forward: '<svg class="ctx-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>',
   copy: '<svg class="ctx-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
@@ -5254,6 +5313,7 @@ function openMsgCtx(id, data){
   var sheet = $('msgCtxSheet');
   if(!sheet) return;
   var items = [];
+  if(mine) items.push({label:'Pin', action:'pin', ico:CTX_ICO.pin, danger:false});
   items.push({label:'Reply', action:'reply', ico:CTX_ICO.reply, danger:false});
   items.push({label:'Forward', action:'forward', ico:CTX_ICO.forward, danger:false});
   if(hasCopyableText) items.push({label:'Copy message', action:'copy', ico:CTX_ICO.copy, danger:false});
@@ -5390,6 +5450,12 @@ async function runCtxAction(act){
     }catch(e){}
   }
 
+  if(act === 'pin'){
+    if(typeof msPinMessage === 'function'){
+      msPinMessage(id, m).catch(function(err){ toast((err && err.message) || 'Pin failed'); });
+    }
+    return;
+  }
   if(act === 'reply'){
     startReplyToMessage(id, m);
   } else if(act === 'forward'){
@@ -6514,6 +6580,246 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 
 
 
+
+/* ═══ Shared Message Pinning System ═══ */
+(function(){
+  var PIN_MAX = 20;
+  var pinUnsub = null;
+  var pinState = { list: [], chatId: null, listNav: false, unpinNav: false, ctxNav: false, selected: {} };
+  function $(id){ return document.getElementById(id); }
+  function msPinPreviewText(m){
+    if(!m) return 'Message';
+    if(m.deletedForEveryone || m.unsent) return 'Unsent message';
+    if(m.imageUrl) return 'Photo';
+    if(m.videoUrl) return 'Video';
+    if(m.audioUrl || m.voiceUrl) return 'Voice message';
+    if(m.sharedPostId || m.sharedPostImg) return 'Attachment';
+    var t = String(m.text || '').trim();
+    if(t.length > 80) t = t.slice(0, 77) + '…';
+    return t || 'Message';
+  }
+  function msPinNormalizeList(raw){
+    if(!Array.isArray(raw)) return [];
+    return raw.filter(function(p){ return p && p.id; }).slice(0, PIN_MAX);
+  }
+  function msPinRenderBar(){
+    var bar = $('msPinBar'), prev = $('msPinPreview'), count = $('msPinCount');
+    if(!bar) return;
+    var list = pinState.list || [];
+    if(!list.length){ bar.classList.remove('show'); bar.setAttribute('aria-hidden','true'); return; }
+    bar.classList.add('show'); bar.setAttribute('aria-hidden','false');
+    var sorted = list.slice().sort(function(a,b){ return (b.atMs||0)-(a.atMs||0); });
+    if(prev) prev.textContent = sorted[0].preview || 'Pinned message';
+    if(count){ if(list.length>1){ count.hidden=false; count.textContent=String(list.length);} else count.hidden=true; }
+  }
+  function msPinListen(chatId){
+    if(pinUnsub){ try{ pinUnsub(); }catch(e){} pinUnsub=null; }
+    pinState.chatId = chatId||null; pinState.list=[]; msPinRenderBar();
+    if(!chatId) return;
+    pinUnsub = db.collection('chats').doc(chatId).onSnapshot(function(snap){
+      if(currentChat !== chatId) return;
+      var data = snap.exists ? (snap.data()||{}) : {};
+      pinState.list = msPinNormalizeList(data.pins);
+      msPinRenderBar();
+    }, function(err){ console.warn('pin listen', err); });
+  }
+  if(typeof window.openChat === 'function' && !window.__msPinOpenHooked){
+    window.__msPinOpenHooked = true;
+    var _oc = window.openChat;
+    window.openChat = function(){ var r=_oc.apply(this,arguments); try{ setTimeout(function(){ msPinListen(currentChat); },0);}catch(e){} return r; };
+  }
+  if(typeof window.closeChat === 'function' && !window.__msPinCloseHooked){
+    window.__msPinCloseHooked = true;
+    var _cc = window.closeChat;
+    window.closeChat = function(){ try{ msPinListen(null);}catch(e){} try{ msPinCloseAll(true);}catch(e){} return _cc.apply(this,arguments); };
+  }
+  async function msPinMessage(msgId, msgData){
+    if(!user || !currentChat || !msgId) throw new Error('Unavailable');
+    if(!msgData || msgData.uid !== user.uid) throw new Error('You can only pin your own messages');
+    var chatRef = db.collection('chats').doc(currentChat);
+    await db.runTransaction(async function(tx){
+      var snap = await tx.get(chatRef);
+      var data = snap.exists ? (snap.data()||{}) : {};
+      var pins = msPinNormalizeList(data.pins);
+      if(pins.some(function(p){ return p.id === msgId; })) throw new Error('Already pinned');
+      if(pins.length >= PIN_MAX) throw new Error('Maximum '+PIN_MAX+' pinned messages');
+      pins.push({ id: msgId, by: user.uid, uid: msgData.uid, atMs: Date.now(), preview: msPinPreviewText(msgData) });
+      tx.set(chatRef, { pins: pins }, { merge: true });
+    });
+    if(typeof toast==='function') toast('Message pinned');
+  }
+  window.msPinMessage = msPinMessage;
+  async function msUnpinMessages(msgIds){
+    if(!user || !currentChat || !msgIds || !msgIds.length) return;
+    var chatRef = db.collection('chats').doc(currentChat);
+    await db.runTransaction(async function(tx){
+      var snap = await tx.get(chatRef);
+      var data = snap.exists ? (snap.data()||{}) : {};
+      var pins = msPinNormalizeList(data.pins);
+      var next = pins.filter(function(p){ if(msgIds.indexOf(p.id)===-1) return true; return p.by !== user.uid; });
+      tx.set(chatRef, { pins: next }, { merge: true });
+    });
+    if(typeof toast==='function') toast(msgIds.length>1?'Messages unpinned':'Message unpinned');
+  }
+  window.msUnpinMessages = msUnpinMessages;
+  function msPinCloseCtx(){
+    var el=$('msPinCtx'); if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+    if(pinState.ctxNav){ pinState.ctxNav=false; try{ if(currentChat) history.replaceState({page:'chat',chat:currentChat},'','#chat/'+currentChat);}catch(e){} }
+  }
+  function msPinCloseList(fromPop){
+    var el=$('msPinList'); if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+    if(!fromPop && pinState.listNav){ pinState.listNav=false; try{ if(currentChat) history.replaceState({page:'chat',chat:currentChat},'','#chat/'+currentChat);}catch(e){} }
+    else if(fromPop) pinState.listNav=false;
+  }
+  function msPinCloseUnpin(fromPop){
+    var el=$('msPinUnpin'); if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); }
+    pinState.selected={};
+    if(!fromPop && pinState.unpinNav){ pinState.unpinNav=false; try{ if(currentChat) history.replaceState({page:'chat',chat:currentChat},'','#chat/'+currentChat);}catch(e){} }
+    else if(fromPop) pinState.unpinNav=false;
+  }
+  function msPinCloseAll(fromPop){ msPinCloseCtx(); msPinCloseUnpin(fromPop); msPinCloseList(fromPop); }
+  window.msPinCloseAll = msPinCloseAll;
+  async function msPinScrollTo(msgId){
+    if(!msgId||!currentChat) return;
+    var box=$('messages'); if(!box) return;
+    var art=box.querySelector('article.msg[data-id="'+msgId+'"]');
+    if(!art){
+      try{
+        var snap=await db.collection('chats').doc(currentChat).collection('messages').doc(msgId).get();
+        if(snap.exists && typeof renderMessage==='function'){
+          var html=renderMessage(msgId, snap.data()||{});
+          if(html){ box.insertAdjacentHTML('afterbegin', html); if(window.__gcMsgDataCache) window.__gcMsgDataCache[msgId]=snap.data(); }
+        }
+      }catch(e){}
+      art=box.querySelector('article.msg[data-id="'+msgId+'"]');
+    }
+    if(!art){ if(typeof toast==='function') toast('Message not found in view'); return; }
+    art.scrollIntoView({behavior:'smooth', block:'center'});
+    art.classList.add('ms-pin-highlight');
+    setTimeout(function(){ try{ art.classList.remove('ms-pin-highlight'); }catch(e){} }, 2000);
+  }
+  function msPinOpenList(){
+    var list=pinState.list||[];
+    if(list.length<=1){ if(list[0]) msPinScrollTo(list[0].id); return; }
+    var body=$('msPinListBody'), countEl=$('msPinListCount');
+    if(countEl) countEl.textContent=String(list.length);
+    var sorted=list.slice().sort(function(a,b){ return (b.atMs||0)-(a.atMs||0); });
+    if(body){
+      body.innerHTML=sorted.map(function(p){
+        var who=(user&&p.uid===user.uid)?'My':'User';
+        try{ if(p.uid&&p.uid!==user.uid){ var n=$('chatName'); if(n) who=n.textContent||who; } }catch(e){}
+        var t=''; try{ if(p.atMs) t=new Date(p.atMs).toLocaleString(); }catch(e){}
+        return '<button type="button" class="ms-pin-row" data-pin-id="'+String(p.id).replace(/"/g,'&quot;')+'"><div class="ms-pin-row-main"><div class="ms-pin-row-name">'+esc(who)+'</div><div class="ms-pin-row-text">'+esc(p.preview||'Message')+'</div>'+(t?'<div class="ms-pin-row-time">'+esc(t)+'</div>':'')+'</div></button>';
+      }).join('');
+      Array.prototype.forEach.call(body.querySelectorAll('[data-pin-id]'), function(btn){
+        btn.onclick=function(){ var id=btn.getAttribute('data-pin-id'); msPinCloseList(false); msPinScrollTo(id); };
+      });
+    }
+    var el=$('msPinList'); if(el){ el.classList.add('open'); el.setAttribute('aria-hidden','false'); }
+    if(!pinState.listNav){ pinState.listNav=true; try{ history.pushState({page:'pinlist',chat:currentChat},'',(location.hash||'#chat')+'/pins'); }catch(e){} }
+  }
+  function msPinOpenUnpinSelect(){
+    var mine=(pinState.list||[]).filter(function(p){ return user&&p.by===user.uid; });
+    if(!mine.length){ if(typeof toast==='function') toast('No pins of yours to unpin'); return; }
+    pinState.selected={};
+    var body=$('msPinUnpinBody'), go=$('msPinUnpinGo');
+    if(go){ go.disabled=true; go.textContent='Unpin Selected'; }
+    if(body){
+      body.innerHTML=mine.map(function(p){
+        return '<button type="button" class="ms-pin-row" data-unpin-id="'+String(p.id).replace(/"/g,'&quot;')+'"><span class="ms-pin-check" aria-hidden="true"></span><div class="ms-pin-row-main"><div class="ms-pin-row-text">'+esc(p.preview||'Message')+'</div></div></button>';
+      }).join('');
+      Array.prototype.forEach.call(body.querySelectorAll('[data-unpin-id]'), function(btn){
+        btn.onclick=function(){
+          var id=btn.getAttribute('data-unpin-id');
+          if(pinState.selected[id]){ delete pinState.selected[id]; btn.classList.remove('selected'); }
+          else { pinState.selected[id]=true; btn.classList.add('selected'); }
+          var n=Object.keys(pinState.selected).length;
+          if(go){ go.disabled=n<1; go.textContent=n?('Unpin Selected ('+n+')'):'Unpin Selected'; }
+        };
+      });
+    }
+    var el=$('msPinUnpin'); if(el){ el.classList.add('open'); el.setAttribute('aria-hidden','false'); }
+    if(!pinState.unpinNav){ pinState.unpinNav=true; try{ history.pushState({page:'pinunpin',chat:currentChat},'',(location.hash||'#chat')+'/unpin'); }catch(e){} }
+  }
+  function msPinShowCtx(anchorEl){
+    var list=pinState.list||[];
+    var mine=list.filter(function(p){ return user&&p.by===user.uid; });
+    if(!mine.length) return;
+    var ctx=$('msPinCtx'); if(!ctx) return;
+    var rect=(anchorEl||$('msPinBar')).getBoundingClientRect();
+    ctx.classList.add('open'); ctx.setAttribute('aria-hidden','false');
+    ctx.style.top=(rect.bottom+6)+'px';
+    ctx.style.left=Math.min(window.innerWidth-160, Math.max(8, rect.right-150))+'px';
+    if(!pinState.ctxNav){ pinState.ctxNav=true; try{ history.pushState({page:'pinctx',chat:currentChat},'',(location.hash||'#chat')+'/pinctx'); }catch(e){} }
+  }
+  function wirePin(){
+    var bar=$('msPinBar');
+    if(bar && !bar._pinWired){
+      bar._pinWired=true;
+      var holdTimer=null, moved=false, sx=0, sy=0;
+      bar.addEventListener('click', function(){
+        if(moved) return;
+        var n=(pinState.list||[]).length;
+        if(n===1) msPinScrollTo(pinState.list[0].id);
+        else if(n>1) msPinOpenList();
+      });
+      bar.addEventListener('touchstart', function(e){
+        if(!e.touches||!e.touches[0]) return;
+        moved=false; sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+        clearTimeout(holdTimer);
+        holdTimer=setTimeout(function(){ if(moved) return; try{ if(navigator.vibrate) navigator.vibrate(10);}catch(err){} msPinShowCtx(bar); }, 1000);
+      }, {passive:true});
+      bar.addEventListener('touchmove', function(e){
+        if(!e.touches||!e.touches[0]) return;
+        if(Math.abs(e.touches[0].clientX-sx)>12||Math.abs(e.touches[0].clientY-sy)>12){ moved=true; clearTimeout(holdTimer); }
+      }, {passive:true});
+      bar.addEventListener('touchend', function(){ clearTimeout(holdTimer); }, {passive:true});
+      bar.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    }
+    var listBd=$('msPinList');
+    if(listBd && !listBd._pinWired){ listBd._pinWired=true; listBd.addEventListener('click', function(e){ if(e.target===listBd) msPinCloseList(false); }); }
+    var unpinBd=$('msPinUnpin');
+    if(unpinBd && !unpinBd._pinWired){ unpinBd._pinWired=true; unpinBd.addEventListener('click', function(e){ if(e.target===unpinBd) msPinCloseUnpin(false); }); }
+    var cancel=$('msPinUnpinCancel');
+    if(cancel && !cancel._pinWired){ cancel._pinWired=true; cancel.onclick=function(){ msPinCloseUnpin(false); }; }
+    var go=$('msPinUnpinGo');
+    if(go && !go._pinWired){
+      go._pinWired=true;
+      go.onclick=async function(){
+        var ids=Object.keys(pinState.selected); if(!ids.length) return;
+        go.disabled=true;
+        try{ await msUnpinMessages(ids); msPinCloseUnpin(false); }
+        catch(e){ if(typeof toast==='function') toast((e&&e.message)||'Unpin failed'); }
+        finally{ go.disabled=false; }
+      };
+    }
+    var ctxUnpin=$('msPinCtxUnpin');
+    if(ctxUnpin && !ctxUnpin._pinWired){
+      ctxUnpin._pinWired=true;
+      ctxUnpin.onclick=async function(){
+        msPinCloseCtx();
+        var list=pinState.list||[];
+        var mine=list.filter(function(p){ return user&&p.by===user.uid; });
+        if(mine.length===1){ try{ await msUnpinMessages([mine[0].id]); }catch(e){ toast((e&&e.message)||'Unpin failed'); } }
+        else if(mine.length>1) msPinOpenUnpinSelect();
+      };
+    }
+    document.addEventListener('click', function(e){
+      var ctx=$('msPinCtx');
+      if(ctx && ctx.classList.contains('open') && !e.target.closest('#msPinCtx, #msPinBar')) msPinCloseCtx();
+    }, true);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wirePin);
+  else wirePin();
+  setTimeout(wirePin, 0); setTimeout(wirePin, 400);
+  setTimeout(function(){ if(currentChat) msPinListen(currentChat); }, 600);
+  window.addEventListener('popstate', function(){
+    if($('msPinUnpin')&&$('msPinUnpin').classList.contains('open')){ msPinCloseUnpin(true); return; }
+    if($('msPinList')&&$('msPinList').classList.contains('open')){ msPinCloseList(true); return; }
+    if($('msPinCtx')&&$('msPinCtx').classList.contains('open')){ msPinCloseCtx(); return; }
+  }, true);
+})();
+
 /* ═══ Export Chat ═══ */
 (function(){
   var exportNavPushed = false;
@@ -6585,7 +6891,7 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 
   function msExportSenderLabel(m){
     if(!m || !user) return 'User';
-    if(m.uid === user.uid) return 'আমি';
+    if(m.uid === user.uid) return 'My';
     return exportState.otherName || m.senderName || 'User';
   }
 
@@ -6594,7 +6900,7 @@ window.msWatchPeerBlock = msWatchPeerBlock;
     var pending = [];
     uids.forEach(function(uid){
       if(!uid) return;
-      if(user && uid === user.uid){ map[uid] = 'আমি'; return; }
+      if(user && uid === user.uid){ map[uid] = 'My'; return; }
       try{
         if(typeof usersCache !== 'undefined' && usersCache && usersCache.has(uid)){
           var u = usersCache.get(uid) || {};
@@ -6625,7 +6931,7 @@ window.msWatchPeerBlock = msWatchPeerBlock;
     Object.keys(reactions).forEach(function(emoji){
       var arr = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
       arr.forEach(function(uid){
-        var nm = (nameMap && nameMap[uid]) || (uid === (user && user.uid) ? 'আমি' : (exportState.otherName || 'User'));
+        var nm = (nameMap && nameMap[uid]) || (uid === (user && user.uid) ? 'My' : (exportState.otherName || 'User'));
         lines.push(nm + ' reacted ' + emoji);
       });
     });
@@ -6664,7 +6970,7 @@ window.msWatchPeerBlock = msWatchPeerBlock;
     lines.push('---');
     lines.push('');
     lines.push('Conversation With: ' + otherName);
-    lines.push('Participants: আমি, ' + otherName);
+    lines.push('Participants: My, ' + otherName);
     lines.push('Export Date: ' + exportDate);
     lines.push('Total Messages: ' + messages.length);
     lines.push('');
@@ -8433,6 +8739,26 @@ window.msWatchPeerBlock = msWatchPeerBlock;
   </div>
 </div>
 
+
+<div id="msPinList" class="ms-pin-backdrop" aria-hidden="true">
+  <div class="ms-pin-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="ms-pin-sheet-head"><h3>Pinned Messages</h3><span id="msPinListCount">0</span></div>
+    <div class="ms-pin-sheet-body" id="msPinListBody"></div>
+  </div>
+</div>
+<div id="msPinUnpin" class="ms-pin-backdrop" aria-hidden="true">
+  <div class="ms-pin-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="ms-pin-sheet-head"><h3>Unpin Messages</h3><span id="msPinUnpinHint">Select your pins</span></div>
+    <div class="ms-pin-sheet-body" id="msPinUnpinBody"></div>
+    <div class="ms-pin-sheet-foot">
+      <button type="button" class="ms-pin-cancel" id="msPinUnpinCancel">Cancel</button>
+      <button type="button" class="ms-pin-go" id="msPinUnpinGo" disabled>Unpin Selected</button>
+    </div>
+  </div>
+</div>
+<div id="msPinCtx" class="ms-pin-ctx" role="menu" aria-hidden="true">
+  <button type="button" id="msPinCtxUnpin"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>Unpin</button>
+</div>
 <div id="msChatOptSheet" class="ms-opt-backdrop" aria-hidden="true">
   <div class="ms-opt-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="ms-opt-handle" aria-hidden="true"></div>
