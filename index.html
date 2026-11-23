@@ -1302,6 +1302,43 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
       </span>
       <span class="chevron">›</span>
     </button>
+    <button type="button" class="ms-priv-card" id="msChatPrivacyBtn">
+      <span class="ms-priv-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/></svg></span>
+      <span class="ms-priv-copy">
+        <strong>Chat privacy</strong>
+        <small>Control who can send messages to you.</small>
+      </span>
+      <span class="chevron">›</span>
+    </button>
+
+  </div>
+</div>
+
+<div id="msChatPrivPage" class="ms-priv-page" aria-hidden="true">
+  <header class="ms-priv-top">
+    <button type="button" class="ms-priv-back" id="msChatPrivBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.51191C14.7001 4.19745 15.1736 4.16101 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
+    <div class="ms-priv-title">Chat privacy</div>
+    <span class="ms-priv-spacer"></span>
+  </header>
+  <div class="ms-priv-body">
+    <div class="ms-priv-info">
+      <h3>Who can message you</h3>
+      <p>Make sure who can message you.</p>
+      <p style="color:var(--accent);font-weight:700;">Note: This is very important for your security.</p>
+    </div>
+    <div class="ms-priv-sec-label">Who can message you?</div>
+    <button type="button" class="ms-priv-opt selected" data-chat-perm="everyone" id="msChatPermEveryone">
+      <span class="ms-priv-radio" aria-hidden="true"></span>
+      <span class="ms-priv-opt-copy"><strong>Everyone</strong><small>Anyone can send you messages.</small></span>
+    </button>
+    <button type="button" class="ms-priv-opt" data-chat-perm="friends" id="msChatPermFriends">
+      <span class="ms-priv-radio" aria-hidden="true"></span>
+      <span class="ms-priv-opt-copy"><strong>Friend</strong><small>Only people who follow you and whom you follow back can message you.</small></span>
+    </button>
+    <button type="button" class="ms-priv-opt" data-chat-perm="no_one" id="msChatPermNoOne">
+      <span class="ms-priv-radio" aria-hidden="true"></span>
+      <span class="ms-priv-opt-copy"><strong>No one</strong><small>Nobody can send you new messages.</small></span>
+    </button>
   </div>
 </div>
 <div id="msStarMsgPage" class="ms-priv-page" aria-hidden="true">
@@ -5279,7 +5316,11 @@ window.addEventListener('popstate', function(e){
     try{ msCloseStoryViewer(true); }catch(err){}
     return;
   }
-    if(document.getElementById('msStarMsgPage') && document.getElementById('msStarMsgPage').classList.contains('open')){
+    if(document.getElementById('msChatPrivPage') && document.getElementById('msChatPrivPage').classList.contains('open')){
+    try{ msClosePrivacyPages(true); }catch(err){}
+    return;
+  }
+  if(document.getElementById('msStarMsgPage') && document.getElementById('msStarMsgPage').classList.contains('open')){
     try{ msClosePrivacyPages(true); }catch(err){}
     return;
   }
@@ -6680,6 +6721,180 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 
 
 
+
+
+/* ═══ Chat Privacy · who can message you ═══ */
+(function(){
+  var FIELD = 'chatMessagePermission';
+  var chatNav = false;
+  var cache = {};
+  function $(id){ return document.getElementById(id); }
+  function migrateOld(v, legacy){
+    if(v) return v;
+    legacy = String(legacy || '').toLowerCase();
+    if(legacy === 'public' || legacy === 'everyone') return 'everyone';
+    if(legacy === 'following' || legacy === 'friends' || legacy === 'friend') return 'friends';
+    if(legacy === 'no_one' || legacy === 'none' || legacy === 'nobody') return 'no_one';
+    return 'everyone';
+  }
+  function normalize(v){
+    v = String(v || '').toLowerCase();
+    if(v === 'friends' || v === 'friend' || v === 'mutual' || v === 'following') return 'friends';
+    if(v === 'no_one' || v === 'noone' || v === 'none') return 'no_one';
+    return 'everyone';
+  }
+  async function fetchChatPerm(uid){
+    if(!uid) return 'everyone';
+    var hit = cache[uid];
+    if(hit && Date.now() - hit.at < 12000) return hit.v;
+    try{
+      var snap = await db.collection('users').doc(uid).get();
+      var v = 'everyone';
+      if(snap.exists){
+        var d = snap.data() || {};
+        v = normalize(migrateOld(d[FIELD], d.chatPrivacy));
+      }
+      cache[uid] = { v: v, at: Date.now() };
+      return v;
+    }catch(e){ return 'everyone'; }
+  }
+  async function isMutual(a, b){
+    if(!a || !b) return false;
+    try{
+      if(user && a === user.uid && userData){
+        var fol = userData.following || [];
+        var fr = userData.followers || [];
+        if(Array.isArray(fol) && Array.isArray(fr) && fol.indexOf(b) !== -1 && fr.indexOf(b) !== -1) return true;
+      }
+      var snap = await db.collection('users').doc(a).get();
+      if(!snap.exists) return false;
+      var d = snap.data() || {};
+      var following = d.following || [], followers = d.followers || [];
+      return Array.isArray(following) && Array.isArray(followers) && following.indexOf(b) !== -1 && followers.indexOf(b) !== -1;
+    }catch(e){ return false; }
+  }
+  function chatErr(perm){
+    if(perm === 'no_one') return "This user isn't accepting messages.";
+    if(perm === 'friends') return "Only mutual followers can message this user.";
+    return "You can't message this user due to their privacy settings.";
+  }
+  async function assertCanChat(recipientUid){
+    if(!user || !recipientUid || recipientUid === 'group') return true;
+    if(recipientUid === user.uid) return true;
+    try{
+      if(typeof msIsBlockedByMe === 'function' && msIsBlockedByMe(recipientUid)){
+        var mb = 'Messaging is blocked';
+        if(typeof toast === 'function') toast(mb);
+        throw new Error(mb);
+      }
+      if(typeof msDidBlockMe === 'function' && msDidBlockMe(recipientUid)){
+        var mb2 = 'Messaging is blocked';
+        if(typeof toast === 'function') toast(mb2);
+        throw new Error(mb2);
+      }
+    }catch(e){ if(e && e.message === 'Messaging is blocked') throw e; }
+    var perm = await fetchChatPerm(recipientUid);
+    if(perm === 'everyone') return true;
+    if(perm === 'no_one'){
+      var m = chatErr(perm);
+      if(typeof toast === 'function') toast(m);
+      throw new Error(m);
+    }
+    if(perm === 'friends'){
+      var ok = await isMutual(recipientUid, user.uid);
+      if(!ok){
+        var m2 = chatErr(perm);
+        if(typeof toast === 'function') toast(m2);
+        throw new Error(m2);
+      }
+    }
+    return true;
+  }
+  window.msAssertCanChat = assertCanChat;
+  window.msFetchChatPerm = fetchChatPerm;
+
+  if(typeof window.sendPayload === 'function' && !window.__msChatPrivHooked){
+    window.__msChatPrivHooked = true;
+    var _sp = window.sendPayload;
+    window.sendPayload = async function(payload){
+      if(currentOther && currentOther !== 'group'){
+        await assertCanChat(currentOther);
+      }
+      return _sp.apply(this, arguments);
+    };
+  }
+  if(typeof window.gcSubmitComposer === 'function' && !window.__msChatPrivComposerHooked){
+    window.__msChatPrivComposerHooked = true;
+    var _gc = window.gcSubmitComposer;
+    window.gcSubmitComposer = async function(){
+      try{
+        if(currentOther && currentOther !== 'group') await assertCanChat(currentOther);
+      }catch(e){ return false; }
+      return _gc.apply(this, arguments);
+    };
+  }
+
+  function openPage(id){ var el=$(id); if(el){ el.classList.add('open'); el.setAttribute('aria-hidden','false'); } }
+  function closePage(id){ var el=$(id); if(el){ el.classList.remove('open'); el.setAttribute('aria-hidden','true'); } }
+  function openChatPriv(){
+    openPage('msChatPrivPage'); paint();
+    if(!chatNav){ chatNav = true; try{ history.pushState({ page:'chatprivacy' }, '', '#privacy/chat'); }catch(e){} }
+  }
+  function closeChatPriv(fromPop){
+    closePage('msChatPrivPage');
+    if(!fromPop && chatNav){ chatNav = false; try{ history.replaceState({ page:'privacy' }, '', '#privacy'); }catch(e){} }
+    else if(fromPop) chatNav = false;
+  }
+  function paint(){
+    var cur = normalize(migrateOld(userData && userData[FIELD], userData && userData.chatPrivacy));
+    document.querySelectorAll('[data-chat-perm]').forEach(function(btn){
+      btn.classList.toggle('selected', btn.getAttribute('data-chat-perm') === cur);
+    });
+  }
+  async function setChatPerm(v){
+    v = normalize(v);
+    if(!user){ toast('Not signed in'); return; }
+    var prev = normalize(migrateOld(userData && userData[FIELD], userData && userData.chatPrivacy));
+    userData = userData || {};
+    userData[FIELD] = v;
+    cache[user.uid] = { v: v, at: Date.now() };
+    paint();
+    try{
+      await db.collection('users').doc(user.uid).set({ chatMessagePermission: v }, { merge: true });
+      if(typeof toast === 'function') toast('Chat privacy updated');
+    }catch(e){
+      console.error(e);
+      userData[FIELD] = prev;
+      cache[user.uid] = { v: prev, at: Date.now() };
+      paint();
+      var code = (e && e.code) ? String(e.code) : '';
+      if(typeof toast === 'function') toast(code.indexOf('permission')!==-1 ? 'Permission denied. Deploy updated Firestore rules.' : 'Could not save setting');
+    }
+  }
+  function wire(){
+    var btn = $('msChatPrivacyBtn');
+    if(btn && !btn._cpWired){ btn._cpWired = true; btn.addEventListener('click', function(){ openChatPriv(); }); }
+    var back = $('msChatPrivBack');
+    if(back && !back._cpWired){ back._cpWired = true; back.addEventListener('click', function(){ closeChatPriv(false); }); }
+    document.querySelectorAll('[data-chat-perm]').forEach(function(el){
+      if(el._cpWired) return;
+      el._cpWired = true;
+      el.addEventListener('click', function(){ setChatPerm(el.getAttribute('data-chat-perm')); });
+    });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+  setTimeout(wire, 0); setTimeout(wire, 400);
+
+  var _closeAll = window.msClosePrivacyPages;
+  window.msClosePrivacyPages = function(fromPop){
+    if($('msChatPrivPage') && $('msChatPrivPage').classList.contains('open')) closeChatPriv(fromPop);
+    if(typeof _closeAll === 'function') _closeAll(fromPop);
+  };
+  window.addEventListener('popstate', function(){
+    if($('msChatPrivPage') && $('msChatPrivPage').classList.contains('open')){ closeChatPriv(true); }
+  }, true);
+})();
 
 /* ═══ Star Message · media privacy permission ═══ */
 (function(){
