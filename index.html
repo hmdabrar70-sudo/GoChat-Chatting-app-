@@ -1288,15 +1288,14 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 @keyframes msDurUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .ms-sp-dur-pop-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
 .ms-sp-dur-pop-head span{font-size:13px;font-weight:750;color:rgba(255,255,255,.9)}
-.ms-sp-dur-done{border:0;background:transparent;color:#a78bfa;font-weight:800;font-size:13px;cursor:pointer;padding:4px 6px}
+.ms-sp-dur-done{border:0;background:transparent;color:var(--accent);font-weight:800;font-size:13px;cursor:pointer;padding:4px 6px}
 .ms-sp-dur-opt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;cursor:pointer;text-align:left;padding:12px 14px;margin:0 0 8px;border-radius:14px;background:rgba(255,255,255,.06);color:#fff;font-weight:700;font-size:14px}
 .ms-sp-dur-opt:last-child{margin-bottom:0}
-.ms-sp-dur-opt.selected{background:linear-gradient(135deg,#7c3aed,#a78bfa);box-shadow:0 6px 16px rgba(124,58,237,.35)}
+.ms-sp-dur-opt.selected{background:var(--accent);box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 35%,transparent)}
 .ms-sp-dur-opt .ms-sp-dur-check{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:grid;place-items:center;flex:none}
 .ms-sp-dur-opt.selected .ms-sp-dur-check{border-color:#fff;background:#fff}
 .ms-sp-dur-opt .ms-sp-dur-check::after{content:"";width:8px;height:5px;border-left:2px solid transparent;border-bottom:2px solid transparent;transform:rotate(-45deg);margin-top:-2px}
-.ms-sp-dur-opt.selected .ms-sp-dur-check::after{border-left-color:#7c3aed;border-bottom-color:#7c3aed}
-
+.ms-sp-dur-opt.selected .ms-sp-dur-check::after{border-left-color:var(--accent);border-bottom-color:var(--accent)}
 </style>
 </head>
 <body>
