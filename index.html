@@ -1278,6 +1278,25 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
   .ms-reg-inner{padding:28px 18px 0}
   .ms-reg-foot{padding-left:18px;padding-right:18px}
 }
+
+/* Story duration selector */
+.ms-sp-dur-wrap{position:absolute;left:14px;bottom:max(18px,env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.ms-sp-dur-btn{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;padding:10px 14px;border-radius:99px;background:rgba(28,28,36,.72);color:#fff;font-weight:750;font-size:13px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 6px 20px rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12)}
+.ms-sp-dur-btn .ms-sp-dur-chev{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid rgba(255,255,255,.85);margin-left:2px}
+.ms-sp-dur-pop{display:none;min-width:200px;padding:12px;border-radius:18px;background:rgba(32,32,42,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 36px rgba(0,0,0,.4);animation:msDurUp .22s ease}
+.ms-sp-dur-pop.open{display:block}
+@keyframes msDurUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ms-sp-dur-pop-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.ms-sp-dur-pop-head span{font-size:13px;font-weight:750;color:rgba(255,255,255,.9)}
+.ms-sp-dur-done{border:0;background:transparent;color:#a78bfa;font-weight:800;font-size:13px;cursor:pointer;padding:4px 6px}
+.ms-sp-dur-opt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;cursor:pointer;text-align:left;padding:12px 14px;margin:0 0 8px;border-radius:14px;background:rgba(255,255,255,.06);color:#fff;font-weight:700;font-size:14px}
+.ms-sp-dur-opt:last-child{margin-bottom:0}
+.ms-sp-dur-opt.selected{background:linear-gradient(135deg,#7c3aed,#a78bfa);box-shadow:0 6px 16px rgba(124,58,237,.35)}
+.ms-sp-dur-opt .ms-sp-dur-check{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:grid;place-items:center;flex:none}
+.ms-sp-dur-opt.selected .ms-sp-dur-check{border-color:#fff;background:#fff}
+.ms-sp-dur-opt .ms-sp-dur-check::after{content:"";width:8px;height:5px;border-left:2px solid transparent;border-bottom:2px solid transparent;transform:rotate(-45deg);margin-top:-2px}
+.ms-sp-dur-opt.selected .ms-sp-dur-check::after{border-left-color:#7c3aed;border-bottom-color:#7c3aed}
+
 </style>
 </head>
 <body>
@@ -1591,6 +1610,15 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
 </svg></button><span>New story</span><button type="button" id="msSpPost" class="ms-sp-post">Share</button></div>
   <div class="ms-sp-media" id="msSpMedia"></div>
+  <div class="ms-sp-dur-wrap" id="msSpDurWrap">
+    <div class="ms-sp-dur-pop" id="msSpDurPop" aria-hidden="true">
+      <div class="ms-sp-dur-pop-head"><span>Story Duration</span><button type="button" class="ms-sp-dur-done" id="msSpDurDone">Done</button></div>
+      <button type="button" class="ms-sp-dur-opt" data-hours="12"><span>12 Hours</span><span class="ms-sp-dur-check" aria-hidden="true"></span></button>
+      <button type="button" class="ms-sp-dur-opt selected" data-hours="24"><span>24 Hours</span><span class="ms-sp-dur-check" aria-hidden="true"></span></button>
+      <button type="button" class="ms-sp-dur-opt" data-hours="48"><span>48 Hours</span><span class="ms-sp-dur-check" aria-hidden="true"></span></button>
+    </div>
+    <button type="button" class="ms-sp-dur-btn" id="msSpDurBtn"><span id="msSpDurLabel">24 Hours</span><span class="ms-sp-dur-chev" aria-hidden="true"></span></button>
+  </div>
 </div>
 <section id="settingsPage" class="main-page"><div class="profile-head"><img id="settingsAvatar" class="avatar large" alt=""><div class="profile-name" id="settingsName">Your account</div><div class="profile-username" id="settingsUsername" hidden></div><div class="about" id="settingsEmail"></div></div></section>
 <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
@@ -4155,6 +4183,8 @@ function renderActiveList(){
 /* ═══ Messenger Stories · same Firestore `stories` as main GoChat ═══ */
 (function(){
   var STORY_MS = 24 * 60 * 60 * 1000;
+  var storyDurationHours = 24; // confirmed selection for next upload
+  var storyDurationDraft = 24;
   var storyUnsub = null;
   var storyGroups = []; // [{uid, name, avatar, items:[]}]
   var activeGroup = null;
@@ -4284,12 +4314,37 @@ function msStoryIsSeen(s, localSeen){
       return Math.floor(s/86400)+'d';
     }catch(e){ return ''; }
   }
+  function storyExpiryMs(s){
+    try{
+      if(!s) return 0;
+      var ex = s.expiresAt;
+      if(ex){
+        if(typeof ex.toDate === 'function') return ex.toDate().getTime();
+        if(typeof ex.toMillis === 'function') return ex.toMillis();
+        if(typeof ex.seconds === 'number') return ex.seconds * 1000;
+        if(typeof ex === 'number') return ex;
+        if(ex instanceof Date) return ex.getTime();
+      }
+      var created = 0;
+      var c = s.createdAt;
+      if(c){
+        if(typeof c.toDate === 'function') created = c.toDate().getTime();
+        else if(typeof c.toMillis === 'function') created = c.toMillis();
+        else if(typeof c.seconds === 'number') created = c.seconds * 1000;
+        else if(typeof c === 'number') created = c;
+        else if(c instanceof Date) created = c.getTime();
+      }
+      if(!created) return 0;
+      var hours = (typeof s.durationHours === 'number' && s.durationHours > 0) ? s.durationHours : 24;
+      return created + hours * 3600000;
+    }catch(e){ return 0; }
+  }
   function isExpired(s){
     try{
-      if(s.expiresAt && s.expiresAt.toDate) return s.expiresAt.toDate().getTime() < Date.now();
-      if(s.createdAt && s.createdAt.toDate) return (s.createdAt.toDate().getTime() + STORY_MS) < Date.now();
-    }catch(e){}
-    return false;
+      var exp = storyExpiryMs(s);
+      if(!exp) return false;
+      return exp < Date.now();
+    }catch(e){ return false; }
   }
   function followingSet(){
     var f = (userData && Array.isArray(userData.following)) ? userData.following : [];
@@ -4936,8 +4991,10 @@ function prevSegment(){
     }
     var prev = $('msStoryPreview');
     if(prev){ prev.classList.add('open'); prev.setAttribute('aria-hidden','false'); }
+    try{ msCloseDurPop(false); msSyncDurUI(); }catch(e){}
   }
   function closePreview(){
+    try{ msCloseDurPop(false); }catch(e){}
     var prev = $('msStoryPreview');
     if(prev){ prev.classList.remove('open'); prev.setAttribute('aria-hidden','true'); }
     var media = $('msSpMedia');
@@ -4951,6 +5008,8 @@ function prevSegment(){
     if(btn){ btn.disabled=true; btn.textContent='Sharing…'; }
     try{
       var url = await uploadBlobToCloudinary(pendingFile, pendingFile.name|| (pendingIsVideo?'story.mp4':'story.jpg'), pendingIsVideo?'video':'image');
+      var _durH = (typeof storyDurationHours === 'number' && [12,24,48].indexOf(storyDurationHours) >= 0) ? storyDurationHours : 24;
+      var _expMs = Date.now() + (_durH * 3600000);
       await db.collection('stories').add({
         uid: user.uid,
         name: (userData && userData.name) || 'User',
@@ -4961,8 +5020,9 @@ function prevSegment(){
         isVideo: !!pendingIsVideo,
         views: [],
         reacts: [],
+        durationHours: _durH,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        expiresAt: new Date(Date.now() + STORY_MS)
+        expiresAt: firebase.firestore.Timestamp.fromMillis(_expMs)
       });
       toast('Story added!');
       closePreview();
@@ -4972,6 +5032,71 @@ function prevSegment(){
     }finally{
       if(btn){ btn.disabled=false; btn.textContent='Share'; }
     }
+  }
+
+  
+  function msDurLabel(h){ return (h === 12 || h === 24 || h === 48) ? (h + ' Hours') : '24 Hours'; }
+  function msSyncDurUI(){
+    var lab = $('msSpDurLabel');
+    if(lab) lab.textContent = msDurLabel(storyDurationHours);
+    var pop = $('msSpDurPop');
+    if(pop){
+      pop.querySelectorAll('.ms-sp-dur-opt').forEach(function(btn){
+        var h = parseInt(btn.getAttribute('data-hours'), 10);
+        btn.classList.toggle('selected', h === storyDurationDraft);
+      });
+    }
+  }
+  function msOpenDurPop(){
+    storyDurationDraft = storyDurationHours;
+    msSyncDurUI();
+    var pop = $('msSpDurPop');
+    if(pop){ pop.classList.add('open'); pop.setAttribute('aria-hidden','false'); }
+  }
+  function msCloseDurPop(save){
+    if(save){
+      if([12,24,48].indexOf(storyDurationDraft) >= 0) storyDurationHours = storyDurationDraft;
+    } else {
+      storyDurationDraft = storyDurationHours;
+    }
+    msSyncDurUI();
+    var pop = $('msSpDurPop');
+    if(pop){ pop.classList.remove('open'); pop.setAttribute('aria-hidden','true'); }
+  }
+  function msWireDuration(){
+    var btn = $('msSpDurBtn');
+    if(btn && !btn._durWired){
+      btn._durWired = true;
+      btn.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        var pop = $('msSpDurPop');
+        if(pop && pop.classList.contains('open')) msCloseDurPop(false);
+        else msOpenDurPop();
+      });
+    }
+    var done = $('msSpDurDone');
+    if(done && !done._durWired){
+      done._durWired = true;
+      done.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        msCloseDurPop(true);
+      });
+    }
+    var pop = $('msSpDurPop');
+    if(pop && !pop._durWired){
+      pop._durWired = true;
+      pop.addEventListener('click', function(e){
+        var opt = e.target.closest('.ms-sp-dur-opt');
+        if(!opt) return;
+        e.preventDefault(); e.stopPropagation();
+        var h = parseInt(opt.getAttribute('data-hours'), 10);
+        if([12,24,48].indexOf(h) >= 0){
+          storyDurationDraft = h;
+          msSyncDurUI();
+        }
+      });
+    }
+    msSyncDurUI();
   }
 
   function bind(){
@@ -4989,6 +5114,7 @@ function prevSegment(){
 }
     });
     if($('msStoryFileInput')) $('msStoryFileInput').onchange = onFilePicked;
+    try{ msWireDuration(); }catch(e){}
 
     if($('msSvSoundToggle')) $('msSvSoundToggle').onclick = function(e){
       if(e){
