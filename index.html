@@ -1213,10 +1213,155 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 .ms-priv-opt .ms-priv-opt-copy small{display:block;margin-top:4px;font-size:12px;color:var(--muted);font-weight:600;line-height:1.4}
 .ms-priv-sec-label{font-size:13px;font-weight:800;color:var(--text);margin:6px 0 10px}
 
+
+/* ═══ Create Account (3-step) — mockup-aligned ═══ */
+#msRegScreen{display:none;position:fixed;inset:0;z-index:50;background:var(--bg);overflow:hidden}
+#msRegScreen.open{display:flex;align-items:stretch;justify-content:center}
+.ms-reg-shell{position:relative;width:100%;max-width:420px;height:100%;min-height:100dvh;margin:0 auto;display:flex;flex-direction:column;overflow:hidden;background:var(--surface)}
+.ms-reg-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.ms-reg-bg-top{position:absolute;top:-120px;right:-80px;width:280px;height:280px;border-radius:50%;background:var(--accent-soft);opacity:.9}
+.ms-reg-bg-top2{position:absolute;top:-40px;right:40px;width:160px;height:160px;border-radius:50%;background:var(--accent-soft);opacity:.55}
+.ms-reg-bg-bottom{position:absolute;bottom:-40px;left:-60px;right:-20px;height:140px;border-radius:50% 50% 0 0 / 100% 100% 0 0;background:var(--accent-soft);opacity:.7}
+.ms-reg-bg-bottom2{position:absolute;bottom:20px;left:10%;right:20%;height:80px;border-radius:50%;background:var(--accent-soft);opacity:.4}
+.ms-reg-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;padding:36px 24px 0;box-sizing:border-box;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.ms-reg-head{margin:8px 0 28px;text-align:center}
+.ms-reg-title{margin:0 0 10px;font-size:26px;font-weight:850;letter-spacing:-.5px;color:var(--text)}
+.ms-reg-desc{margin:0 auto;font-size:14px;line-height:1.45;color:var(--muted);font-weight:600;max-width:280px}
+.ms-reg-body{flex:1;display:flex;flex-direction:column;min-height:0}
+.ms-reg-step{display:none;flex:1;flex-direction:column;min-height:0}
+.ms-reg-step.active{display:flex}
+.ms-reg-fields{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px;margin:0 auto}
+.ms-reg-fields .field{margin:0;height:52px;border-radius:16px;background:var(--bg);border:1.5px solid var(--line);display:flex;align-items:center;padding:0 16px;box-shadow:none}
+.ms-reg-fields .field input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px;font-weight:600}
+.ms-reg-fields .field input::placeholder{color:var(--muted);font-weight:560}
+.ms-reg-fields .field.input-error{border-color:#e11d48}
+.ms-reg-hint{min-height:18px;font-size:12px;font-weight:650;padding:2px 4px 0;color:var(--muted)}
+.ms-reg-hint.ok{color:var(--accent)}
+.ms-reg-hint.bad{color:#e11d48}
+.ms-reg-error{min-height:18px;font-size:13px;font-weight:650;color:#e11d48;text-align:center;margin:10px 8px 0}
+.ms-reg-foot{display:flex;gap:12px;padding:16px 24px calc(18px + env(safe-area-inset-bottom,0px));margin-top:auto;background:transparent;position:relative;z-index:2}
+.ms-reg-foot button{flex:1;height:52px;border:0;border-radius:16px;font-weight:800;font-size:15px;cursor:pointer}
+.ms-reg-btn-back{background:var(--surface2);color:var(--text)}
+.ms-reg-btn-next{background:var(--accent);color:#fff}
+.ms-reg-btn-next:disabled,.ms-reg-btn-next.is-disabled{background:var(--surface2);color:var(--muted);cursor:not-allowed;opacity:1}
+.ms-reg-btn-next.is-loading{opacity:.75}
+/* Step 3 review — avatar left, info right */
+.ms-reg-review{display:flex;align-items:center;gap:20px;width:100%;max-width:340px;margin:12px auto 0;padding:8px 0}
+.ms-reg-av-col{display:flex;flex-direction:column;align-items:center;gap:12px;flex:none}
+.ms-reg-av{width:108px;height:108px;border-radius:50%;object-fit:cover;background:var(--accent-soft);border:3px solid var(--line);display:block}
+.ms-reg-change{border:0;background:var(--surface2);color:var(--text);font-weight:750;font-size:13px;padding:10px 16px;border-radius:99px;cursor:pointer}
+.ms-reg-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;border-left:1px solid var(--line);padding-left:18px}
+.ms-reg-info-row{display:flex;flex-direction:column;gap:2px}
+.ms-reg-info-row span{font-size:11px;font-weight:700;color:var(--muted)}
+.ms-reg-info-row strong{font-size:15px;font-weight:750;color:var(--text);word-break:break-word}
+.ms-reg-login-link{display:block;text-align:center;margin-top:14px;background:none;border:0;color:var(--accent);font-weight:750;font-size:14px;cursor:pointer;padding:8px}
+/* Crop overlay */
+#msRegCrop{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);align-items:center;justify-content:center}
+#msRegCrop.open{display:flex}
+.ms-crop-card{width:min(420px,100%);height:100%;max-height:100dvh;background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.ms-crop-head{height:56px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid var(--line);flex:none}
+.ms-crop-head h2{margin:0;font-size:17px;font-weight:800;color:var(--text)}
+.ms-crop-x{position:absolute;left:12px;top:50%;transform:translateY(-50%);border:0;background:var(--surface2);color:var(--text);width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:700;cursor:pointer;line-height:1}
+.ms-crop-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg);position:relative;overflow:hidden;touch-action:none}
+.ms-crop-stage canvas{max-width:100%;max-height:100%;border-radius:12px;background:#111}
+.ms-crop-foot{padding:14px 18px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);flex:none;background:var(--surface)}
+.ms-crop-ratios{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ms-crop-ratios button{border:0;background:var(--surface2);color:var(--muted);font-weight:750;font-size:12px;padding:8px 12px;border-radius:10px;cursor:pointer}
+.ms-crop-ratios button.on{background:var(--accent);color:#fff}
+.ms-crop-actions{display:flex;gap:12px}
+.ms-crop-actions button{flex:1;height:50px;border:0;border-radius:14px;font-weight:800;font-size:15px;cursor:pointer}
+.ms-crop-cancel{background:var(--surface2);color:var(--text)}
+.ms-crop-apply{background:var(--accent);color:#fff}
+@media(max-width:360px){
+  .ms-reg-title{font-size:23px}
+  .ms-reg-av{width:92px;height:92px}
+  .ms-reg-inner{padding:28px 18px 0}
+  .ms-reg-foot{padding-left:18px;padding-right:18px}
+}
 </style>
 </head>
 <body>
-<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button></form></div></section>
+<div id="bootLoader" aria-live="polite">Loading…</div><section id="authScreen" class="auth-wrap hidden"><div class="auth-card"><h1>Welcome back</h1><div class="auth-sub" style="margin:6px 0 24px">Sign in with your GoChat account</div><form id="loginForm"><label class="field"><input id="email" type="email" autocomplete="username" placeholder="Email address" required></label><label class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button type="button" id="togglePassword" aria-label="Show password"><svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"/><path d="M12 3.25C7.48587 3.25 4.44529 5.9542 2.68057 8.24686L2.64874 8.2882C2.24964 8.80653 1.88206 9.28392 1.63269 9.8484C1.36564 10.4529 1.25 11.1117 1.25 12C1.25 12.8883 1.36564 13.5471 1.63269 14.1516C1.88206 14.7161 2.24964 15.1935 2.64875 15.7118L2.68057 15.7531C4.44529 18.0458 7.48587 20.75 12 20.75C16.5141 20.75 19.5547 18.0458 21.3194 15.7531L21.3512 15.7118C21.7504 15.1935 22.1179 14.7161 22.3673 14.1516C22.6344 13.5471 22.75 12.8883 22.75 12C22.75 11.1117 22.6344 10.4529 22.3673 9.8484C22.1179 9.28391 22.24964 8.80652 21.3512 8.28818L21.3194 8.24686C19.5547 5.9542 16.5141 3.25 12 3.25ZM3.86922 9.1618C5.49864 7.04492 8.15036 4.75 12 4.75C15.8496 4.75 18.5014 7.04492 20.1308 9.1618C20.5694 9.73159 20.8263 10.0721 20.9952 10.4545C21.1532 10.812 21.25 11.2489 21.25 12C21.25 12.7511 21.1532 13.188 20.9952 13.5455C20.8263 13.9279 20.5694 14.2684 20.1308 14.8382C18.5014 16.9551 15.8496 19.25 12 19.25C8.15036 19.25 5.49864 16.9551 3.86922 14.8382C3.43064 14.2684 3.17374 14.0721 3.00476 13.5455C2.84684 13.188 2.75 12.7511 2.75 12C2.75 11.2489 2.84684 10.812 3.00476 10.4545C3.17374 10.0721 3.43063 9.73159 3.86922 9.1618Z"/></g></svg><svg id="eyeClosed" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M22.2954 6.31065C22.6761 6.47382 22.8524 6.91473 22.6893 7.29545L21.9999 7.00001C22.6893 7.29545 22.6894 7.29527 22.6893 7.29545L22.6886 7.29713L22.6875 7.29961L22.6843 7.30697L22.6736 7.33105C22.6646 7.35118 22.6518 7.3794 22.6352 7.41508C22.6019 7.48643 22.5533 7.58776 22.4888 7.71416C22.3599 7.96681 22.1675 8.32069 21.9084 8.73647C21.4828 9.41951 20.8724 10.2777 20.0619 11.1302L21.0303 12.0985C21.3231 12.3914 21.3231 12.8663 21.0303 13.1592C20.7374 13.4521 20.2625 13.4521 19.9696 13.1592L18.969 12.1586C18.3093 12.7113 17.5528 13.23 16.695 13.6562L17.6286 15.091C17.8545 15.438 17.7562 15.9027 17.409 16.1286C17.0618 16.3546 16.5972 16.2562 16.3713 15.909L15.2821 14.2352C14.5028 14.4897 13.659 14.6626 12.7499 14.7246V16.5C12.7499 16.9142 12.4141 17.25 11.9999 17.25C11.5857 17.25 11.2499 16.9142 11.2499 16.5V14.7246C10.3689 14.6645 9.54909 14.5002 8.78982 14.2584L7.71575 15.9091C7.48984 16.2563 7.02526 16.3546 6.67807 16.1287C6.33089 15.9028 6.23257 15.4382 6.45847 15.091L7.37089 13.6888C6.5065 13.2667 5.74381 12.7502 5.07842 12.1983L4.11744 13.1592C3.82455 13.4521 3.34968 13.4521 3.05678 13.1592C2.76389 12.8664 2.76389 12.3915 3.05678 12.0986L3.98055 11.1748C3.15599 10.3151 2.53525 9.44656 2.10277 8.75468C1.83984 8.33404 1.6446 7.97566 1.51388 7.7197C1.44848 7.59164 1.3991 7.48895 1.36537 7.41665C1.3485 7.38048 1.33553 7.35189 1.32641 7.33149L1.31562 7.3071L1.31238 7.29966L1.31129 7.29714L1.31088 7.29619C1.14772 6.91547 1.32376 6.47382 1.70448 6.31065C2.08489 6.14762 2.52539 6.32356 2.68888 6.70363C2.68894 6.70376 2.68882 6.7035 2.68888 6.70363" clip-rule="evenodd"/></svg></button></label><div id="loginError" class="error"></div><button class="login-btn" id="loginButton" type="submit">Log in</button>
+<button type="button" class="ms-reg-login-link" id="msOpenCreateAccount">Create account</button></form></div></section>
+
+<section id="msRegScreen" aria-hidden="true">
+  <div class="ms-reg-shell">
+    <div class="ms-reg-bg" aria-hidden="true">
+      <div class="ms-reg-bg-top"></div>
+      <div class="ms-reg-bg-top2"></div>
+      <div class="ms-reg-bg-bottom"></div>
+      <div class="ms-reg-bg-bottom2"></div>
+    </div>
+    <div class="ms-reg-inner">
+      <div class="ms-reg-head">
+        <h1 class="ms-reg-title">Create Account</h1>
+        <p class="ms-reg-desc" id="msRegDesc">Enter your information to get started</p>
+      </div>
+      <div class="ms-reg-body">
+        <div class="ms-reg-step active" data-step="1" id="msRegStep1">
+          <div class="ms-reg-fields">
+            <label class="field"><input id="msRegName" type="text" autocomplete="name" placeholder="Full Name" maxlength="48"></label>
+            <div>
+              <label class="field"><input id="msRegUsername" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username" maxlength="24"></label>
+              <div class="ms-reg-hint" id="msRegUserHint"></div>
+            </div>
+            <label class="field"><input id="msRegEmail" type="email" autocomplete="email" placeholder="Enter your email address"></label>
+          </div>
+          <div class="ms-reg-error" id="msRegErr1"></div>
+        </div>
+        <div class="ms-reg-step" data-step="2" id="msRegStep2">
+          <div class="ms-reg-fields">
+            <label class="field"><input id="msRegPass" type="password" autocomplete="new-password" placeholder="Password"></label>
+            <label class="field"><input id="msRegPass2" type="password" autocomplete="new-password" placeholder="Confirm Password"></label>
+          </div>
+          <div class="ms-reg-error" id="msRegErr2"></div>
+        </div>
+        <div class="ms-reg-step" data-step="3" id="msRegStep3">
+          <div class="ms-reg-review">
+            <div class="ms-reg-av-col">
+              <img class="ms-reg-av" id="msRegAvatar" alt="Profile photo" src="">
+              <button type="button" class="ms-reg-change" id="msRegChangePhoto">Change Photo</button>
+              <input type="file" id="msRegPhotoInput" accept="image/*" hidden>
+            </div>
+            <div class="ms-reg-info">
+              <div class="ms-reg-info-row"><span>Full Name</span><strong id="msRegReviewName">—</strong></div>
+              <div class="ms-reg-info-row"><span>Username</span><strong id="msRegReviewUser">—</strong></div>
+              <div class="ms-reg-info-row"><span>Email Address</span><strong id="msRegReviewEmail">—</strong></div>
+            </div>
+          </div>
+          <div class="ms-reg-error" id="msRegErr3"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ms-reg-foot">
+      <button type="button" class="ms-reg-btn-back" id="msRegBack">Back</button>
+      <button type="button" class="ms-reg-btn-next" id="msRegNext">Next</button>
+    </div>
+  </div>
+</section>
+<div id="msRegCrop" aria-hidden="true">
+  <div class="ms-crop-card">
+    <div class="ms-crop-head">
+      <button type="button" class="ms-crop-x" id="msCropClose" aria-label="Close">×</button>
+      <h2>Crop Photo</h2>
+    </div>
+    <div class="ms-crop-stage" id="msCropStage">
+      <canvas id="msCropCanvas" width="320" height="320"></canvas>
+    </div>
+    <div class="ms-crop-foot">
+      <div class="ms-crop-ratios" id="msCropRatios">
+        <button type="button" data-ratio="1" class="on">1:1</button>
+        <button type="button" data-ratio="0.8">4:5</button>
+        <button type="button" data-ratio="0.75">3:4</button>
+        <button type="button" data-ratio="1.777">16:9</button>
+      </div>
+      <div class="ms-crop-actions">
+        <button type="button" class="ms-crop-cancel" id="msCropCancel">Cancel</button>
+        <button type="button" class="ms-crop-apply" id="msCropApply">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="mainApp" class="app-shell hidden"><header class="topbar"><div class="page-title" id="mainPageTitle">Chats</div><button type="button" class="icon-btn ms-profile-settings-btn" id="profileSettingsBtn" aria-label="Settings" hidden><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2ZM8.67773 12C8.67773 9.92893 10.3567 8.25 12.4277 8.25C14.4988 8.25 16.1777 9.92893 16.1777 12C16.1777 14.0711 14.4988 15.75 12.4277 15.75C10.3567 15.75 8.67773 14.0711 8.67773 12Z" clip-rule="evenodd"/></svg></button></header>
 <section id="chatsPage" class="main-page active"><div class="searchbar"><input id="chatSearch" placeholder="Search friends by name or username" autocomplete="off"></div><div id="searchResults" class="search-results"></div><div id="chatList"><div class="empty">Loading your chats…</div></div></section>
 <section id="activePage" class="main-page"><div class="active-wrap"><div id="activeList" class="active-grid"><div class="active-empty">Loading active people…</div></div></div></section>
@@ -1714,6 +1859,8 @@ function showAuthOnly(){
 function showAppOnly(){
   hideBoot();
   if($('authScreen')) $('authScreen').classList.add('hidden');
+  var _rs = document.getElementById('msRegScreen');
+  if(_rs){ _rs.classList.remove('open'); _rs.setAttribute('aria-hidden','true'); }
   if($('mainApp')) $('mainApp').classList.remove('hidden');
 }
 
@@ -9402,6 +9549,573 @@ window.msWatchPeerBlock = msWatchPeerBlock;
   setTimeout(wire, 0);
   setTimeout(wire, 500);
 })();
+
+
+
+/* ═══ Create Account — Shared GoChat registration ═══ */
+(function(){
+  var regStep = 1;
+  var regNavPushed = false;
+  var regCreating = false;
+  var regState = {
+    name: '', username: '', email: '', pass: '',
+    avatarUrl: '', avatarDataUri: '', usernameOk: false,
+    photoReady: false, _avatarBlob: null
+  };
+  var userCheckTimer = null;
+
+  /* crop state */
+  var cropImg = null;
+  var cropRatio = 1;
+  var cropScale = 1;
+  var cropOx = 0, cropOy = 0;
+  var cropDrag = null;
+
+  function $(id){ return document.getElementById(id); }
+
+  function normalizeUsername(raw){
+    return String(raw || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 24);
+  }
+  function normalizeNameLower(name){
+    return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+  function validateDisplayName(name){
+    var n = String(name || '').trim();
+    if(!n) return { ok:false, msg:'Name cannot be empty' };
+    try{
+      if(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(n) || /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u.test(n)){
+        return { ok:false, msg:'Name cannot contain emojis' };
+      }
+    }catch(e){}
+    if(/[@#_\-().,'"!$?%^*=+[\]{}\\\/|;:<>~`0-9]/.test(n)){
+      return { ok:false, msg:'Name contains invalid characters' };
+    }
+    if(n.length < 2) return { ok:false, msg:'Name is too short' };
+    return { ok:true, msg:'' };
+  }
+  function validEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+  }
+
+  function setDesc(step){
+    var el = $('msRegDesc');
+    if(!el) return;
+    if(step === 1) el.textContent = 'Enter your information to get started';
+    else if(step === 2) el.textContent = 'Set a secure password';
+    else el.textContent = 'Add your profile photo and review your details';
+  }
+
+  function updateFooter(){
+    var next = $('msRegNext');
+    if(!next) return;
+    if(regStep < 3){
+      next.textContent = 'Next';
+      next.disabled = false;
+      next.classList.remove('is-disabled');
+    } else {
+      next.textContent = "Let's Go";
+      if(regState.photoReady){
+        next.disabled = false;
+        next.classList.remove('is-disabled');
+      } else {
+        next.disabled = true;
+        next.classList.add('is-disabled');
+      }
+    }
+  }
+
+  function showStep(step){
+    regStep = step;
+    setDesc(step);
+    [1,2,3].forEach(function(n){
+      var el = $('msRegStep' + n);
+      if(el) el.classList.toggle('active', n === step);
+    });
+    if(step === 3){
+      if($('msRegReviewName')) $('msRegReviewName').textContent = regState.name || '—';
+      if($('msRegReviewUser')) $('msRegReviewUser').textContent = regState.username ? regState.username : '—';
+      if($('msRegReviewEmail')) $('msRegReviewEmail').textContent = regState.email || '—';
+      var av = $('msRegAvatar');
+      if(av){
+        if(regState.avatarDataUri || regState.avatarUrl){
+          av.src = regState.avatarDataUri || regState.avatarUrl;
+        } else if(typeof gcDefaultAvatarDataUri === 'function'){
+          av.src = gcDefaultAvatarDataUri();
+        }
+      }
+    }
+    updateFooter();
+    try{
+      if(regNavPushed) history.replaceState({ page:'register', step: step }, '', '#register/' + step);
+    }catch(e){}
+  }
+
+  function openRegister(){
+    var screen = $('msRegScreen');
+    if(!screen) return;
+    if($('authScreen')) $('authScreen').classList.add('hidden');
+    screen.classList.add('open');
+    screen.setAttribute('aria-hidden', 'false');
+    regCreating = false;
+    showStep(regStep || 1);
+    if(!regNavPushed){
+      regNavPushed = true;
+      try{ history.pushState({ page:'register', step: regStep || 1 }, '', '#register/' + (regStep || 1)); }catch(e){}
+    }
+  }
+
+  function closeRegister(toLogin){
+    var screen = $('msRegScreen');
+    if(screen){
+      screen.classList.remove('open');
+      screen.setAttribute('aria-hidden', 'true');
+    }
+    closeCrop();
+    if(toLogin !== false){
+      if($('authScreen')) $('authScreen').classList.remove('hidden');
+      if(typeof showAuthOnly === 'function'){
+        try{ showAuthOnly(); }catch(e){}
+      }
+    }
+    if(regNavPushed){
+      regNavPushed = false;
+      try{
+        if(String(location.hash||'').indexOf('register') >= 0){
+          history.replaceState({ page:'auth' }, '', '#auth');
+        }
+      }catch(e){}
+    }
+  }
+
+  function setErr(step, msg){
+    var el = $('msRegErr' + step);
+    if(el) el.textContent = msg || '';
+  }
+
+  function checkUsernameLive(){
+    var raw = ($('msRegUsername') && $('msRegUsername').value) || '';
+    var uname = normalizeUsername(raw);
+    var hint = $('msRegUserHint');
+    regState.usernameOk = false;
+    if(!uname || uname.length < 3){
+      if(hint){ hint.textContent = uname ? 'At least 3 characters' : ''; hint.className = 'ms-reg-hint' + (uname ? ' bad' : ''); }
+      return;
+    }
+    if(hint){ hint.textContent = 'Checking…'; hint.className = 'ms-reg-hint'; }
+    if(userCheckTimer) clearTimeout(userCheckTimer);
+    userCheckTimer = setTimeout(async function(){
+      try{
+        var doc = await db.collection('usernames').doc(uname).get();
+        if(normalizeUsername(($('msRegUsername')||{}).value) !== uname) return;
+        if(doc.exists){
+          regState.usernameOk = false;
+          if(hint){ hint.textContent = 'This username is already taken'; hint.className = 'ms-reg-hint bad'; }
+        } else {
+          regState.usernameOk = true;
+          regState.username = uname;
+          if(hint){ hint.textContent = 'Username is available'; hint.className = 'ms-reg-hint ok'; }
+        }
+      }catch(e){
+        try{
+          var snap = await db.collection('users').where('usernameLower', '==', uname).limit(1).get();
+          if(normalizeUsername(($('msRegUsername')||{}).value) !== uname) return;
+          if(!snap.empty){
+            regState.usernameOk = false;
+            if(hint){ hint.textContent = 'This username is already taken'; hint.className = 'ms-reg-hint bad'; }
+          } else {
+            regState.usernameOk = true;
+            regState.username = uname;
+            if(hint){ hint.textContent = 'Username is available'; hint.className = 'ms-reg-hint ok'; }
+          }
+        }catch(e2){
+          if(hint){ hint.textContent = 'Could not verify username'; hint.className = 'ms-reg-hint bad'; }
+        }
+      }
+    }, 400);
+  }
+
+  function validateStep1(){
+    setErr(1, '');
+    var name = (($('msRegName')||{}).value || '').trim();
+    var uname = normalizeUsername((($('msRegUsername')||{}).value || ''));
+    var email = (($('msRegEmail')||{}).value || '').trim();
+    var vn = validateDisplayName(name);
+    if(!vn.ok){ setErr(1, vn.msg); return false; }
+    if(!uname || uname.length < 3){ setErr(1, 'Choose a username (min 3 characters)'); return false; }
+    if(!regState.usernameOk || regState.username !== uname){ setErr(1, 'Please choose an available username'); return false; }
+    if(!validEmail(email)){ setErr(1, 'Enter a valid email address'); return false; }
+    regState.name = name;
+    regState.username = uname;
+    regState.email = email;
+    return true;
+  }
+
+  function validateStep2(){
+    setErr(2, '');
+    var p1 = (($('msRegPass')||{}).value || '');
+    var p2 = (($('msRegPass2')||{}).value || '');
+    if(!p1 || p1.length < 6){ setErr(2, 'Password must be at least 6 characters'); return false; }
+    if(p1 !== p2){ setErr(2, 'Passwords do not match'); return false; }
+    regState.pass = p1;
+    return true;
+  }
+
+  /* ── Crop UI ── */
+  function openCrop(file){
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function(){
+      cropImg = img;
+      cropRatio = 1;
+      cropScale = 1;
+      cropOx = 0; cropOy = 0;
+      var stage = $('msCropStage');
+      var canvas = $('msCropCanvas');
+      if(!canvas || !stage) return;
+      var maxW = Math.min(stage.clientWidth || 320, 360);
+      var maxH = Math.min(stage.clientHeight || 360, 420);
+      var side = Math.min(maxW, maxH);
+      canvas.width = side;
+      canvas.height = side;
+      // fit image cover into canvas
+      var ir = img.width / img.height;
+      if(ir > 1){ cropScale = side / img.height; }
+      else { cropScale = side / img.width; }
+      cropOx = (side - img.width * cropScale) / 2;
+      cropOy = (side - img.height * cropScale) / 2;
+      drawCrop();
+      var overlay = $('msRegCrop');
+      if(overlay){ overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); }
+      try{ history.pushState({ page:'regcrop' }, '', '#register/crop'); }catch(e){}
+    };
+    img.onerror = function(){ setErr(3, 'Could not load that image'); };
+    img.src = url;
+  }
+  function closeCrop(){
+    var overlay = $('msRegCrop');
+    if(overlay){ overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); }
+    cropImg = null;
+  }
+  function drawCrop(){
+    var canvas = $('msCropCanvas');
+    if(!canvas || !cropImg) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0,0,w,h);
+    ctx.drawImage(cropImg, cropOx, cropOy, cropImg.width * cropScale, cropImg.height * cropScale);
+    // dim outside square crop (full canvas is crop area for 1:1; for other ratios letterbox)
+    var cw = w, ch = h;
+    if(cropRatio >= 1){ ch = w / cropRatio; }
+    else { cw = h * cropRatio; }
+    var cx = (w - cw) / 2, cy = (h - ch) / 2;
+    ctx.fillStyle = 'rgba(0,0,0,.45)';
+    ctx.fillRect(0,0,w,cy);
+    ctx.fillRect(0,cy+ch,w,h-(cy+ch));
+    ctx.fillRect(0,cy,cx,ch);
+    ctx.fillRect(cx+cw,cy,w-(cx+cw),ch);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx+1, cy+1, cw-2, ch-2);
+    // grid
+    ctx.strokeStyle = 'rgba(255,255,255,.35)';
+    ctx.lineWidth = 1;
+    for(var i=1;i<3;i++){
+      ctx.beginPath();
+      ctx.moveTo(cx + cw*i/3, cy); ctx.lineTo(cx + cw*i/3, cy+ch);
+      ctx.moveTo(cx, cy + ch*i/3); ctx.lineTo(cx+cw, cy + ch*i/3);
+      ctx.stroke();
+    }
+  }
+  function applyCrop(){
+    var canvas = $('msCropCanvas');
+    if(!canvas || !cropImg) return;
+    var w = canvas.width, h = canvas.height;
+    var cw = w, ch = h;
+    if(cropRatio >= 1){ ch = w / cropRatio; }
+    else { cw = h * cropRatio; }
+    var cx = (w - cw) / 2, cy = (h - ch) / 2;
+    // map canvas crop rect back to image pixels
+    var out = document.createElement('canvas');
+    var size = 512;
+    out.width = size; out.height = Math.round(size / cropRatio);
+    if(cropRatio < 1){ out.width = Math.round(size * cropRatio); out.height = size; }
+    if(Math.abs(cropRatio - 1) < 0.02){ out.width = size; out.height = size; }
+    var octx = out.getContext('2d');
+    // source rect in image space
+    var sx = (cx - cropOx) / cropScale;
+    var sy = (cy - cropOy) / cropScale;
+    var sw = cw / cropScale;
+    var sh = ch / cropScale;
+    octx.drawImage(cropImg, sx, sy, sw, sh, 0, 0, out.width, out.height);
+    out.toBlob(function(blob){
+      if(!blob){ setErr(3, 'Could not crop photo'); return; }
+      regState._avatarBlob = blob;
+      regState.photoReady = true;
+      regState.avatarDataUri = out.toDataURL('image/jpeg', 0.92);
+      regState.avatarUrl = '';
+      var av = $('msRegAvatar');
+      if(av) av.src = regState.avatarDataUri;
+      closeCrop();
+      updateFooter();
+      setErr(3, '');
+    }, 'image/jpeg', 0.92);
+  }
+
+  function onPhotoSelected(file){
+    if(!file || !file.type || file.type.indexOf('image/') !== 0){
+      setErr(3, 'Please choose an image file');
+      return;
+    }
+    if(file.size > 10 * 1024 * 1024){
+      setErr(3, 'Photo must be 10 MB or smaller');
+      return;
+    }
+    setErr(3, '');
+    openCrop(file);
+  }
+
+  async function completeRegistration(){
+    if(regCreating) return;
+    setErr(3, '');
+    if(!validateStep1()){ showStep(1); return; }
+    if(!validateStep2()){ showStep(2); return; }
+    if(!regState.photoReady || !regState._avatarBlob){
+      setErr(3, 'Please add a profile photo to continue');
+      updateFooter();
+      return;
+    }
+
+    var btn = $('msRegNext');
+    regCreating = true;
+    if(btn){ btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Creating…'; }
+
+    try{
+      var taken = await db.collection('usernames').doc(regState.username).get();
+      if(taken.exists){
+        setErr(3, 'This username was just taken. Go back and choose another.');
+        regState.usernameOk = false;
+        showStep(1);
+        return;
+      }
+      try{
+        var ban = await db.collection('banned_emails').doc(regState.email.toLowerCase()).get();
+        if(ban.exists){
+          setErr(3, "This email can't be used to create an account.");
+          return;
+        }
+      }catch(eBan){}
+
+      var avatarUrl = '';
+      if(regState._avatarBlob && typeof uploadBlobToCloudinary === 'function'){
+        avatarUrl = await uploadBlobToCloudinary(regState._avatarBlob, 'avatar.jpg', 'image');
+        regState.avatarUrl = avatarUrl;
+      }
+      if(!avatarUrl){
+        setErr(3, 'Could not upload profile photo. Check your connection and try again.');
+        return;
+      }
+
+      var result = await auth.createUserWithEmailAndPassword(regState.email, regState.pass);
+      var user = result.user;
+      var uname = regState.username;
+      var fullName = regState.name;
+
+      var userPayload = {
+        uid: user.uid,
+        name: fullName,
+        nameLower: normalizeNameLower(fullName),
+        username: uname,
+        usernameLower: uname,
+        email: user.email || regState.email,
+        authEmail: user.email || regState.email,
+        avatar: avatarUrl,
+        coverPhoto: '',
+        bio: '',
+        location: '', hometown: '', relationship: '', gender: '',
+        friends: [], followers: [], following: [],
+        sentRequests: [], receivedRequests: [], blockedUsers: [],
+        mutedChats: [], pinnedChats: [], archivedChats: [],
+        onboardingComplete: true,
+        profileSetupComplete: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      await db.collection('users').doc(user.uid).set(userPayload, { merge: true });
+
+      try{
+        await db.collection('usernames').doc(uname).set({
+          uid: user.uid,
+          email: (user.email || regState.email).toLowerCase(),
+          username: uname,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }catch(eIdx){ console.warn('username index', eIdx); }
+
+      regNavPushed = false;
+      closeRegister(false);
+      if(typeof toast === 'function') toast('Account created');
+      try{ history.replaceState({ page:'chatsPage' }, '', '#chats'); }catch(e){}
+    }catch(err){
+      var code = (err && err.code) || '';
+      if(code === 'auth/email-already-in-use'){
+        setErr(3, 'An account with this email already exists. Try logging in.');
+      } else if(code === 'auth/weak-password'){
+        setErr(3, 'Please choose a stronger password (at least 6 characters).');
+        showStep(2);
+      } else if(code === 'auth/invalid-email'){
+        setErr(3, 'Please enter a valid email address.');
+        showStep(1);
+      } else {
+        setErr(3, (err && err.message) || "We couldn't create your account. Please try again.");
+      }
+      console.error('register', err);
+    }finally{
+      regCreating = false;
+      updateFooter();
+      if(btn && regStep === 3){ btn.textContent = "Let's Go"; }
+    }
+  }
+
+  function onBack(){
+    if(regStep > 1) showStep(regStep - 1);
+    else closeRegister(true);
+  }
+  function onNext(){
+    if(regStep === 1){ if(validateStep1()) showStep(2); }
+    else if(regStep === 2){ if(validateStep2()) showStep(3); }
+    else { completeRegistration(); }
+  }
+
+  function wireCropDrag(){
+    var canvas = $('msCropCanvas');
+    if(!canvas || canvas._cropWired) return;
+    canvas._cropWired = true;
+    function start(x,y){ cropDrag = { x:x, y:y, ox:cropOx, oy:cropOy }; }
+    function move(x,y){
+      if(!cropDrag) return;
+      cropOx = cropDrag.ox + (x - cropDrag.x);
+      cropOy = cropDrag.oy + (y - cropDrag.y);
+      drawCrop();
+    }
+    function end(){ cropDrag = null; }
+    canvas.addEventListener('mousedown', function(e){ start(e.clientX, e.clientY); });
+    window.addEventListener('mousemove', function(e){ if(cropDrag) move(e.clientX, e.clientY); });
+    window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', function(e){
+      if(e.touches[0]) start(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive:true});
+    canvas.addEventListener('touchmove', function(e){
+      if(e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive:true});
+    canvas.addEventListener('touchend', end);
+  }
+
+  function wire(){
+    var openBtn = $('msOpenCreateAccount');
+    if(openBtn && !openBtn._msReg){
+      openBtn._msReg = true;
+      openBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        regStep = 1;
+        openRegister();
+      });
+    }
+    var back = $('msRegBack');
+    if(back && !back._msReg){
+      back._msReg = true;
+      back.onclick = function(){ onBack(); };
+    }
+    var next = $('msRegNext');
+    if(next && !next._msReg){
+      next._msReg = true;
+      next.onclick = function(){
+        if(next.disabled || next.classList.contains('is-disabled')){
+          if(regStep === 3 && !regState.photoReady){
+            setErr(3, 'Please add a profile photo to continue');
+          }
+          return;
+        }
+        onNext();
+      };
+    }
+    var change = $('msRegChangePhoto');
+    var fileIn = $('msRegPhotoInput');
+    if(change && fileIn && !change._msReg){
+      change._msReg = true;
+      change.onclick = function(){ fileIn.click(); };
+      fileIn.addEventListener('change', function(){
+        var f = fileIn.files && fileIn.files[0];
+        if(f) onPhotoSelected(f);
+        fileIn.value = '';
+      });
+    }
+    var un = $('msRegUsername');
+    if(un && !un._msReg){
+      un._msReg = true;
+      un.addEventListener('input', function(){
+        var v = normalizeUsername(un.value);
+        if(un.value !== v) un.value = v;
+        checkUsernameLive();
+      });
+    }
+    // crop controls
+    var ratios = $('msCropRatios');
+    if(ratios && !ratios._msReg){
+      ratios._msReg = true;
+      ratios.addEventListener('click', function(e){
+        var b = e.target.closest('button[data-ratio]');
+        if(!b) return;
+        cropRatio = parseFloat(b.getAttribute('data-ratio')) || 1;
+        ratios.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+        drawCrop();
+      });
+    }
+    var apply = $('msCropApply');
+    if(apply && !apply._msReg){ apply._msReg = true; apply.onclick = function(){ applyCrop(); }; }
+    var cancel = $('msCropCancel');
+    if(cancel && !cancel._msReg){ cancel._msReg = true; cancel.onclick = function(){ closeCrop(); }; }
+    var cx = $('msCropClose');
+    if(cx && !cx._msReg){ cx._msReg = true; cx.onclick = function(){ closeCrop(); }; }
+    wireCropDrag();
+  }
+
+  window.addEventListener('popstate', function(){
+    var crop = $('msRegCrop');
+    if(crop && crop.classList.contains('open')){
+      closeCrop();
+      try{ history.pushState({ page:'register', step: regStep }, '', '#register/' + regStep); }catch(e){}
+      return;
+    }
+    var screen = $('msRegScreen');
+    if(!screen || !screen.classList.contains('open')) return;
+    if(regStep > 1){
+      showStep(regStep - 1);
+      regNavPushed = true;
+      try{ history.pushState({ page:'register', step: regStep }, '', '#register/' + regStep); }catch(err){}
+    } else {
+      closeRegister(true);
+    }
+  }, true);
+
+  var _showAuthOnlyOrig = null;
+  try{ _showAuthOnlyOrig = showAuthOnly; }catch(e){}
+  if(typeof _showAuthOnlyOrig === 'function'){
+    showAuthOnly = function(){
+      var screen = document.getElementById('msRegScreen');
+      if(screen){ screen.classList.remove('open'); screen.setAttribute('aria-hidden','true'); }
+      closeCrop();
+      return _showAuthOnlyOrig.apply(null, arguments);
+    };
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+  setTimeout(wire, 0);
+  setTimeout(wire, 400);
+})();
+
 
 </script>
 
