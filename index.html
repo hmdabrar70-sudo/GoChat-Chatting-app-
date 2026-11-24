@@ -1296,6 +1296,28 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 .ms-sp-dur-opt.selected .ms-sp-dur-check{border-color:#fff;background:#fff}
 .ms-sp-dur-opt .ms-sp-dur-check::after{content:"";width:8px;height:5px;border-left:2px solid transparent;border-bottom:2px solid transparent;transform:rotate(-45deg);margin-top:-2px}
 .ms-sp-dur-opt.selected .ms-sp-dur-check::after{border-left-color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Blocked users page */
+.ms-blk-page{position:fixed;inset:0;z-index:57;background:var(--bg);display:flex;flex-direction:column;max-width:520px;margin:auto;left:0;right:0;transform:translateX(100%);transition:transform .28s cubic-bezier(.22,.61,.36,1);pointer-events:none;overflow:hidden}
+.ms-blk-page.open{transform:translateX(0);pointer-events:auto}
+.ms-blk-hero{position:relative;flex:none;padding:0 16px 28px;padding-top:max(8px,env(safe-area-inset-top));background:linear-gradient(145deg,var(--accent) 0%,#0d5c42 100%);color:#fff;overflow:hidden}
+.ms-blk-hero-top{height:52px;display:flex;align-items:center;gap:8px;position:relative;z-index:2}
+.ms-blk-back{width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0}
+.ms-blk-back svg{width:22px;height:22px}
+.ms-blk-title{flex:1;text-align:center;font-weight:850;font-size:18px;letter-spacing:-.3px}
+.ms-blk-spacer{width:40px;flex:none}
+.ms-blk-hero-curve{position:absolute;left:0;right:0;bottom:-1px;height:36px;z-index:1;pointer-events:none}
+.ms-blk-hero-curve svg{display:block;width:100%;height:36px}
+.ms-blk-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(24px + env(safe-area-inset-bottom))}
+.ms-blk-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);margin-bottom:10px}
+.ms-blk-card .avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;background:var(--surface2)}
+.ms-blk-meta{flex:1;min-width:0}
+.ms-blk-meta strong{display:block;font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-blk-meta small{display:block;margin-top:3px;font-size:12px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-blk-unbtn{flex:none;border:0;border-radius:99px;padding:10px 16px;font-weight:800;font-size:13px;background:var(--accent);color:#fff;cursor:pointer}
+.ms-blk-unbtn:disabled{opacity:.55;cursor:default}
+.ms-blk-empty{text-align:center;color:var(--muted);font-size:14px;font-weight:650;padding:40px 16px}
+
 </style>
 </head>
 <body>
@@ -1585,6 +1607,12 @@ html.theme-dark .qp-sk::after{background:linear-gradient(90deg,transparent,rgba(
 	<path fill="currentColor" fill-rule="evenodd" d="M12 2.75C11.3423 2.75 10.6951 2.96164 9.08062 3.5143L8.5078 3.71037C6.99521 4.22814 5.8921 4.60605 5.11759 4.92069C4.731 5.07774 4.4509 5.20935 4.25429 5.32353C4.15722 5.3799 4.09034 5.42642 4.04567 5.46273C4.0078 5.49351 3.99336 5.51095 3.99129 5.51349C3.98936 5.51663 3.97693 5.5374 3.95943 5.58654C3.93944 5.64265 3.91729 5.72309 3.89571 5.83506C3.85204 6.06169 3.81894 6.37301 3.79608 6.79292C3.75028 7.63411 3.75 8.80833 3.75 10.4167V11.9914C3.75 17.1665 7.6199 19.7135 10.1988 20.84C10.5703 21.0023 10.7848 21.0941 11.0236 21.1552C11.2517 21.2136 11.53 21.25 12 21.25C12.47 21.25 12.7483 21.2136 12.9764 21.1552C13.2152 21.0941 13.4297 21.0023 13.8012 20.84C16.3801 19.7135 20.25 17.1665 20.25 11.9914V10.4167C20.25 8.80833 20.2497 7.63411 20.2039 6.79292C20.1811 6.37301 20.148 6.06169 20.1043 5.83506C20.0827 5.72309 20.0606 5.64265 20.0406 5.58654C20.0231 5.53737 20.0106 5.5166 20.0087 5.51348C20.0066 5.51092 19.9922 5.49349 19.9543 5.46273C19.9097 5.42642 19.8428 5.3799 19.7457 5.32353C19.5491 5.20935 19.269 5.07774 18.8824 4.92069C18.1079 4.60605 17.0048 4.22814 15.4922 3.71037L14.9194 3.5143C13.3049 2.96164 12.6577 2.75 12 2.75ZM8.72339 2.05112C10.1673 1.55658 11.0625 1.25 12 1.25C12.9375 1.25 13.8327 1.55658 15.2766 2.05112C15.319 2.06563 15.3618 2.0803 15.4052 2.09514L16.004 2.30013C17.4854 2.8072 18.6286 3.19852 19.447 3.53099C19.8592 3.69846 20.2136 3.86067 20.499 4.02641C20.7737 4.1859 21.0492 4.38484 21.2364 4.65154C21.4214 4.91516 21.5171 5.23924 21.5772 5.55122C21.6397 5.87556 21.6774 6.26464 21.7017 6.71136C21.75 7.5984 21.75 8.81361 21.75 10.3898V11.9914C21.75 18.0924 17.142 21.0175 14.4017 22.2146L14.3746 22.2264C14.0348 22.3749 13.7154 22.5144 13.3484 22.6084C12.9609 22.7076 12.5493 22.75 12 22.75C11.4507 22.75 11.0391 22.7076 10.6516 22.6084C10.2846 22.5144 9.96523 22.3749 9.62543 22.2264L9.59833 22.2146C6.85803 21.0175 2.25 18.0924 2.25 11.9914V10.3899C2.25 8.81365 2.25 7.59841 2.2983 6.71136C2.32262 6.26464 2.36031 5.87556 2.42281 5.55122C2.48293 5.23924 2.5786 4.91516 2.76363 4.65154C2.95082 4.38484 3.22634 4.1859 3.50098 4.02641C3.78637 3.86067 4.14078 3.69846 4.55303 3.53099C5.3714 3.19852 6.51462 2.8072 7.99595 2.30014L8.59483 2.09514C8.63817 2.0803 8.68101 2.06563 8.72339 2.05112Z" clip-rule="evenodd" />
 </svg></span>
         <span class="setting-copy"><strong>Privacy</strong><small>Media and shared content controls</small></span>
+        <span class="chevron">›</span>
+      </button>
+
+      <button class="setting" id="blockedButton" type="button">
+        <span class="setting-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M12 2.75C6.89137 2.75 2.75 6.89137 2.75 12C2.75 17.1086 6.89137 21.25 12 21.25C17.1086 21.25 21.25 17.1086 21.25 12C21.25 6.89137 17.1086 2.75 12 2.75ZM1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 17.9371 17.9371 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12ZM7.43056 7.43056C7.72345 7.13767 8.19833 7.13767 8.49122 7.43056L16.5694 15.5088C16.8623 15.8017 16.8623 16.2766 16.5694 16.5694C16.2766 16.8623 15.8017 16.8623 15.5088 16.5694L7.43056 8.49122C7.13767 8.19833 7.13767 7.72345 7.43056 7.43056Z" clip-rule="evenodd"/></svg></span>
+        <span class="setting-copy"><strong>Blocked</strong><small>Manage accounts you blocked</small></span>
         <span class="chevron">›</span>
       </button>
 <button class="setting" id="themeButton" type="button">
@@ -10242,6 +10270,186 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 })();
 
 
+
+
+/* ═══ Blocked Users Page ═══ */
+(function(){
+  var blkNavPushed = false;
+  var blkLoading = false;
+  var unblocking = {};
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function avatarUrl(u){
+    if(u && u.avatar) return u.avatar;
+    if(typeof gcDefaultAvatarDataUri === 'function') return gcDefaultAvatarDataUri((u && u.name) || 'User');
+    return '';
+  }
+
+  function openBlockedPage(){
+    var page = $('msBlockedPage');
+    if(!page) return;
+    page.classList.add('open');
+    page.setAttribute('aria-hidden','false');
+    try{
+      if(!blkNavPushed){
+        history.pushState({ page:'blocked' }, '', '#blocked');
+        blkNavPushed = true;
+      }
+    }catch(e){}
+    loadBlockedList();
+  }
+  function closeBlockedPage(fromPop){
+    var page = $('msBlockedPage');
+    if(page){
+      page.classList.remove('open');
+      page.setAttribute('aria-hidden','true');
+    }
+    if(!fromPop && blkNavPushed){
+      blkNavPushed = false;
+      try{ history.back(); }catch(e){}
+    } else {
+      blkNavPushed = false;
+    }
+  }
+
+  async function loadBlockedList(){
+    var list = $('msBlockedList');
+    if(!list || blkLoading) return;
+    var blocked = [];
+    try{
+      if(typeof userData !== 'undefined' && userData && Array.isArray(userData.blockedUsers)){
+        blocked = userData.blockedUsers.slice();
+      }
+    }catch(e){}
+    if(!blocked.length){
+      list.innerHTML = '<div class="ms-blk-empty">No blocked users</div>';
+      return;
+    }
+    blkLoading = true;
+    list.innerHTML = '<div class="ms-blk-empty">Loading…</div>';
+    try{
+      var snaps = await Promise.all(blocked.map(function(uid){
+        return db.collection('users').doc(uid).get().catch(function(){ return null; });
+      }));
+      var html = '';
+      snaps.forEach(function(snap, i){
+        var uid = blocked[i];
+        var d = (snap && snap.exists) ? (snap.data() || {}) : {};
+        var name = d.name || 'User';
+        var uname = d.username ? ('@' + d.username) : '';
+        var av = d.avatar || '';
+        if(!av && typeof gcDefaultAvatarDataUri === 'function') av = gcDefaultAvatarDataUri(name);
+        html += '<div class="ms-blk-card" data-uid="'+esc(uid)+'">'
+          + '<img class="avatar" src="'+esc(av)+'" alt="">'
+          + '<div class="ms-blk-meta"><strong>'+esc(name)+'</strong><small>'+esc(uname)+'</small></div>'
+          + '<button type="button" class="ms-blk-unbtn" data-uid="'+esc(uid)+'">Unblock</button>'
+          + '</div>';
+      });
+      list.innerHTML = html || '<div class="ms-blk-empty">No blocked users</div>';
+    }catch(err){
+      console.error(err);
+      list.innerHTML = '<div class="ms-blk-empty">Could not load blocked users</div>';
+    }finally{
+      blkLoading = false;
+    }
+  }
+
+  async function unblockUser(uid, btn){
+    if(!uid || !user || unblocking[uid]) return;
+    unblocking[uid] = true;
+    if(btn){ btn.disabled = true; btn.textContent = '…'; }
+    try{
+      var upd = { blockedUsers: firebase.firestore.FieldValue.arrayRemove(uid) };
+      upd['blockMeta.' + uid] = firebase.firestore.FieldValue.delete();
+      await db.collection('users').doc(user.uid).update(upd);
+      try{
+        if(userData && Array.isArray(userData.blockedUsers)){
+          userData.blockedUsers = userData.blockedUsers.filter(function(id){ return id !== uid; });
+        }
+        if(userData && userData.blockMeta) delete userData.blockMeta[uid];
+      }catch(e){}
+      // refresh local chat lock if viewing that user
+      try{
+        if(typeof applyComposerLock === 'function') applyComposerLock();
+        if(typeof refreshBlockBanner === 'function') refreshBlockBanner();
+        if(typeof updateBlockUI === 'function') updateBlockUI();
+      }catch(e){}
+      if(typeof toast === 'function') toast('User unblocked');
+      var card = document.querySelector('.ms-blk-card[data-uid="'+uid+'"]');
+      if(card) card.remove();
+      var list = $('msBlockedList');
+      if(list && !list.querySelector('.ms-blk-card')){
+        list.innerHTML = '<div class="ms-blk-empty">No blocked users</div>';
+      }
+    }catch(err){
+      console.error(err);
+      if(typeof toast === 'function') toast('Could not unblock');
+      if(btn){ btn.disabled = false; btn.textContent = 'Unblock'; }
+    }finally{
+      delete unblocking[uid];
+    }
+  }
+
+  function wireBlocked(){
+    var btn = $('blockedButton');
+    if(btn && !btn._blkWired){
+      btn._blkWired = true;
+      btn.addEventListener('click', function(){ openBlockedPage(); });
+    }
+    var back = $('msBlockedBack');
+    if(back && !back._blkWired){
+      back._blkWired = true;
+      back.addEventListener('click', function(){ closeBlockedPage(false); });
+    }
+    var list = $('msBlockedList');
+    if(list && !list._blkWired){
+      list._blkWired = true;
+      list.addEventListener('click', function(e){
+        var b = e.target.closest('.ms-blk-unbtn');
+        if(!b) return;
+        var uid = b.getAttribute('data-uid');
+        if(uid) unblockUser(uid, b);
+      });
+    }
+  }
+
+  window.addEventListener('popstate', function(){
+    var page = $('msBlockedPage');
+    if(page && page.classList.contains('open')){
+      closeBlockedPage(true);
+    }
+  });
+
+  // Refresh list when userData blockedUsers changes (reuse existing user doc listener if present)
+  try{
+    var _prevBlocked = null;
+    setInterval(function(){
+      try{
+        if(typeof userData === 'undefined' || !userData) return;
+        var cur = (userData.blockedUsers || []).join(',');
+        if(_prevBlocked === null){ _prevBlocked = cur; return; }
+        if(cur !== _prevBlocked){
+          _prevBlocked = cur;
+          var page = $('msBlockedPage');
+          if(page && page.classList.contains('open')) loadBlockedList();
+        }
+      }catch(e){}
+    }, 1500);
+  }catch(e){}
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireBlocked);
+  else wireBlocked();
+  setTimeout(wireBlocked, 0);
+  setTimeout(wireBlocked, 400);
+
+  window.msOpenBlockedPage = openBlockedPage;
+  window.msCloseBlockedPage = closeBlockedPage;
+  window.msLoadBlockedList = loadBlockedList;
+})();
+
 </script>
 
 <div id="msDelConfirm" class="ms-del-backdrop" aria-hidden="true">
@@ -10275,6 +10483,23 @@ window.msWatchPeerBlock = msWatchPeerBlock;
 <div id="msPinCtx" class="ms-pin-ctx" role="menu" aria-hidden="true">
   <button type="button" id="msPinCtxUnpin"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>Unpin</button>
 </div>
+
+<div id="msBlockedPage" class="ms-blk-page" aria-hidden="true">
+  <div class="ms-blk-hero">
+    <div class="ms-blk-hero-top">
+      <button type="button" class="ms-blk-back" id="msBlockedBack" aria-label="Back"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path fill="currentColor" fill-rule="evenodd" d="M15.4881 4.43056C15.8026 4.70012 15.839 5.1736 15.5694 5.48809L9.98781 12L15.5694 18.5119C15.839 18.8264 15.8026 19.2999 15.4881 19.5694C15.1736 19.839 14.7001 19.8026 14.4306 19.4881L8.43056 12.4881C8.18981 12.2072 8.18981 11.7928 8.43056 11.5119L14.4306 4.5119C14.7001 4.19741 15.1736 4.16099 15.4881 4.43056Z" clip-rule="evenodd"/></svg></button>
+      <div class="ms-blk-title">Blocked</div>
+      <span class="ms-blk-spacer" aria-hidden="true"></span>
+    </div>
+    <div class="ms-blk-hero-curve" aria-hidden="true">
+      <svg viewBox="0 0 400 36" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C120,36 280,36 400,0 L400,36 L0,36 Z" fill="var(--bg)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="ms-blk-body" id="msBlockedList"></div>
+</div>
+
 <div id="msChatOptSheet" class="ms-opt-backdrop" aria-hidden="true">
   <div class="ms-opt-sheet" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="ms-opt-handle" aria-hidden="true"></div>
