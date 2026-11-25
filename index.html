@@ -1851,25 +1851,87 @@ id="msInAppHost" aria-live="polite"></div>
 const firebaseConfig={apiKey:"AIzaSyAnKueAHG8cw6O-Hy8U9fgGzH4fDMYQBy8",authDomain:"gochat-3efa3.firebaseapp.com",projectId:"gochat-3efa3",storageBucket:"gochat-3efa3.firebasestorage.app",messagingSenderId:"203332487017",appId:"1:203332487017:web:06af0b8b4b12af89581ff8"};
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
 try{auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);}catch(e){}
-db.settings({experimentalForceLongPolling:true});
-try{ db.enablePersistence({synchronizeTabs:true}).catch(function(){}); }catch(e){}
+// WebView-friendly Firestore networking + offline cache
+try{
+  db.settings({
+    experimentalForceLongPolling: true,
+    merge: true
+  });
+}catch(e){
+  try{ db.settings({ experimentalForceLongPolling: true }); }catch(e2){}
+}
+// Local IndexedDB cache so chats/messages remain readable offline inside WebView
+try{
+  db.enablePersistence({ synchronizeTabs: true })
+    .then(function(){ try{ window.__msPersistence = 'on'; }catch(e){} })
+    .catch(function(err){
+      // Failed multi-tab → retry single-tab (common in WebView)
+      try{
+        db.enablePersistence({ synchronizeTabs: false })
+          .then(function(){ try{ window.__msPersistence = 'single'; }catch(e){} })
+          .catch(function(){ try{ window.__msPersistence = 'off'; }catch(e){} });
+      }catch(e3){}
+    });
+}catch(e){}
 
 let user=null,userData={},authReady=false,typingUnsub=null,typingMap={},myTypingTimer=null,seenMsgIds=new Set(),mediaOpen=false,mediaCurrentUrl="",mediaCurrentKind="image",chatMap=new Map(),chatReturnPage='chatsPage',usersCache=new Map(),listUnsubs=[],msgUnsub=null,otherStatusUnsub=null,currentChat=null,currentOther=null,replyTarget=null,mediaRecorder=null,voiceChunks=[],voiceStream=null,voiceState='idle',presenceTimer=null;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
 
-/* ═══ Offline view-only mode + network toast ═══ */
+/* ═══ Offline view-only mode + network toast (WebView-safe) ═══
+   navigator.onLine alone is unreliable inside Android WebView.
+   We combine: browser events + active HTTP probe + Firebase failures + optional native bridge.
+*/
 (function(){
-  var lastOnline = (navigator.onLine !== false);
   var hideTimer = null;
+  var probeTimer = null;
+  var lastPaintedOnline = null; // null until first paint
+  var probing = false;
 
-  function netOnline(){ return navigator.onLine !== false; }
+  // Signal layers (true = online, false = offline, null = unknown)
+  var browserOnline = (typeof navigator !== 'undefined' && navigator.onLine !== false);
+  var probeOnline = null;
+  var firebaseOnline = null;
+  var nativeOnline = null; // set by Android/iOS bridge if available
+
+  function computeOnline(){
+    // Explicit native bridge wins when provided
+    if(nativeOnline === true) return true;
+    if(nativeOnline === false) return false;
+    // Hard offline from browser
+    if(browserOnline === false) return false;
+    // Probe result is most reliable in WebView
+    if(probeOnline === false) return false;
+    if(probeOnline === true) return true;
+    // Firebase signal
+    if(firebaseOnline === false) return false;
+    if(firebaseOnline === true) return true;
+    // Fallback to browser flag
+    return browserOnline !== false;
+  }
+
+  function netOnline(){ return computeOnline(); }
   window.msIsNetworkOnline = netOnline;
 
   window.msRequireOnline = function(actionLabel){
     if(netOnline()) return true;
     try{ toast("You're offline. " + (actionLabel || 'This action') + " needs internet."); }catch(e){}
+    // Kick a probe so UI recovers quickly when network returns
+    try{ scheduleProbe(400); }catch(e){}
     return false;
+  };
+
+  // Optional native WebView bridge:
+  // Android: webView.evaluateJavascript / addJavascriptInterface → MSNative.setOnline(true|false)
+  // Or call: window.msSetNativeOnline(true|false)
+  window.msSetNativeOnline = function(v){
+    if(v === true || v === false){
+      nativeOnline = v;
+      paintOffline(true);
+    } else if(v == null){
+      nativeOnline = null;
+      paintOffline(false);
+    }
   };
 
   function showNetToast(text){
@@ -1888,37 +1950,168 @@ function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clea
     try{ document.body.classList.toggle('ms-offline', !on); }catch(e){}
     try{
       var input = document.getElementById('messageInput');
-      if(input){ input.disabled = !on; input.placeholder = on ? 'Message…' : 'Offline — viewing only'; }
+      if(input){
+        input.disabled = !on;
+        input.placeholder = on ? 'Message…' : 'Offline — viewing only';
+      }
       ['mediaButton','voiceButton','sendButton','emojiButton'].forEach(function(id){
         var el = document.getElementById(id);
         if(el){ el.disabled = !on; el.setAttribute('aria-disabled', on ? 'false' : 'true'); }
       });
     }catch(e){}
-    if(showToast){
+
+    if(showToast && lastPaintedOnline !== null && lastPaintedOnline !== on){
       if(!on) showNetToast('No internet');
       else showNetToast('Back online');
     }
-    lastOnline = on;
+    lastPaintedOnline = on;
   }
 
   window.msPaintOffline = function(){ paintOffline(false); };
 
+  // Mark network failure from Firebase / fetch callers
+  window.msReportNetworkError = function(err){
+    try{
+      var code = (err && (err.code || err.name || '')) + '';
+      var msg = (err && (err.message || '')) + '';
+      var offlineLike =
+        code.indexOf('unavailable') !== -1 ||
+        code.indexOf('network') !== -1 ||
+        code === 'auth/network-request-failed' ||
+        /offline|network|Failed to fetch|NETWORK_ERROR|timeout/i.test(msg);
+      if(offlineLike){
+        firebaseOnline = false;
+        probeOnline = false;
+        paintOffline(true);
+        scheduleProbe(2500);
+      }
+    }catch(e){}
+  };
+
+  window.msReportNetworkOk = function(){
+    if(firebaseOnline === false || probeOnline === false){
+      firebaseOnline = true;
+      if(probeOnline !== true) probeOnline = true;
+      paintOffline(true);
+    } else {
+      firebaseOnline = true;
+    }
+  };
+
+  function probeOnce(){
+    if(probing) return;
+    probing = true;
+    var done = false;
+    var finish = function(ok){
+      if(done) return;
+      done = true;
+      probing = false;
+      var prev = computeOnline();
+      probeOnline = !!ok;
+      if(ok) firebaseOnline = true;
+      var now = computeOnline();
+      // Only toast when the computed status actually flips
+      paintOffline(prev !== now);
+    };
+
+    // Prefer a lightweight no-cors / generate_204 style probe (works in WebView)
+    var urls = [
+      'https://www.gstatic.com/generate_204',
+      'https://firestore.googleapis.com/generate_204',
+      'https://www.google.com/generate_204'
+    ];
+    var url = urls[Math.floor(Math.random() * urls.length)] + '?t=' + Date.now();
+
+    var ctrl = null;
+    var timer = setTimeout(function(){ finish(false); }, 4500);
+
+    try{
+      if(typeof AbortController !== 'undefined'){
+        ctrl = new AbortController();
+        setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 4000);
+      }
+      fetch(url, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function(){
+        clearTimeout(timer);
+        // no-cors opaque response still means we reached the network
+        finish(true);
+      }).catch(function(){
+        clearTimeout(timer);
+        // Fallback: try a second endpoint once
+        var url2 = 'https://www.cloudflare.com/cdn-cgi/trace?t=' + Date.now();
+        var t2 = setTimeout(function(){ finish(false); }, 3500);
+        fetch(url2, { method:'GET', mode:'no-cors', cache:'no-store', credentials:'omit' })
+          .then(function(){ clearTimeout(t2); finish(true); })
+          .catch(function(){ clearTimeout(t2); finish(false); });
+      });
+    }catch(e){
+      clearTimeout(timer);
+      finish(browserOnline !== false);
+    }
+  }
+
+  function scheduleProbe(delay){
+    if(probeTimer) clearTimeout(probeTimer);
+    probeTimer = setTimeout(function(){
+      probeTimer = null;
+      probeOnce();
+    }, typeof delay === 'number' ? delay : 0);
+  }
+
+  // Browser events (may not fire in some WebViews, but cheap to keep)
   window.addEventListener('online', function(){
-    if(lastOnline === false) paintOffline(true);
-    else paintOffline(false);
+    browserOnline = true;
+    scheduleProbe(200);
+    paintOffline(false);
   });
   window.addEventListener('offline', function(){
-    if(lastOnline === true) paintOffline(true);
-    else paintOffline(false);
+    browserOnline = false;
+    probeOnline = false;
+    paintOffline(true);
   });
 
+  // Visibility / focus — re-check when user returns to the WebView
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') scheduleProbe(300);
+  });
+  window.addEventListener('focus', function(){ scheduleProbe(300); });
+
+  // Periodic probe — critical for WebView where online/offline events are missing
+  setInterval(function(){
+    try{
+      browserOnline = (typeof navigator !== 'undefined' && navigator.onLine !== false);
+    }catch(e){}
+    probeOnce();
+  }, 12000);
+
+  // Hook Firebase write failures if firebase is present
+  function hookFirebase(){
+    try{
+      if(typeof firebase === 'undefined' || !firebase.firestore) return;
+      // Wrap enableNetwork/disableNetwork is not required; rely on error reporting from callers
+    }catch(e){}
+  }
+
   function boot(){
-    lastOnline = netOnline();
-    paintOffline(false); // no toast on first load
+    try{ browserOnline = (typeof navigator !== 'undefined' && navigator.onLine !== false); }catch(e){}
+    // Check native bridge flags if host set them before load
+    try{
+      if(typeof window.MS_NATIVE_ONLINE === 'boolean'){
+        nativeOnline = window.MS_NATIVE_ONLINE;
+      }
+    }catch(e){}
+    paintOffline(false);
+    scheduleProbe(500);
+    hookFirebase();
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
-  setTimeout(boot, 300);
+  setTimeout(boot, 400);
 })();
 
 /* ═══ Unified Navigation Stack (msNav) ═══
@@ -2933,8 +3126,12 @@ function listenMessages(cid){
   }
   // Fast first paint via get(), then live updates
   q.get().then(function(snap){ if(!painted) paint(snap); }).catch(function(){});
-  msgUnsub = q.onSnapshot(function(s){ paint(s); }, function(err){
+  msgUnsub = q.onSnapshot(function(s){
+    paint(s);
+    try{ if(typeof msReportNetworkOk === 'function') msReportNetworkOk(); }catch(e){}
+  }, function(err){
     console.warn('messages listen', err);
+    try{ if(typeof msReportNetworkError === 'function') msReportNetworkError(err); }catch(e){}
     if(box && currentChat===cid && !painted) box.innerHTML = '<div class="empty">Could not load messages.</div>';
   });
 }
@@ -3146,6 +3343,7 @@ async function sendPayload(payload){
     await db.collection('chats').doc(activeCid).collection('messages').add(out);
   }catch(err){
     console.error('message add failed', activeCid, err);
+    try{ if(typeof msReportNetworkError === 'function') msReportNetworkError(err); }catch(e){}
     throw err;
   }
 
